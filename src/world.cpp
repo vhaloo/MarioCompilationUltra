@@ -38,7 +38,7 @@ Scene World::inspect(const Core &c) const {
         s.playerY = word(r, 0x96);
         s.stage = word(r, 0x65) | int(r[0x67]) << 16;
         s.vertical = (r[0x5b] & 1) != 0;
-        int screens = std::clamp(int(r[0x5d]) + 1, 1, 32);
+        int screens = std::clamp(int(r[0x5d]), 1, 32);
         s.width = s.vertical ? 512 : screens * 256;
         s.height = s.vertical ? screens * 256 : 432;
         s.fullMap = true;
@@ -253,7 +253,8 @@ void World::prepareGraphics(const Core &c, const Scene &s) {
         return;
     blockPixels.resize(512);
     auto &r = v.ram;
-    size_t bank = c.cart.family == Family::AllStarsWorld ? 0x4d : 0x0d;
+    // The supported US compilation relocates World's Map16 bank by 0x30.
+    size_t bank = c.cart.family == Family::AllStarsWorld ? 0x3d : 0x0d;
     for (int id = 0; id < 512; id++) {
         int ptr = word(r, 0xfbe + id * 2);
         size_t p = bank * 0x8000 + (ptr & 0x7fff);
