@@ -253,8 +253,8 @@ void World::prepareGraphics(const Core &c, const Scene &s) {
         return;
     blockPixels.resize(512);
     auto &r = v.ram;
-    // The supported US compilation relocates World's Map16 bank by 0x30.
-    size_t bank = c.cart.family == Family::AllStarsWorld ? 0x3d : 0x0d;
+    // The supported US compilation stores World's tile definitions in bank 0x2c.
+    size_t bank = c.cart.family == Family::AllStarsWorld ? 0x2c : 0x0d;
     for (int id = 0; id < 512; id++) {
         int ptr = word(r, 0xfbe + id * 2);
         size_t p = bank * 0x8000 + (ptr & 0x7fff);
