@@ -27,7 +27,8 @@ int run(const std::vector<std::string> &args) {
                 << "\n--import FILE_OR_FOLDER --game "
                    "smb1|smb2|smb3|world|yoshi|lostlevels\n--data-dir FOLDER --size WIDTHxHEIGHT "
                    "--headless --software --frames COUNT\n--script FILE --capture BMP --report "
-                   "JSON --dump RAMFILE --menu --no-resume --benchmark\n";
+                   "JSON --dump RAMFILE --menu --no-resume --benchmark\n"
+                   "--locale en|fr|es|ja|de|it|pt|ru|zh|ko\n";
             return 0;
         } else if (a == "--data-dir")
             data = fs::u8path(value());
@@ -35,7 +36,11 @@ int run(const std::vector<std::string> &args) {
             o.importPath = value();
         else if (a == "--game")
             o.game = value();
-        else if (a == "--size") {
+        else if (a == "--locale") {
+            o.locale = value();
+            if (localeIndex(o.locale) < 0)
+                throw std::runtime_error("Unsupported interface locale");
+        } else if (a == "--size") {
             auto s = value();
             auto p = s.find('x');
             if (p == std::string::npos)

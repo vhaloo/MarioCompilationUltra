@@ -29,3 +29,12 @@ the US four-character adventure requested for the main collection.
 
 Imports store local file paths in the app's private settings. They do not copy
 ROM bytes into a public folder, modify originals, or upload cartridge content.
+
+## Default local cartridge folder
+
+The picker opens the exact SDL application data folder. Compatible files placed
+directly in that folder are imported on startup; this scan is nonrecursive and
+does not search other drives. Missing local files are shown as requiring import.
+An existing, available standalone World selection is preserved when importing
+All-Stars + World. Moving a cartridge requires selecting its new local path.
+See the translated guides for each operating system's default folder.

@@ -1,4 +1,5 @@
 #include "settings.h"
+#include "localization.h"
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
@@ -11,7 +12,7 @@ void Settings::clamp() {
     blur = std::clamp(blur, 0, 48);
     brightness = std::clamp(brightness, 10, 100);
     scanlines = std::clamp(scanlines, 0, 80);
-    language = std::clamp(language, 0, 1);
+    language = std::clamp(language, 0, LocaleCount - 1);
     volume = std::clamp(volume, 0, 100);
     quality = std::clamp(quality, 0, 2);
     uiScale = std::clamp(uiScale, 75, 175);

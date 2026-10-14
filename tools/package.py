@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse, subprocess, shutil, zipfile, hashlib, json, plistlib, os
 from audit_public import audit_archive
 ROOT=Path(__file__).resolve().parents[1]
-VERSION='0.1.0'
+VERSION='0.2.0'
 def pack(folder,out):
     with zipfile.ZipFile(out,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
         for p in sorted(folder.rglob('*')):
@@ -28,10 +28,16 @@ def main():
             lib=line.strip().split(' (')[0]
             if 'SDL2' in lib:subprocess.run(['install_name_tool','-change',lib,'@executable_path/../Frameworks/'+Path(lib).name,str(exe)],check=True)
         for p in frameworks.iterdir():subprocess.run(['codesign','--force','--sign','-',str(p)],check=True)
-        plist=dict(CFBundleName='Mario Compilation Ultra',CFBundleDisplayName='Mario Compilation Ultra',CFBundleExecutable='MarioCompilationUltra',CFBundleIdentifier='com.vhaloo.mariocompilationultra',CFBundleVersion=VERSION,CFBundleShortVersionString=VERSION,CFBundlePackageType='APPL',NSHighResolutionCapable=True)
+        resources=app/'Contents/Resources';resources.mkdir(parents=True);shutil.copy2(ROOT/'assets/icon.icns',resources/'icon.icns')
+        shutil.move(str(folder/'docs'),mac/'docs')
+        for filename in ['README.md','LICENSE','THIRD_PARTY_NOTICES.md']:shutil.copy2(ROOT/filename,mac/filename)
+        shutil.copytree(folder/'licenses',mac/'licenses')
+        plist=dict(CFBundleName='Mario Compilation Ultra',CFBundleDisplayName='Mario Compilation Ultra',CFBundleExecutable='MarioCompilationUltra',CFBundleIdentifier='com.vhaloo.mariocompilationultra',CFBundleVersion=VERSION,CFBundleShortVersionString=VERSION,CFBundlePackageType='APPL',CFBundleIconFile='icon.icns',CFBundleLocalizations=['en','fr','es','ja','de','it','pt','ru','zh-Hans','ko'],NSHighResolutionCapable=True)
         (app/'Contents/Info.plist').write_bytes(plistlib.dumps(plist));subprocess.run(['codesign','--force','--deep','--sign','-',str(app)],check=True)
     for filename in ['README.md','LICENSE','THIRD_PARTY_NOTICES.md']:shutil.copy2(ROOT/filename,folder/filename)
     shutil.copytree(ROOT/'docs',folder/'docs',dirs_exist_ok=True)
+    if a.platform=='windows':shutil.copy2(ROOT/'Install-Windows.ps1',folder/'Install-Windows.ps1')
+    if a.platform=='linux':shutil.copy2(ROOT/'Install-Linux.sh',folder/'Install-Linux.sh');(folder/'Install-Linux.sh').chmod(0o755)
     artifacts=[];archive=a.out/(name+'.zip');pack(folder,archive);artifacts.append(archive)
     if a.source:
         source=a.out/f'MarioCompilationUltra-{VERSION}-source.zip'

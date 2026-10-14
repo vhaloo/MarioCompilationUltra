@@ -36,6 +36,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Documentation and localization dependencies
+        run: python -m pip install -r tools/requirements.txt
+      - name: Validate translations and bundled glyphs
+        run: |
+          python tools/localization.py --check
+          python tools/build_font.py --check
+          python tools/guides.py --check
+          python tools/audit_docs.py
       - name: Linux dependencies
         if: runner.os == 'Linux'
         run: |
@@ -71,7 +79,7 @@ jobs:
       - name: Package
         run: python tools/package.py --build build --platform ${{ matrix.platform }} --arch ${{ matrix.arch }} --out dist --source
       - name: Test installed portable executable
-        run: python tools/validate_package.py --folder dist/MarioCompilationUltra-0.1.0-${{ matrix.platform }}-${{ matrix.arch }} --platform ${{ matrix.platform }}
+        run: python tools/validate_package.py --folder dist/MarioCompilationUltra-0.2.0-${{ matrix.platform }}-${{ matrix.arch }} --platform ${{ matrix.platform }}
       - name: Upload
         uses: actions/upload-artifact@v4
         with:

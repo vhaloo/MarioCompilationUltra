@@ -7,13 +7,17 @@
 | SDL2 2.32.10 | [libsdl-org/SDL](https://github.com/libsdl-org/SDL), pinned source archive | zlib; `licenses/SDL2.txt` |
 | Dear ImGui 1.91.9b | [ocornut/imgui](https://github.com/ocornut/imgui) | MIT; `licenses/ImGui.txt` |
 | zlib 1.3.1 | [madler/zlib](https://github.com/madler/zlib) | zlib; `licenses/zlib.txt` |
-| Interface.ttf, Noto Sans JP subset | Reused licensed font subset from the user's Sonic host interface; original Noto font project | SIL Open Font License 1.1; `assets/OFL-NotoSansJP.txt` |
+| Interface.otf, MCU Interface subset of Noto Sans CJK JP | [notofonts/noto-cjk](https://github.com/notofonts/noto-cjk), `f8d157532fbfaeda587e826d4cd5b21a49186f7c` | SIL Open Font License 1.1; renamed modified subset; `assets/OFL-MCUInterface.txt` |
 
 The read-only `src/observer.cpp` bridge is original project code. Vendored core
 source is unmodified. Snes9x component headers retain their own author notices
 and permitted exceptions. The source archive includes all used dependencies;
 SDL2's archive has SHA-256
 `5f5993c530f084535c65a6879e9b26ad441169b3e25d789d83287040a9ca5165`.
+
+The ten-language font is reproducible with `tools/build_font.py`. Its upstream
+SHA-256 is `68a3fc98800b2a27b371f2fb79991daf3633bd89309d4ffaa6946fd587f375b5`.
+FontTools is a build-time utility; it is not required by the application.
 
 Names of compatible games are Nintendo trademarks. No game asset licence is
 granted by this project, and no Nintendo game-data pack is distributed.

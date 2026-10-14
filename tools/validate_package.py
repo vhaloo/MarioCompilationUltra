@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import subprocess
 import tempfile
+import shutil
 
 
 def main():
@@ -33,7 +34,12 @@ def main():
         assert report['loaded'] is False, report
         assert report['menu_tab'] == 0, report
         assert report['drawable_width'] == 640 and report['drawable_height'] == 360, report
-        assert (executable.parent / 'assets/Interface.ttf').is_file()
+        assert (executable.parent / 'assets/Interface.otf').is_file()
+        assert report['missing_localized_glyphs'] == 0 and report['available_games'] == 0
+        for code in ['en','fr','es','ja','de','it','pt','ru','zh','ko']:
+            assert (executable.parent / f'assets/locales/{code}.json').is_file()
+            assert (executable.parent / f'docs/{code}/guide.html').is_file()
+            assert (executable.parent / f'docs/{code}/screenshots/0.png').is_file()
         # A bad path must report failure without opening a blocking GUI dialog.
         missing = subprocess.run(
             [str(executable), '--headless', '--software', '--frames', '1',
@@ -41,6 +47,24 @@ def main():
             cwd=data, env=environment, capture_output=True, text=True, timeout=15,
         )
         assert missing.returncode == 1 and missing.stderr.strip(), missing
+        # A Unicode installation path must still load the bundled CJK font and catalog.
+        moved = data / '日本語 Русский'
+        if args.platform == 'macos':
+            moved = moved.with_suffix('.app')
+            shutil.copytree(folder / 'MarioCompilationUltra.app', moved)
+            unicode_executable = moved / 'Contents/MacOS' / executable.name
+        else:
+            shutil.copytree(executable.parent, moved)
+            unicode_executable = moved / executable.name
+        relocated = subprocess.run(
+            [str(unicode_executable), '--headless', '--software', '--menu', '--frames', '4',
+             '--locale', 'ja', '--data-dir', str(data / 'unicode-user'), '--report', str(data / 'unicode.json')],
+            cwd=data, env=environment, capture_output=True, text=True, timeout=60,
+        )
+        if relocated.returncode:
+            raise RuntimeError(relocated.stdout + relocated.stderr)
+        unicode_report = json.loads((data / 'unicode.json').read_text(encoding='utf8'))
+        assert unicode_report['locale'] == 'ja' and unicode_report['missing_localized_glyphs'] == 0
     print(f'Portable {args.platform} executable launched from a separate working directory')
 
 

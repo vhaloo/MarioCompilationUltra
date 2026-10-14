@@ -58,6 +58,17 @@ int main() {
             a.settings.language = 1;
             step();
             check(ImGui::GetDrawData()->TotalVtxCount > 100, "French interface renders");
+            check(a.missingLocalizedGlyphs() == 0,
+                  "Every localized character has a real font glyph");
+            for (int language = 0; language < LocaleCount; ++language) {
+                a.settings.language = language;
+                a.scriptCommand("tab", "4");
+                step();
+                check(ImGui::GetDrawData()->TotalVtxCount > 100 &&
+                          localeIndex(locale(language).code) == language,
+                      "Localized controls and language selector render");
+            }
+            a.settings.language = 9;
             a.scriptCommand("tab", "0");
             step();
             std::vector<uint8_t> rom(32768, 0xea);
@@ -113,6 +124,24 @@ int main() {
                 step();
             check(a.core.loaded, "Disconnect does not unload the cartridge");
         }
+        fs::path fresh = data / "fresh-default-folder";
+        atomicWrite(fresh / "original-fixture.sfc", readFile(data / "original-fixture.sfc"));
+        {
+            App restored(o, fresh);
+            restored.init();
+            check(restored.gameAvailable("world") && restored.availableGames() == 1,
+                  "A cartridge in the default local folder imports without manual configuration");
+            check(restored.importFolder() == fresh,
+                  "File picker opens the exact local cartridge folder");
+        }
+        Settings persisted;
+        persisted.dataDir = data;
+        Library savedLibrary;
+        persisted.load(savedLibrary);
+        check(persisted.language == 9, "Korean language survives the settings round trip");
+        check(localeIndex("pt-BR") == 6 && localeIndex("zh_CN") == 8 &&
+                  localeIndex("unknown") == -1,
+              "System locale variants resolve correctly");
         SDL_Quit();
         std::cout << checks << " controller/UI checks passed\n";
         return 0;

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="400" viewBox="0 0 1440 400" role="img" aria-label="Mario Compilation Ultra">
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#111d2a"/><stop offset="1" stop-color="#203342"/></linearGradient><pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#8cb1ba" stroke-opacity=".08"/></pattern></defs>
+<rect width="1440" height="400" rx="26" fill="url(#bg)"/><rect width="1440" height="400" rx="26" fill="url(#grid)"/>
+<g fill="#a0d1b6"><rect x="70" y="258" width="50" height="54" rx="7"/><rect x="130" y="198" width="50" height="114" rx="7"/><rect x="190" y="138" width="50" height="174" rx="7"/></g><circle cx="95" cy="138" r="22" fill="#ecd477"/>
+<rect x="53" y="110" width="207" height="225" rx="14" fill="none" stroke="#ecd477" stroke-opacity=".45" stroke-dasharray="7 7"/>
+<g font-family="system-ui,Arial,sans-serif"><text x="310" y="152" fill="#eef5f1" font-size="52" font-weight="700">MARIO COMPILATION ULTRA</text><text x="312" y="215" fill="#a0d1b6" font-size="27">自分のカートリッジ。もっと広い画面。</text><text x="312" y="267" fill="#acc0cc" font-size="20">Windows · Linux · macOS · 10 / 日本語</text><text x="312" y="314" fill="#99aebc" font-size="18">説明用の図形です。任天堂の画像は使用していません。</text></g></svg>

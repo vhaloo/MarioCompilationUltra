@@ -163,7 +163,9 @@ std::string Library::import(const fs::path &p) {
     auto full = fs::absolute(p);
     for (auto &g : games())
         if (offers(c.family, g.id)) {
-            if (g.id == "world" && c.family == Family::AllStarsWorld && paths.count(g.id))
+            std::error_code ec;
+            if (g.id == "world" && c.family == Family::AllStarsWorld && paths.count(g.id) &&
+                fs::is_regular_file(paths.at(g.id), ec))
                 continue;
             paths[g.id] = full;
         }

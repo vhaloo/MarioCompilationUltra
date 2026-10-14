@@ -23,10 +23,18 @@ void App::init() {
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
     if (!fs::exists(settings.dataDir / "settings.ini")) {
         auto *locales = SDL_GetPreferredLocales();
-        if (locales && locales[0].language && std::strcmp(locales[0].language, "fr") == 0)
-            settings.language = 1;
+        if (locales)
+            for (int i = 0; locales[i].language; ++i) {
+                int language = localeIndex(locales[i].language);
+                if (language >= 0) {
+                    settings.language = language;
+                    break;
+                }
+            }
         SDL_free(locales);
     }
+    if (!options.locale.empty())
+        settings.language = localeIndex(options.locale);
     SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, options.headless ? "1" : "0");
     window = SDL_CreateWindow("Mario Compilation Ultra", SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED, options.width, options.height,
@@ -53,13 +61,34 @@ void App::init() {
     io.IniFilename = nullptr;
     io.LogFilename = nullptr;
     char *base = SDL_GetBasePath();
-    fs::path font = fs::u8path(base ? base : "") / "assets/Interface.ttf";
+    programPath = fs::u8path(base ? base : "");
+    fs::path font = programPath / "assets/Interface.otf";
     SDL_free(base);
+    ImFontGlyphRangesBuilder glyphs;
+    glyphs.AddRanges(io.Fonts->GetGlyphRangesDefault());
+    for (auto *text : localizedTexts())
+        glyphs.AddText(text);
+    glyphs.BuildRanges(&fontRanges);
     if (fs::exists(font))
-        io.Fonts->AddFontFromFileTTF(font.u8string().c_str(), 19, nullptr,
-                                     io.Fonts->GetGlyphRangesDefault());
-    else
-        io.Fonts->AddFontDefault();
+        fontBytes = readFile(font);
+    ImFontConfig fontConfig;
+    fontConfig.FontDataOwnedByAtlas = false;
+    if (fontBytes.empty() ||
+        !io.Fonts->AddFontFromMemoryTTF(fontBytes.data(), int(fontBytes.size()), 19, &fontConfig,
+                                        fontRanges.Data))
+        throw std::runtime_error(
+            "The interface font is missing. Extract the complete software package.");
+    io.Fonts->Build();
+    for (auto *text : localizedTexts())
+        while (*text) {
+            unsigned int c = 0;
+            int consumed = ImTextCharFromUtf8(&c, text, nullptr);
+            if (!consumed)
+                break;
+            text += consumed;
+            if (c >= 32 && !io.Fonts->Fonts[0]->FindGlyphNoFallback(ImWchar(c)))
+                ++missingGlyphs;
+        }
     ImGui::StyleColorsDark();
     auto &style = ImGui::GetStyle();
     style.WindowRounding = 14;
@@ -87,6 +116,8 @@ void App::init() {
         settings.fullscreen = false;
     fullscreen();
     menu = options.menu || options.game.empty();
+    if (fs::is_directory(settings.dataDir))
+        library.importFolder(settings.dataDir);
     if (!options.importPath.empty()) {
         auto p = fs::u8path(options.importPath);
         if (fs::is_directory(p))
@@ -101,7 +132,7 @@ void App::init() {
         else
             menu = options.menu;
     }
-    browserPath = settings.dataDir.parent_path();
+    browserPath = settings.dataDir;
 }
 App::~App() {
     try {
@@ -120,9 +151,13 @@ App::~App() {
             SDL_DestroyTexture(worldTex);
         if (backgroundTex)
             SDL_DestroyTexture(backgroundTex);
-        ImGui_ImplSDLRenderer2_Shutdown();
-        ImGui_ImplSDL2_Shutdown();
-        ImGui::DestroyContext();
+        if (ImGui::GetCurrentContext()) {
+            if (ImGui::GetIO().BackendRendererUserData)
+                ImGui_ImplSDLRenderer2_Shutdown();
+            if (ImGui::GetIO().BackendPlatformUserData)
+                ImGui_ImplSDL2_Shutdown();
+            ImGui::DestroyContext();
+        }
         SDL_DestroyRenderer(renderer);
     }
     if (window)
@@ -565,14 +600,28 @@ void App::request(int action, int slot, const std::string &game) {
     menu = true;
     core.clearAudio();
 }
+bool App::gameAvailable(const std::string &id) const {
+    auto entry = library.paths.find(id);
+    std::error_code ec;
+    return entry != library.paths.end() && fs::is_regular_file(entry->second, ec);
+}
+int App::availableGames() const {
+    int count = 0;
+    for (const auto &game : games())
+        if (gameAvailable(game.id))
+            ++count;
+    return count;
+}
 void App::libraryUi() {
     ImGui::TextColored({.64f, .84f, .74f, 1}, "%s",
                        tr("SIX ADVENTURES · YOUR CARTRIDGES", "SIX AVENTURES · TES CARTOUCHES"));
     ImGui::TextWrapped(
-        "%s", tr("Import All-Stars + World for the remakes and World. Add Yoshi's Island "
-                 "separately. All game data stays on your computer.",
-                 "Importe All-Stars + World pour les remakes et World. Ajoute Yoshi's Island "
-                 "séparément. Toutes les données de jeu restent sur ton ordinateur."));
+        "%s", availableGames() == 6
+                  ? tr("Your local collection is ready. Choose Play to start a game.")
+                  : tr("Import All-Stars + World for the remakes and World. Add Yoshi's Island "
+                       "separately. All game data stays on your computer.",
+                       "Importe All-Stars + World pour les remakes et World. Ajoute Yoshi's Island "
+                       "séparément. Toutes les données de jeu restent sur ton ordinateur."));
     ImGui::Spacing();
     if (button("Choose cartridge...", "Choisir une cartouche...")) {
         browser = true;
@@ -598,9 +647,9 @@ void App::libraryUi() {
         auto pos = ImGui::GetCursorScreenPos();
         ImGui::GetWindowDrawList()->AddRectFilled(pos, {pos.x + card - 24, pos.y + 4}, col, 2);
         ImGui::Dummy({1, 9});
-        ImGui::TextWrapped("%s", g.title.c_str());
-        ImGui::TextDisabled("%s", g.description.c_str());
-        bool ready = library.paths.count(g.id);
+        ImGui::TextWrapped("%s", tr(g.title.c_str()));
+        ImGui::TextWrapped("%s", tr(g.description.c_str()));
+        bool ready = gameAvailable(g.id);
         ImGui::TextColored(ready ? ImVec4(.62f, .88f, .70f, 1) : ImVec4(.63f, .67f, .72f, 1), "%s",
                            ready ? tr("Cartridge available", "Cartouche disponible")
                                  : tr("Import required", "Import nécessaire"));
@@ -617,16 +666,20 @@ void App::libraryUi() {
     }
     focusLibrary = false;
     ImGui::Spacing();
-    ImGui::TextDisabled("%s", tr("No ROMs, music or Nintendo artwork are bundled.",
-                                 "Aucune ROM, musique ou illustration Nintendo n'est fournie."));
+    ImGui::Text("%s: %d / 6", tr("Configured games"), availableGames());
+    ImGui::TextWrapped("%s", tr("Available cartridges stay on your computer. Public downloads "
+                                "contain the software and documentation."));
 }
 void App::optionsUi() {
     auto combo = [&](const char *en, const char *fr, int &v,
                      std::initializer_list<const char *> labels) {
-        if (ImGui::BeginCombo(tr(en, fr), *(labels.begin() + v))) {
+        ImGui::PushID(en);
+        ImGui::TextWrapped("%s", tr(en, fr));
+        ImGui::SetNextItemWidth(-1);
+        if (ImGui::BeginCombo("##value", tr(*(labels.begin() + v)))) {
             int i = 0;
             for (auto label : labels) {
-                if (ImGui::Selectable(label, i == v))
+                if (ImGui::Selectable(tr(label), i == v))
                     v = i;
                 if (i == v)
                     ImGui::SetItemDefaultFocus();
@@ -634,26 +687,24 @@ void App::optionsUi() {
             }
             ImGui::EndCombo();
         }
+        ImGui::PopID();
     };
     auto check = [&](const char *en, const char *fr, bool &v) { ImGui::Checkbox(tr(en, fr), &v); };
     auto slider = [&](const char *en, const char *fr, int &v, int lo, int hi) {
-        ImGui::SliderInt(tr(en, fr), &v, lo, hi);
+        ImGui::PushID(en);
+        ImGui::TextWrapped("%s", tr(en, fr));
+        ImGui::SetNextItemWidth(-1);
+        ImGui::SliderInt("##value", &v, lo, hi);
+        ImGui::PopID();
     };
     if (tab == 1) {
         ImGui::TextWrapped(
             "%s", tr("The game keeps its original SNES clock. View options change presentation.",
                      "Le jeu garde son rythme SNES d'origine. Les vues modifient son affichage."));
-        if (settings.language)
-            combo("View", "Vue", settings.view,
-                  {"Cadrage original", "Panorama", "Monde en pixels", "Atlas du niveau"});
-        else
-            combo("View", "Vue", settings.view,
-                  {"Original framing", "Panorama", "Pixel world", "Stage atlas"});
+        combo("View", "Vue", settings.view,
+              {"Original framing", "Panorama", "Pixel world", "Stage atlas"});
         slider("Pixel zoom", "Zoom en pixels", settings.zoom, 1, 8);
-        if (settings.language)
-            combo("Quality", "Qualité", settings.quality, {"Léger", "Équilibré", "Ultra"});
-        else
-            combo("Quality", "Qualité", settings.quality, {"Lightweight", "Balanced", "Ultra"});
+        combo("Quality", "Qualité", settings.quality, {"Lightweight", "Balanced", "Ultra"});
         check("Borderless fullscreen", "Plein écran sans bordure", settings.fullscreen);
         check("Span all displays", "Étendre sur tous les écrans", settings.span);
         if (ImGui::BeginCombo(tr("Display", "Écran"), settings.display < 0
@@ -674,12 +725,8 @@ void App::optionsUi() {
         check("Performance overlay", "Afficher les performances", settings.showStats);
     }
     if (tab == 2) {
-        if (settings.language)
-            combo("Backdrop", "Fond", settings.background,
-                  {"Paysage adouci", "Paysage net", "Bleu nuit", "Noir"});
-        else
-            combo("Backdrop", "Fond", settings.background,
-                  {"Soft scenery", "Sharp scenery", "Midnight", "Black"});
+        combo("Backdrop", "Fond", settings.background,
+              {"Soft scenery", "Sharp scenery", "Midnight", "Black"});
         slider("Blur", "Flou", settings.blur, 0, 48);
         slider("Brightness", "Luminosité", settings.brightness, 10, 100);
         check("Freeze / free camera", "Caméra fixe / libre", settings.freeze);
@@ -738,12 +785,18 @@ void App::optionsUi() {
     }
     if (tab == 4) {
         slider("Stick dead zone (%)", "Zone morte du stick (%)", settings.deadzone, 5, 60);
-        if (settings.language)
-            combo("Interface language", "Langue de l'interface", settings.language,
-                  {"English", "Français"});
-        else
-            combo("Interface language", "Langue de l'interface", settings.language,
-                  {"English", "Français"});
+        ImGui::TextWrapped("%s", tr("Interface language"));
+        ImGui::SetNextItemWidth(-1);
+        if (ImGui::BeginCombo("##language", locale(settings.language).name)) {
+            for (int i = 0; i < LocaleCount; ++i) {
+                if (ImGui::Selectable(locale(i).name, i == settings.language))
+                    settings.language = i;
+                if (i == settings.language)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::TextWrapped("%s", tr("Original cartridge text keeps its original language."));
         slider("Interface size (%)", "Taille de l'interface (%)", settings.uiScale, 75, 175);
         check("High contrast", "Contraste élevé", settings.highContrast);
         ImGui::Separator();
@@ -781,10 +834,10 @@ void App::optionsUi() {
             "%s",
             tr("Use cartridges you are entitled to use. This independent, noncommercial project is "
                "not affiliated with Nintendo. Names identify compatible games. No ROM, artwork, "
-               "music, firmware, extracted level pack or game screenshot is distributed.",
+               "music, extracted level pack or game screenshot is distributed.",
                "Utilise des cartouches que tu es autorisé à utiliser. Ce projet indépendant et "
                "non commercial n'est pas affilié à Nintendo. Les noms identifient les jeux "
-               "compatibles. Aucune ROM, illustration, musique, firmware, banque de niveaux ou "
+               "compatibles. Aucune ROM, illustration, musique, banque de niveaux ou "
                "capture de jeu n'est distribuée."));
         ImGui::Spacing();
         ImGui::TextWrapped("%s",
@@ -801,6 +854,19 @@ void App::optionsUi() {
             ImGui::Text("SNES %.5f Hz · %u × %u · %.0f Hz audio", core.fps, core.width, core.height,
                         core.sampleRate);
         }
+        if (button("Open guide", "Ouvrir le guide")) {
+            auto guide =
+                fs::absolute(programPath / "docs" / locale(settings.language).code / "guide.html");
+            auto url = std::string("file://") + guide.generic_u8string();
+#ifdef _WIN32
+            url = std::string("file:///") + guide.generic_u8string();
+#endif
+            std::string encoded;
+            for (char c : url)
+                encoded += c == ' ' ? "%20" : std::string(1, c);
+            SDL_OpenURL(encoded.c_str());
+        }
+        ImGui::SameLine();
         if (button("Open project on GitHub", "Ouvrir le projet GitHub"))
             SDL_OpenURL("https://github.com/vhaloo/MarioCompilationUltra");
     }
@@ -845,7 +911,7 @@ void App::menuUi() {
             tab = shownTab;
     }
     ImGui::Separator();
-    float footer = core.loaded ? 88 : 66;
+    float footer = core.loaded ? 126 : 102;
     ImGui::BeginChild("page", {0, -footer}, ImGuiChildFlags_None);
     if (focusPage) {
         ImGui::SetScrollY(0);
@@ -874,12 +940,12 @@ void App::menuUi() {
     if (button("Quit", "Quitter"))
         request(4);
     ImGui::SameLine();
-    ImGui::TextDisabled("%s", tr("D-pad / arrows · Confirm / Back · LB/RB sections",
-                                 "Croix / flèches · Confirmer / Retour · LB/RB pages"));
+    ImGui::TextWrapped("%s", tr("D-pad / arrows · Confirm / Back · LB/RB sections",
+                                "Croix / flèches · Confirmer / Retour · LB/RB pages"));
     if (!message.empty() && message != "folder")
-        ImGui::TextWrapped("%s", message.c_str());
+        ImGui::TextWrapped("%s", tr(message.c_str()));
     else if (core.loaded)
-        ImGui::TextDisabled("%s", core.status.c_str());
+        ImGui::TextDisabled("%s", tr(core.status.c_str()));
     ImGui::End();
 }
 void App::browserUi() {
@@ -961,8 +1027,12 @@ void App::browserUi() {
         }
         if (button("Backspace", "Effacer")) {
             auto n = std::strlen(path);
-            if (n)
-                path[n - 1] = 0;
+            if (n) {
+                --n;
+                while (n && (uint8_t(path[n]) & 0xc0) == 0x80)
+                    --n;
+                path[n] = 0;
+            }
         }
         ImGui::SameLine();
         if (button("Done", "Terminé"))
@@ -1013,7 +1083,7 @@ void App::browserUi() {
         ImGui::EndChild();
     }
     if (!message.empty() && message != "folder")
-        ImGui::TextWrapped("%s", message.c_str());
+        ImGui::TextWrapped("%s", tr(message.c_str()));
     ImGui::End();
 }
 void App::dialogs() {
@@ -1135,7 +1205,7 @@ void App::render() {
         }
         if (settings.showHud) {
             std::string text = sc.id + " · " +
-                               tr(sc.fullMap ? "loaded stage" : "observed terrain",
+                               tr(sc.fullMap ? "Loaded stage" : "Observed terrain",
                                   sc.fullMap ? "niveau chargé" : "terrain observé");
             d->AddRectFilled({12, 12}, {std::min(size.x - 12, 440.f), 44}, IM_COL32(7, 16, 24, 210),
                              5);
@@ -1205,7 +1275,11 @@ void App::report(const fs::path &p, double elapsed) const {
     report.insert(report.size() - 3,
                   std::string(",\n\"menu_tab\":") + std::to_string(tab) +
                       ",\n\"cartridge_crc32\":" + jsonString(hex32(core.cart.checksum)) +
-                      ",\n\"profile_supported\":" + (core.cart.supported ? "true" : "false"));
+                      ",\n\"profile_supported\":" + (core.cart.supported ? "true" : "false") +
+                      ",\n\"locale\":" + jsonString(locale(settings.language).code) +
+                      ",\n\"data_dir\":" + jsonString(settings.dataDir.u8string()) +
+                      ",\n\"available_games\":" + std::to_string(availableGames()) +
+                      ",\n\"missing_localized_glyphs\":" + std::to_string(missingGlyphs));
     atomicText(p, report);
 }
 void App::scriptCommand(const std::string &cmd, const std::string &value) {

@@ -46,4 +46,33 @@ Presentation commands include `view`, `zoom`, `quality`, `background`, `freeze`,
 The runtime/unit suite executes an original, tiny 65C816 program created in
 memory. The UI suite uses an SDL virtual gamepad and a newly written synthetic
 cartridge; no retail ROM fixture is committed. The smoke suite renders the
-actual menu at four output sizes and in both languages.
+actual menu at four output sizes and in all ten languages.
+
+## Ten-language documentation and assets
+
+The normal C++ build uses the committed, compiled translation table and bundled
+OFL font. No Python or network font download is needed at application runtime.
+To change translations or reproduce their assets:
+
+```sh
+python -m pip install -r tools/requirements.txt
+python tools/localization.py
+python tools/build_font.py
+python tools/illustrations.py
+python tools/guides.py
+python tools/localization.py --check
+python tools/build_font.py --check
+python tools/guides.py --check
+```
+
+`build_font.py` downloads and verifies a pinned upstream font only when its local
+source file is absent. Pass `--source FILE` to use an existing verified copy.
+Catalog order preserves legacy English=0 and French=1 settings. Locale variants
+such as `pt-BR` and `zh_CN` resolve to the corresponding interface catalog.
+`--locale en|fr|es|ja|de|it|pt|ru|zh|ko` selects a language and stores the choice.
+
+To reproduce the published screenshots, run the smoke command above, then
+`python tools/guides.py --captures build/ui-smoke`. The smoke tool keeps all
+240 original PNG captures. The documentation crops only the unused surround
+of the 1920×1080 images; no application pixels are fabricated or retouched.
+Window sizes of 640×360 use scrolling to retain access to every page.

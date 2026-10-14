@@ -1,10 +1,30 @@
-# 0.1.0
+# Releases
 
-- SNES collection host for All-Stars 1/2/3/Lost Levels, World and Yoshi's Island.
-- Bounded ZIP/SMC/SFC import with content recognition and private path references.
-- English/French controller menus, borderless multi-display output and software fallback.
-- Original/panorama/pixel/atlas views; full loaded World terrain and observed-terrain maps elsewhere.
-- World placement-origin markers and supported active object markers.
-- Nine save slots, battery SRAM, automatic resume and compressed framebuffer-aware rewind.
-- Synthetic console/UI tests, real ROM-free menu captures, public-content audit and platform builds.
-- Preview limits documented per presentation feature; no commercial game data included.
+## 0.2.0 — 2026-10-14
+
+- Complete interface catalogs for English, French, Spanish, Japanese, German,
+  Italian, Portuguese, Russian, Simplified Chinese and Korean. System-locale
+  detection, an in-app selector, persistent settings and `--locale` are included.
+- A renamed, reproducible OFL font supports every interface and guide character.
+  Font loading handles Unicode installation paths. Existing English/French
+  settings retain their original numeric identifiers.
+- Ten illustrated README guides and ten offline HTML guides, sixty real ROM-free
+  menu screenshots, original geometric identities, view diagrams and desktop icons.
+- The picker opens the real application data folder. Cartridges placed directly
+  there import at launch. Missing cartridge files are detected, and a complete
+  local collection says it is ready to play.
+- Windows user installation and desktop-shortcut script; Linux desktop registration;
+  both Mac architectures keep an explicit experimental / physical-Mac-untested status.
+- Runtime/controller assertions and 240 ROM-free interface captures validate the
+  localization and import changes. Every portable package includes all ten languages.
+
+The SNES simulation and expanded-view coverage retain the documented limits of
+0.1.0. This release does not turn the collection into five native decompilations
+or translate the commercial cartridge's own game data.
+
+## 0.1.0 — 2026-10-13
+
+Initial six-entry collection, complete Snes9x cartridge simulation, World
+loaded-area atlas, observed-terrain views for the other supported ordinary scenes,
+controller menus, save/resume/rewind, and four portable platform distributions.
+No Nintendo cartridge data or gameplay screenshots were published.

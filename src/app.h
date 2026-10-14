@@ -1,5 +1,6 @@
 #pragma once
 #include "world.h"
+#include "localization.h"
 #include <SDL.h>
 #include <array>
 #include <functional>
@@ -8,7 +9,7 @@ namespace mcu {
 struct Options {
     bool headless = false, software = false, menu = false, realtime = true, noResume = false;
     int width = 1280, height = 720, frames = -1;
-    std::string game, importPath, script, report, capture, dump;
+    std::string game, importPath, script, report, capture, dump, locale;
 };
 class App {
     SDL_Window *window = nullptr;
@@ -19,6 +20,10 @@ class App {
     bool browser = false, pathEdit = false, releaseInput = false, focusPage = true,
          focusLibrary = true;
     fs::path browserPath;
+    fs::path programPath;
+    ImVector<ImWchar> fontRanges;
+    std::vector<uint8_t> fontBytes;
+    int missingGlyphs = 0;
     char path[4096]{};
     std::array<SDL_GameController *, 2> pads{};
     std::array<bool, 2> previousMenu{}, previousStart{}, previousLeft{}, previousRight{},
@@ -30,7 +35,9 @@ class App {
     bool bootstrap = false;
     int bootstrapTarget = 0, bootstrapPhase = 0;
     uint64_t bootstrapAge = 0;
-    const char *tr(const char *en, const char *fr) const { return settings.language ? fr : en; }
+    const char *tr(const char *en, const char * = nullptr) const {
+        return translate(settings.language, en);
+    }
     void background();
     void drawGame();
     void menuUi();
@@ -71,5 +78,9 @@ class App {
     void report(const fs::path &, double elapsed) const;
     void scriptCommand(const std::string &, const std::string &);
     int activeTab() const { return tab; }
+    bool gameAvailable(const std::string &id) const;
+    int availableGames() const;
+    int missingLocalizedGlyphs() const { return missingGlyphs; }
+    const fs::path &importFolder() const { return browserPath; }
 };
 } // namespace mcu
