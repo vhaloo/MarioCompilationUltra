@@ -121,7 +121,7 @@ Choose cartridge again if its file was moved or a drive is disconnected. ZIPs mu
 
 ## Packages and validation · 0.2.1
 
-Public checks cover 84 runtime/controller assertions, 166 messages in ten catalogs, font coverage and 240 actual interface captures. Private Windows checks cover six real cartridges, 2,160 display configurations, nine save slots, automatic resume, SRAM, rewind and controller events. These are bounded scenarios, not full campaign completion; physical gamepad presses and audible output are not certified. See the detailed report.
+Public checks cover 85 runtime/controller assertions, 166 messages in ten catalogs, font coverage and 240 actual interface captures. Private Windows checks cover six real cartridges, 2,160 display configurations, nine save slots, automatic resume, SRAM, rewind and controller events. These are bounded scenarios, not full campaign completion; physical gamepad presses and audible output are not certified. See the detailed report.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 
