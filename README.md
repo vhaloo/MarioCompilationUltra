@@ -1,6 +1,6 @@
 <p align="center"><img src="assets/brand.svg" width="960" alt="Mario Compilation Ultra"></p>
 
-<p align="center"><a href="https://github.com/vhaloo/MarioCompilationUltra/releases/latest">Download</a> · <a href="docs/QUICK_START_FR.md">Démarrage en français</a> · <a href="docs/FEATURES.md">Features</a> · <a href="docs/BUILD.md">Build</a></p>
+<p align="center"><a href="https://github.com/vhaloo/MarioCompilationUltra/releases">Download</a> · <a href="docs/QUICK_START_FR.md">Démarrage en français</a> · <a href="docs/FEATURES.md">Features</a> · <a href="docs/BUILD.md">Build</a></p>
 
 **Play your own SNES copies of the All-Stars remakes, Super Mario World and
 Yoshi's Island in a PC collection with adaptable views and controller menus.**

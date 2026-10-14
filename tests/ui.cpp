@@ -7,6 +7,7 @@ static void check(bool b, const char *m) {
     ++checks;
     if (!b)
         throw std::runtime_error(m);
+    std::cout << checks << ": " << m << '\n' << std::flush;
 }
 int main() {
     try {
@@ -103,12 +104,15 @@ int main() {
             press(SDL_CONTROLLER_BUTTON_BACK);
             press(SDL_CONTROLLER_BUTTON_B);
             check(!a.menu, "Controller back returns to gameplay");
+            // Close our fixture handle while SDL and the application's controller
+            // references are still alive, then exercise device-removal handling.
+            SDL_JoystickClose(joy);
+            joy = nullptr;
             SDL_JoystickDetachVirtual(device);
             for (int i = 0; i < 4; i++)
                 step();
             check(a.core.loaded, "Disconnect does not unload the cartridge");
         }
-        SDL_JoystickClose(joy);
         SDL_Quit();
         std::cout << checks << " controller/UI checks passed\n";
         return 0;

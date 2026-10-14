@@ -34,6 +34,8 @@ void App::init() {
                                   (options.headless ? SDL_WINDOW_HIDDEN : 0));
     if (!window)
         throw std::runtime_error(SDL_GetError());
+    SDL_GetWindowPosition(window, &windowed.x, &windowed.y);
+    SDL_GetWindowSize(window, &windowed.w, &windowed.h);
     renderer = SDL_CreateRenderer(
         window, -1,
         options.software

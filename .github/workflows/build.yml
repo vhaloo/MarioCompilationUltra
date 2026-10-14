@@ -54,6 +54,9 @@ jobs:
         run: cmake --build build --config Release --parallel 3
       - name: Tests
         run: ctest --test-dir build -C Release --output-on-failure
+      - name: Windows controller disconnect stability
+        if: runner.os == 'Windows'
+        run: ctest --test-dir build -C Release -R mcu_controller_ui --repeat until-fail:5 --output-on-failure
       - name: Audit public source
         run: python tools/audit_public.py --tree . --report build/public-audit.json
       - name: ROM-free UI smoke

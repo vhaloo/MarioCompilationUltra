@@ -8,6 +8,10 @@ or a claim that all campaigns, bosses and hardware combinations were completed.
 The Release build was exercised on Windows x64 with the pinned Snes9x core,
 SDL 2.32.10 and software rendering. CTest contains two suites and **48 checks**:
 
+A local windowed, real-time cartridge run also completed through the normal
+renderer/audio initialization path, with audio muted. This is a short runtime
+check; audible output and every GPU/controller combination are not certified.
+
 - 28 import, file-integrity, settings, graphics and engine checks. These include
   stored/deflated ZIP handling, corrupt/truncated input rejection, copier-header
   normalization, controller masks, real CPU/video/audio execution of an
@@ -15,6 +19,12 @@ SDL 2.32.10 and software rendering. CTest contains two suites and **48 checks**:
 - 20 controller/interface checks. An SDL virtual gamepad visits every menu
   page, wraps tabs, launches the synthetic cartridge, supplies a native jump
   input, pauses/resumes, saves/restores the exact frame and disconnects safely.
+
+After one intermittent Windows CI disconnect-test crash, the fixture's own
+joystick handle was closed before detachment and before application teardown.
+The revised controller suite passed **20 consecutive local Windows runs**.
+The Windows workflow additionally repeats that suite five times. This evidence
+does not establish the cause of every possible device-removal failure.
 
 The public synthetic test program was written for this project. No retail ROM
 or Nintendo game routine is required for these tests.
