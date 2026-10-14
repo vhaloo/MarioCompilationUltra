@@ -83,7 +83,7 @@ Nine manual slots per game, automatic resume, battery SRAM and a bounded rewind 
 
 ## Local files
 
-This folder contains settings.ini, local cartridge references, states/, sram/ and screenshots/. Imports do not upload your cartridge or modify the original file. Back up this folder before moving computers. Save states depend on the exact cartridge and engine; battery SRAM is a separate file.
+This folder contains settings.ini, local cartridge references, states/, saves/ and screenshots/. Imports do not upload your cartridge or modify the original file. Back up this folder before moving computers. Save states depend on the exact cartridge and engine; battery SRAM is a separate file.
 
 | OS | Local cartridge folder |
 |---|---|

@@ -77,7 +77,7 @@ Chaque jeu a neuf emplacements manuels, une reprise automatique, la SRAM et un r
 
 ## Fichiers locaux
 
-Ce dossier contient settings.ini, les références locales aux cartouches, states/, sram/ et screenshots/. L’importation n’envoie pas la cartouche et ne modifie pas le fichier original. Sauvegarde ce dossier avant de changer d’ordinateur. Les états dépendent de la cartouche exacte et du moteur ; la SRAM est un fichier séparé.
+Ce dossier contient settings.ini, les références locales aux cartouches, states/, saves/ et screenshots/. L’importation n’envoie pas la cartouche et ne modifie pas le fichier original. Sauvegarde ce dossier avant de changer d’ordinateur. Les états dépendent de la cartouche exacte et du moteur ; la SRAM est un fichier séparé.
 
 | OS | Dossier des cartouches locales |
 |---|---|

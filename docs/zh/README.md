@@ -77,7 +77,7 @@ View/Back：设置 · LT：倒带 · RT：Select<br>
 
 ## 本地文件
 
-此文件夹包含settings.ini、卡带本地引用、states/、sram/和screenshots/。导入不会上传卡带或修改原文件。更换电脑前请备份此文件夹。即时存档依赖完全相同的卡带与核心；SRAM是独立文件。
+此文件夹包含settings.ini、卡带本地引用、states/、saves/和screenshots/。导入不会上传卡带或修改原文件。更换电脑前请备份此文件夹。即时存档依赖完全相同的卡带与核心；SRAM是独立文件。
 
 | OS | 本地卡带文件夹 |
 |---|---|

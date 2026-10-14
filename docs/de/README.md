@@ -77,7 +77,7 @@ Pro Spiel gibt es neun manuelle Plätze, automatisches Fortsetzen, Batterie-SRAM
 
 ## Lokale Dateien
 
-Dieser Ordner enthält settings.ini, Modulverweise, states/, sram/ und screenshots/. Importieren lädt das Modul nicht hoch und ändert das Original nicht. Sichere den Ordner vor einem Computerwechsel. Zustände benötigen dasselbe Modul und dieselbe Engine; SRAM ist separat.
+Dieser Ordner enthält settings.ini, Modulverweise, states/, saves/ und screenshots/. Importieren lädt das Modul nicht hoch und ändert das Original nicht. Sichere den Ordner vor einem Computerwechsel. Zustände benötigen dasselbe Modul und dieselbe Engine; SRAM ist separat.
 
 | OS | Lokaler Modulordner |
 |---|---|

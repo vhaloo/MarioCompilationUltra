@@ -77,7 +77,7 @@ Cada juego tiene nueve ranuras, reanudación automática, SRAM y rebobinado limi
 
 ## Archivos locales
 
-Esta carpeta contiene settings.ini, referencias a cartuchos, states/, sram/ y screenshots/. Importar no sube el cartucho ni modifica el original. Haz una copia antes de cambiar de ordenador. Los estados dependen del cartucho y motor exactos; SRAM es un archivo separado.
+Esta carpeta contiene settings.ini, referencias a cartuchos, states/, saves/ y screenshots/. Importar no sube el cartucho ni modifica el original. Haz una copia antes de cambiar de ordenador. Los estados dependen del cartucho y motor exactos; SRAM es un archivo separado.
 
 | OS | Carpeta local de cartuchos |
 |---|---|

@@ -77,7 +77,7 @@ Cada jogo tem nove espaços, retomada automática, SRAM e retrocesso limitado. U
 
 ## Arquivos locais
 
-Esta pasta contém settings.ini, referências aos cartuchos, states/, sram/ e screenshots/. A importação não envia o cartucho nem modifica o original. Faça backup antes de trocar de computador. Os estados dependem do cartucho e núcleo exatos; SRAM é um arquivo separado.
+Esta pasta contém settings.ini, referências aos cartuchos, states/, saves/ e screenshots/. A importação não envia o cartucho nem modifica o original. Faça backup antes de trocar de computador. Os estados dependem do cartucho e núcleo exatos; SRAM é um arquivo separado.
 
 | OS | Pasta local dos cartuchos |
 |---|---|

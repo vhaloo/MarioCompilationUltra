@@ -77,7 +77,7 @@ Ogni gioco dispone di nove slot, ripresa automatica, SRAM e riavvolgimento limit
 
 ## File locali
 
-Questa cartella contiene settings.ini, riferimenti alle cartucce, states/, sram/ e screenshots/. L’importazione non carica online la cartuccia né modifica l’originale. Fai un backup prima di cambiare computer. Gli stati dipendono da cartuccia e motore esatti; SRAM è separata.
+Questa cartella contiene settings.ini, riferimenti alle cartucce, states/, saves/ e screenshots/. L’importazione non carica online la cartuccia né modifica l’originale. Fai un backup prima di cambiare computer. Gli stati dipendono da cartuccia e motore esatti; SRAM è separata.
 
 | OS | Cartella locale delle cartucce |
 |---|---|
