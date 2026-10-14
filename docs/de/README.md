@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.0
+# Mario Compilation Ultra 0.2.1
 
 Lokale SNES-Sammlung mit anpassbarer PC-Oberfläche und experimentellen Weltansichten. Snes9x emuliert die Module einschließlich Super FX. Eine vollständige Dekompilierung aller Spiele wird nicht behauptet.
 
-[Download und Start vom Desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download und Start vom Desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download und Start vom Desktop
 
@@ -40,6 +40,8 @@ sh ./Install-Linux.sh
 ## Ansichtsmodi
 
 ![Ansichtsmodi](views.svg)
+
+Panorama ist die Standardansicht. Die automatische Einstellung der Pixelwelt wählt den größten ganzzahligen Zoom für das vollständige Originalbild. Manuelle Stufen 1–8 bleiben verfügbar. Beobachtete Atlanten passen sich erkundeten Kamerabereichen an; World zeigt den geladenen Bereich. Der dekorative Hintergrund wiederholt einen gültigen sichtbaren Ausschnitt.
 
 Worlds Atlas zeigt den aktuell geladenen Bereich, nicht alle Spielbereiche zugleich. Mario 1, Lost Levels, Mario 2, Mario 3 und normale Yoshi-Szenen sammeln beim Bewegen beobachtetes Gelände. Unbekannte Bereiche bleiben schraffiert. Außerhalb der Originalkamera können Effekte und Sprites abweichen. Sonderprojektionen nutzen das Originalbild.
 
@@ -85,6 +87,8 @@ Dieser Ordner enthält settings.ini, Modulverweise, states/, saves/ und screensh
 | Linux | `$XDG_DATA_HOME/ValentinWittwe/MarioCompilationUltra/` or `~/.local/share/ValentinWittwe/MarioCompilationUltra/` |
 | macOS | `~/Library/Application Support/ValentinWittwe/MarioCompilationUltra/` |
 
+--data-dir überschreibt den Standardpfad. Windows-Verknüpfungsupdates behalten diese Option. Lokale Dateien zeigt den tatsächlich verwendeten Ordner.
+
 ## Wenn ein Spiel weiter einen Import verlangt
 
 Wähle das Modul erneut, wenn die Datei verschoben oder das Laufwerk getrennt wurde. ZIPs müssen eine .sfc oder .smc enthalten, unverschlüsselt und gespeichert oder DEFLATE-komprimiert. Prüfe die Liste der Ausgaben und Header. Bei fehlender Schrift oder SDL das gesamte Paket erneut entpacken.
@@ -115,9 +119,9 @@ Wähle das Modul erneut, wenn die Datei verschoben oder das Laufwerk getrennt wu
 
 ![Über das Programm](screenshots/5.png)
 
-## Pakete und Prüfung · 0.2.0
+## Pakete und Prüfung · 0.2.1
 
-Automatische Prüfungen umfassen 63 Laufzeit-/Controller-Prüfungen, 165 Texte in zehn Katalogen, Schriftabdeckung und 240 echte Aufnahmen in vier Größen. Kurze private Spieltests bedeuten keinen vollständigen Durchlauf. Bericht und Release-Workflow trennen geprüfte Funktionen von ungetesteter Hardware.
+Öffentliche Prüfungen umfassen 85 Laufzeit-/Controller-Tests, 166 Meldungen in zehn Katalogen, Schriftabdeckung und 240 echte Bildschirmaufnahmen. Private Windows-Prüfungen betreffen sechs Spiele, 2.160 Anzeigevarianten, neun Speicherplätze, Fortsetzen, SRAM, Zurückspulen und Controller-Ereignisse. Keine vollständigen Kampagnen; physische Tastendrücke und hörbarer Ton sind nicht bestätigt. Siehe Prüfbericht.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

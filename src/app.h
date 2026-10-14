@@ -28,7 +28,7 @@ class App {
     std::array<SDL_GameController *, 2> pads{};
     std::array<bool, 2> previousMenu{}, previousStart{}, previousLeft{}, previousRight{},
         previousThumb{}, previousBack{};
-    bool previousFullscreen = false, previousSpan = false;
+    bool previousFullscreen = false, previousSpan = false, previousVsync = false;
     int previousDisplay = -2;
     SDL_Rect windowed{SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720};
     uint64_t lastCompose = ~uint64_t(0), lastPresentation = 0;

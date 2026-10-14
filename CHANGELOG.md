@@ -1,5 +1,24 @@
 # Releases
 
+## 0.2.1 — 2026-10-14
+
+- Correct World’s compilation-specific Map16 addresses and vertical screen columns.
+  Terrain no longer appears sixteen rows above the original game.
+- Read real per-scanline scroll offsets for observed terrain; exclude status rows,
+  defer caching until a fresh frame after restore, and keep unused streamed VRAM
+  out of decorative scenery.
+- Default to Panorama and add automatic integer pixel zoom. Observed atlases fit
+  explored camera bounds so high vertical coordinates do not shrink the whole view.
+- Decode each distinct tile once per frame and cap world sampling at native detail.
+  Atlas pixel budgets bound CPU work on very wide desktops.
+- Clear old observer buffers and image dimensions when selecting a new cartridge.
+- Reset controller edges on unplug/reconnect, select the correct All-Stars game
+  after a corrupt resume, apply VSync changes immediately, and keep Alt+Enter
+  separate from SNES Start. Windows shortcut updates preserve an explicit data folder.
+- Expanded original regression fixtures and private six-game gameplay/display/save
+  checks; refresh ten illustrated guides and ROM-free interface galleries.
+
+
 ## 0.2.0 — 2026-10-14
 
 - Complete interface catalogs for English, French, Spanish, Japanese, German,

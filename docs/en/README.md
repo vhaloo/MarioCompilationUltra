@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.0
+# Mario Compilation Ultra 0.2.1
 
 A local SNES collection with an adaptive PC interface and experimental world views. Snes9x supplies the cartridge simulation, including Super FX. No decompilation of every game is claimed.
 
-[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download and desktop startup
 
@@ -40,6 +40,8 @@ sh ./Install-Linux.sh
 ## View modes
 
 ![View modes](views.svg)
+
+Panorama is the default view. In Pixel world, choose Auto (fit window) for the largest whole-number zoom that shows the original frame. Manual zooms 1–8 are still available. Observed atlases fit explored camera bounds; World fits its loaded area. Decorative scenery outside the original camera repeats a safe displayed region.
 
 World’s atlas covers the currently loaded area, not every area of the game at once. Mario 1, Lost Levels, Mario 2, Mario 3 and ordinary Yoshi scenes build a map from observed terrain as you move. Unknown areas stay hatched. Outside the original camera, effects and sprites may differ. Special projections fall back to the original image.
 
@@ -85,6 +87,8 @@ This folder contains settings.ini, local cartridge references, states/, saves/ a
 | Linux | `$XDG_DATA_HOME/ValentinWittwe/MarioCompilationUltra/` or `~/.local/share/ValentinWittwe/MarioCompilationUltra/` |
 | macOS | `~/Library/Application Support/ValentinWittwe/MarioCompilationUltra/` |
 
+An explicit --data-dir folder overrides this default. Windows shortcut updates preserve that option. The Local files page shows the folder actually used by your running app.
+
 ## If a game still asks for importing
 
 Choose cartridge again if its file was moved or a drive is disconnected. ZIPs must contain one .sfc or .smc and use stored or DEFLATE compression without encryption. Check the supported header/edition list. A missing font or SDL library usually means only the executable was extracted; extract the complete package again.
@@ -115,9 +119,9 @@ Choose cartridge again if its file was moved or a drive is disconnected. ZIPs mu
 
 ![About](screenshots/5.png)
 
-## Packages and validation · 0.2.0
+## Packages and validation · 0.2.1
 
-Automated checks cover 63 runtime/controller assertions, all 165 messages in ten catalogs, font coverage and 240 real interface captures across four sizes. Short private cartridge samples are not full campaign completion. The detailed test report and per-release workflow record distinguish checked behaviour from untested hardware.
+Public checks cover 84 runtime/controller assertions, 166 messages in ten catalogs, font coverage and 240 actual interface captures. Private Windows checks cover six real cartridges, 2,160 display configurations, nine save slots, automatic resume, SRAM, rewind and controller events. These are bounded scenarios, not full campaign completion; physical gamepad presses and audible output are not certified. See the detailed report.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

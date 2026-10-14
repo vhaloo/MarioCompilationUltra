@@ -7,9 +7,14 @@ static int signedWord(const std::array<uint8_t, 131072> &r, int p) { return int1
 static int wrap(int x, int n) { return ((x % n) + n) % n; }
 static uint64_t key(int x, int y) { return uint64_t(uint32_t(x)) << 32 | uint32_t(y); }
 static uint32_t rgb(uint16_t q, int brightness) {
-    int r = (q & 31) * 255 / 31, g = ((q >> 5) & 31) * 255 / 31, b = ((q >> 10) & 31) * 255 / 31;
-    return 0xff000000 | ((r * brightness / 15) << 16) | ((g * brightness / 15) << 8) |
-           (b * brightness / 15);
+    int r = ((q & 31) * brightness + 7) / 15;
+    int g = (((q >> 5) & 31) * brightness + 7) / 15;
+    int b = (((q >> 10) & 31) * brightness + 7) / 15;
+    // Match the core's 5-bit brightness and RGB565 conversion, including green's
+    // replicated high bit. Scaling an already-expanded RGB value creates seams.
+    g = (g << 1) | (g >> 4);
+    return 0xff000000 | (((r * 255 + 15) / 31) << 16) | (((g * 255 + 31) / 63) << 8) |
+           ((b * 255 + 15) / 31);
 }
 static int bpp(int mode, int bg) {
     static const int table[8][4] = {{2, 2, 2, 2}, {4, 4, 2, 0}, {4, 4, 0, 0}, {8, 4, 0, 0},
@@ -29,16 +34,20 @@ Scene World::inspect(const Core &c) const {
              : s.id == "smb2"       ? 2
              : s.id == "smb3"       ? 3
                                     : 5;
+    if (c.snapshot.mode != 1 || c.width != 256 || c.height > c.snapshot.raster.size() ||
+        !(c.snapshot.mainLayers & 1))
+        return s;
     if (s.kind == 4) {
         if (r[0x100] != 0x14)
             return s;
         s.cameraX = word(r, 0x1a);
-        s.cameraY = word(r, 0x1c);
+        // The first emitted SNES scanline samples the following world row.
+        s.cameraY = word(r, 0x1c) + 1;
         s.playerX = word(r, 0x94);
         s.playerY = word(r, 0x96);
         s.stage = word(r, 0x65) | int(r[0x67]) << 16;
         s.vertical = (r[0x5b] & 1) != 0;
-        int screens = std::clamp(int(r[0x5d]), 1, 32);
+        int screens = std::clamp(int(r[0x5d]), 1, s.vertical ? 14 : 32);
         s.width = s.vertical ? 512 : screens * 256;
         s.height = s.vertical ? screens * 256 : 432;
         s.fullMap = true;
@@ -136,7 +145,26 @@ uint32_t World::tilePixel(const McuVideo &s, int bg, uint16_t a, int x, int y) c
         palette += bg * 32;
     return rgb(s.palette[(palette + v) & 255], s.brightness);
 }
-uint32_t World::bgPixel(const McuVideo &s, int bg, int x, int y) const {
+uint32_t World::preparedTilePixel(const McuVideo &s, int bg, uint16_t a, int x, int y) const {
+    uint16_t id = a & 0x1fff; // Tile and palette; priority does not change its colour.
+    auto &tiles = decodedTiles[bg];
+    auto found = tiles.find(id);
+    if (found == tiles.end()) {
+        std::array<uint32_t, 64> pixels;
+        for (int row = 0; row < 8; ++row)
+            for (int column = 0; column < 8; ++column)
+                pixels[row * 8 + column] = tilePixel(s, bg, id, column, row);
+        found = tiles.emplace(id, pixels).first;
+    }
+    x &= 7;
+    y &= 7;
+    if (a & 0x4000)
+        x = 7 - x;
+    if (a & 0x8000)
+        y = 7 - y;
+    return found->second[y * 8 + x];
+}
+uint32_t World::bgPixel(const McuVideo &s, int bg, int x, int y, bool prepared) const {
     auto &l = s.layers[bg];
     int tileSize = l.tile16 ? 16 : 8;
     int columns = (l.size & 1) ? 64 : 32, rows = (l.size & 2) ? 64 : 32;
@@ -155,7 +183,7 @@ uint32_t World::bgPixel(const McuVideo &s, int bg, int x, int y) const {
         int t = ((a & 1023) + dx + dy * 16) & 1023;
         a = (a & 0xfc00) | t;
     }
-    return tilePixel(s, bg, a, x, y);
+    return prepared ? preparedTilePixel(s, bg, a, x, y) : tilePixel(s, bg, a, x, y);
 }
 uint32_t World::backdrop(const Core &c, const Scene &s, int x, int y) const {
     auto &v = c.snapshot;
@@ -163,10 +191,13 @@ uint32_t World::backdrop(const Core &c, const Scene &s, int x, int y) const {
     for (int bg = 1; bg >= 1; --bg) {
         if (!(v.mainLayers & (1 << bg)))
             continue;
-        int dx = x - s.cameraX + v.layers[bg].x;
-        int dy = y - s.cameraY + v.layers[bg].y + 1;
-        auto p = !scenery.empty() ? scenery[wrap(dy, sceneryH) * sceneryW + wrap(dx, sceneryW)]
-                                  : bgPixel(v, bg, dx, dy);
+        // Only the currently displayed part of a streamed tilemap is trustworthy.
+        // Repeat that decorative window, never unused VRAM pages or status tiles.
+        int nx = wrap(x - s.cameraX, int(c.width));
+        int ny = wrap(y - s.cameraY, int(c.height));
+        int dx = nx + (v.rasterValid ? v.raster[ny][bg].x : v.layers[bg].x);
+        int dy = ny + (v.rasterValid ? v.raster[ny][bg].y : v.layers[bg].y + 1);
+        auto p = !scenery.empty() ? scenery[ny * sceneryW + nx] : bgPixel(v, bg, dx, dy);
         if (p)
             out = p;
     }
@@ -177,11 +208,15 @@ uint32_t World::terrain(const Core &c, const Scene &s, int x, int y) const {
         return 0;
     if (s.fullMap) {
         auto &r = c.snapshot.ram;
-        int idx = s.vertical ? (y / 256) * 512 + ((y / 16) & 15) * 32 + x / 16
-                             : (x / 256) * 432 + (y / 16) * 16 + ((x / 16) & 15);
+        int idx = s.vertical
+                      ? (y / 256) * 512 + (x / 256) * 256 + ((y / 16) & 15) * 16 + ((x / 16) & 15)
+                      : (x / 256) * 432 + (y / 16) * 16 + ((x / 16) & 15);
         if (idx < 0 || idx >= 0x3600)
             return 0;
-        int t = r[0xc800 + idx] | r[0x1c800 + idx] << 8;
+        // World's arrays move by 256 bytes in All-Stars + World. Using the
+        // standalone addresses lifts its terrain by sixteen complete tile rows.
+        int base = c.cart.family == Family::AllStarsWorld ? 0xc700 : 0xc800;
+        int t = r[base + idx] | r[base + 0x10000 + idx] << 8;
         if (t >= 512)
             return 0;
         return blockPixels[t][(y & 15) * 16 + (x & 15)];
@@ -210,17 +245,25 @@ void World::remember(const Core &c, const Scene &s) {
     maxY = std::max(maxY, s.cameraY + 224);
     if (s.fullMap)
         return;
+    // Serialized states retain their exact native image, but the core's per-row
+    // renderer scratch data is rebuilt on the next real frame. Do not cache it early.
+    if (!c.snapshot.rasterValid)
+        return;
     // Sample the actual BG1 ring buffer only inside the authoritative camera.
     // No guessed wraparound terrain is presented beyond known tiles.
-    for (int ty = (s.cameraY + 8) / 8; ty < (s.cameraY + int(c.height) - 8) / 8; ty++)
+    int hudTop = s.kind <= 1 ? 32 : 8;
+    int hudBottom = s.kind == 3 ? 32 : 8;
+    for (int ty = (s.cameraY + hudTop + 7) / 8; ty < (s.cameraY + int(c.height) - hudBottom) / 8;
+         ty++)
         for (int tx = (s.cameraX + 8) / 8; tx < (s.cameraX + 248) / 8; tx++) {
             CachedTile t;
             for (int y = 0; y < 8; y++)
                 for (int x = 0; x < 8; x++) {
                     int wx = tx * 8 + x, wy = ty * 8 + y;
-                    int dx = wx - s.cameraX + c.snapshot.layers[0].x;
-                    int dy = wy - s.cameraY + c.snapshot.layers[0].y + 1;
-                    t.pixels[y * 8 + x] = bgPixel(c.snapshot, 0, dx, dy);
+                    int row = wy - s.cameraY;
+                    int dx = wx - s.cameraX + c.snapshot.raster[row][0].x;
+                    int dy = row + c.snapshot.raster[row][0].y;
+                    t.pixels[y * 8 + x] = bgPixel(c.snapshot, 0, dx, dy, true);
                 }
             cache[key(tx, ty)] = t;
         }
@@ -241,14 +284,17 @@ void World::prepareGraphics(const Core &c, const Scene &s) {
         return;
     graphicsVersion = c.imageVersion;
     auto &v = c.snapshot;
-    auto &layer = v.layers[1];
-    int tileSize = layer.tile16 ? 16 : 8;
-    sceneryW = ((layer.size & 1) ? 64 : 32) * tileSize;
-    sceneryH = ((layer.size & 2) ? 64 : 32) * tileSize;
+    for (auto &tiles : decodedTiles)
+        tiles.clear();
+    sceneryW = int(c.width);
+    sceneryH = int(c.height);
     scenery.resize(size_t(sceneryW) * sceneryH);
-    for (int y = 0; y < sceneryH; y++)
+    for (int y = 0; y < sceneryH; y++) {
+        int dx = v.rasterValid ? v.raster[y][1].x : v.layers[1].x;
+        int dy = v.rasterValid ? v.raster[y][1].y : v.layers[1].y + 1;
         for (int x = 0; x < sceneryW; x++)
-            scenery[y * sceneryW + x] = bgPixel(v, 1, x, y);
+            scenery[y * sceneryW + x] = bgPixel(v, 1, x + dx, y + dy, true);
+    }
     if (!s.fullMap)
         return;
     blockPixels.resize(512);
@@ -264,8 +310,8 @@ void World::prepareGraphics(const Core &c, const Scene &s) {
                 size_t a = p + size_t(q) * 2;
                 uint32_t pixel = 0;
                 if (ptr >= 0x8000 && a + 1 < c.cart.bytes.size())
-                    pixel =
-                        tilePixel(v, 0, uint16_t(c.cart.bytes[a] | c.cart.bytes[a + 1] << 8), x, y);
+                    pixel = preparedTilePixel(
+                        v, 0, uint16_t(c.cart.bytes[a] | c.cart.bytes[a + 1] << 8), x, y);
                 blockPixels[id][y * 16 + x] = pixel;
             }
     }
@@ -294,47 +340,35 @@ void World::compose(const Core &c, Settings &s, int dw, int dh) {
         canvas = {};
         return;
     }
-    if (s.background == 0 && s.blur > 0) {
-        auto input = backdropPixels;
-        int radius = std::clamp(s.blur / 4, 1, 10);
-        for (int y = 0; y < 56; y++)
-            for (int x = 0; x < 64; x++) {
-                int red = 0, green = 0, blue = 0, count = 0;
-                for (int j = -radius; j <= radius; j++)
-                    for (int i = -radius; i <= radius; i++) {
-                        uint32_t p =
-                            input[std::clamp(y + j, 0, 55) * 64 + std::clamp(x + i, 0, 63)];
-                        red += (p >> 16) & 255;
-                        green += (p >> 8) & 255;
-                        blue += p & 255;
-                        ++count;
-                    }
-                backdropPixels[y * 64 + x] =
-                    0xff000000 | ((red / count) << 16) | ((green / count) << 8) | (blue / count);
-            }
-    }
     auto sc = scene;
     int w = std::clamp(dw, 1, 16384), h = std::clamp(dh, 1, 8192);
     float aspect = float(w) / h;
     if (s.view == 3) {
-        if (!sc.fullMap) {
-            sc.width = std::max(512, maxX);
-            sc.height = std::max(256, maxY);
-        }
+        float left = 0, top = 0;
         float fw = float(sc.width), fh = float(sc.height);
+        if (!sc.fullMap) {
+            // Observed maps fit the explored camera bounds. Absolute level Y can
+            // be thousands of pixels even when only one screen has been seen.
+            left = float(minX);
+            top = float(minY);
+            fw = float(std::max(int(c.width), maxX - minX));
+            fh = float(std::max(int(c.height), maxY - minY));
+        }
+        float centerX = left + fw / 2, centerY = top + fh / 2;
         if (fw / fh < aspect)
             fw = fh * aspect;
         else
             fh = fw / aspect;
         canvas.worldWidth = fw;
         canvas.worldHeight = fh;
-        canvas.x = (sc.width - fw) / 2;
-        canvas.y = (sc.height - fh) / 2;
+        canvas.x = centerX - fw / 2;
+        canvas.y = centerY - fh / 2;
     } else {
-        float scale = s.view == 1 ? float(h) / 224 : float(s.zoom);
+        float scale =
+            s.view == 1 ? float(h) / c.height : float(s.pixelZoom(w, h, c.width, c.height));
         canvas.worldWidth = w / scale;
         canvas.worldHeight = h / scale;
-        float cx = sc.cameraX + 128, cy = sc.cameraY + 112;
+        float cx = sc.cameraX + c.width / 2.f, cy = sc.cameraY + c.height / 2.f;
         if (s.freeze) {
             cx = s.cameraX;
             cy = s.cameraY;
@@ -347,30 +381,56 @@ void World::compose(const Core &c, Settings &s, int dw, int dh) {
     }
     int divisor = s.quality == 0 ? 3 : s.quality == 1 ? 2 : 1;
     if (s.view == 2)
-        divisor = s.zoom;
-    canvas.width = std::clamp(w / divisor, 1, 16384);
-    canvas.height = std::clamp(h / divisor, 1, 8192);
+        divisor = s.pixelZoom(w, h, c.width, c.height);
+    // SNES art has no extra detail above one sample per world pixel. Avoid
+    // rebuilding millions of identical samples on wide, high-resolution screens.
+    canvas.width = std::clamp(std::min(w / divisor, int(std::ceil(canvas.worldWidth))), 1, 16384);
+    canvas.height = std::clamp(std::min(h / divisor, int(std::ceil(canvas.worldHeight))), 1, 8192);
     if (uint64_t(canvas.width) * canvas.height > 32 * 1024 * 1024)
         canvas.height = 32 * 1024 * 1024 / canvas.width;
-    canvas.pixels.resize(size_t(canvas.width) * canvas.height);
-    for (int y = 0; y < canvas.height; y++)
-        for (int x = 0; x < canvas.width; x++) {
+    if (s.view == 3) {
+        // An atlas is an overview. Bound its CPU sampling cost independently of
+        // an 8K desktop; the separate native inset keeps the original fine detail.
+        int budget = s.quality == 0 ? 512 * 1024 : s.quality == 1 ? 1024 * 1024 : 2 * 1024 * 1024;
+        double pixels = double(canvas.width) * canvas.height;
+        if (pixels > budget) {
+            double scale = std::sqrt(budget / pixels);
+            canvas.width = std::max(1, int(canvas.width * scale));
+            canvas.height = std::max(1, int(canvas.height * scale));
+        }
+    }
+    canvas.pixels.assign(size_t(canvas.width) * canvas.height, 0);
+    auto pixelX = [&](float x) {
+        return int(std::ceil((x - canvas.x) * canvas.width / canvas.worldWidth));
+    };
+    auto pixelY = [&](float y) {
+        return int(std::ceil((y - canvas.y) * canvas.height / canvas.worldHeight));
+    };
+    int left = std::clamp(pixelX(float(std::min(0, sc.cameraX))), 0, canvas.width);
+    int right =
+        std::clamp(pixelX(float(std::max(sc.width, sc.cameraX + int(c.width)))), 0, canvas.width);
+    int top = std::clamp(pixelY(float(std::min(0, sc.cameraY))), 0, canvas.height);
+    int bottom = std::clamp(pixelY(float(std::max(sc.height, sc.cameraY + int(c.height)))), 0,
+                            canvas.height);
+    for (int y = top; y < bottom; y++)
+        for (int x = left; x < right; x++) {
             int wx = int(std::floor(canvas.x + x * canvas.worldWidth / canvas.width)),
                 wy = int(std::floor(canvas.y + y * canvas.worldHeight / canvas.height));
-            uint32_t p = s.background == 3 ? 0xff000000 : 0xff101c29;
-            if (s.background <= 1) {
-                p = backdropPixels[(y * 56 / canvas.height) * 64 + x * 64 / canvas.width];
-                int factor = s.brightness;
-                p = 0xff000000 | ((((p >> 16) & 255) * factor / 100) << 16) |
-                    ((((p >> 8) & 255) * factor / 100) << 8) | ((p & 255) * factor / 100);
+            int nx = wx - sc.cameraX, ny = wy - sc.cameraY;
+            if (nx >= 0 && nx < int(c.width) && ny >= 0 && ny < int(c.height) &&
+                !c.native.empty()) {
+                canvas.pixels[y * canvas.width + x] = c.native[ny * c.width + nx];
+                continue;
             }
+            uint32_t p = 0;
+            if (wx >= 0 && wx < sc.width && wy >= 0 && wy < sc.height)
+                p = s.background <= 1   ? backdrop(c, sc, wx, wy)
+                    : s.background == 3 ? 0xff000000
+                                        : 0xff101c29;
             auto t = terrain(c, scene, wx, wy);
             if (t)
                 p = t;
-            int nx = wx - sc.cameraX, ny = wy - sc.cameraY;
-            if (nx >= 0 && nx < int(c.width) && ny >= 0 && ny < int(c.height) && !c.native.empty())
-                p = c.native[ny * c.width + nx];
-            else if (!sc.fullMap && cache.find(key(wx / 8, wy / 8)) == cache.end()) {
+            if (p && !sc.fullMap && cache.find(key(wx / 8, wy / 8)) == cache.end()) {
                 int factor = ((wx / 16 + wy / 16) & 1) ? 72 : 88;
                 p = 0xff000000 | ((((p >> 16) & 255) * factor / 100) << 16) |
                     ((((p >> 8) & 255) * factor / 100) << 8) | ((p & 255) * factor / 100);

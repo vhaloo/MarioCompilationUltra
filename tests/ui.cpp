@@ -115,14 +115,31 @@ int main() {
             press(SDL_CONTROLLER_BUTTON_BACK);
             press(SDL_CONTROLLER_BUTTON_B);
             check(!a.menu, "Controller back returns to gameplay");
-            // Close our fixture handle while SDL and the application's controller
-            // references are still alive, then exercise device-removal handling.
+            // Unplug while an edge-triggered button is held, then reconnect with
+            // that button down. Its first press must not inherit the old device's edge.
+            SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_BACK, 1);
+            step();
+            check(a.menu, "Held Back opens the pause menu before disconnect");
             SDL_JoystickClose(joy);
             joy = nullptr;
             SDL_JoystickDetachVirtual(device);
             for (int i = 0; i < 4; i++)
                 step();
             check(a.core.loaded, "Disconnect does not unload the cartridge");
+            device =
+                SDL_JoystickAttachVirtual(SDL_JOYSTICK_TYPE_GAMECONTROLLER, SDL_CONTROLLER_AXIS_MAX,
+                                          SDL_CONTROLLER_BUTTON_MAX, 0);
+            joy = SDL_JoystickOpen(device);
+            check(joy != nullptr, "Replacement gamepad reconnects");
+            SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_BACK, 1);
+            step();
+            check(!a.menu, "Replacement controller receives its first Back press");
+            SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_BACK, 0);
+            step();
+            SDL_JoystickClose(joy);
+            joy = nullptr;
+            SDL_JoystickDetachVirtual(device);
+            step();
         }
         fs::path fresh = data / "fresh-default-folder";
         atomicWrite(fresh / "original-fixture.sfc", readFile(data / "original-fixture.sfc"));

@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse, subprocess, shutil, zipfile, hashlib, json, plistlib, os
 from audit_public import audit_archive
 ROOT=Path(__file__).resolve().parents[1]
-VERSION='0.2.0'
+VERSION='0.2.1'
 def pack(folder,out):
     with zipfile.ZipFile(out,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
         for p in sorted(folder.rglob('*')):

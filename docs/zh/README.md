@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.0
+# Mario Compilation Ultra 0.2.1
 
 本地SNES合集，提供可调整的电脑界面和实验性扩展视图。Snes9x负责模拟卡带，包括Super FX。本项目并未声称已反编译所有游戏。
 
-[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 下载与桌面启动
 
@@ -40,6 +40,8 @@ sh ./Install-Linux.sh
 ## 视图模式
 
 ![视图模式](views.svg)
+
+默认视图为全景。在像素世界中选择自动设置，即可使用能完整显示原始画面的最大整数倍率，也可手动选择1至8倍。观测地图根据已探索的相机范围取景；World显示已加载的区域。原始相机外的装饰背景重复有效的可见区域。
 
 World地图册显示当前加载的区域，并非一次显示游戏所有区域。马里奥1、Lost Levels、马里奥2、马里奥3和Yoshi普通场景在移动时积累已观察地形。未知区域以斜线表示。原镜头外的效果与精灵可能不同。特殊投影使用原始画面。
 
@@ -85,6 +87,8 @@ View/Back：设置 · LT：倒带 · RT：Select<br>
 | Linux | `$XDG_DATA_HOME/ValentinWittwe/MarioCompilationUltra/` or `~/.local/share/ValentinWittwe/MarioCompilationUltra/` |
 | macOS | `~/Library/Application Support/ValentinWittwe/MarioCompilationUltra/` |
 
+--data-dir可覆盖默认目录。Windows快捷方式更新会保留该选项。本地文件页面显示实际使用的文件夹。
+
 ## 若游戏仍提示需要导入
 
 若文件已移动或磁盘断开，请重新选择卡带。ZIP必须只含一个.sfc或.smc，且采用未加密的存储或DEFLATE压缩。请核对支持的版本与卡带头。若缺少字体或SDL，请重新完整解压软件包。
@@ -115,9 +119,9 @@ View/Back：设置 · LT：倒带 · RT：Select<br>
 
 ![关于](screenshots/5.png)
 
-## 软件包与验证 · 0.2.0
+## 软件包与验证 · 0.2.1
 
-自动检查涵盖63项运行与手柄断言、十种语言各165条消息、字体覆盖以及四种尺寸共240张真实界面截图。短暂的私人卡带测试不等于通关全部游戏。详细报告与每版工作流区分已验证行为和未测试硬件。
+公开检查涵盖85项测试、十种语言的166条消息、字体覆盖和240张真实界面截图。Windows本地私密检查涵盖六款游戏、2160种显示配置、九个存档槽、自动恢复、SRAM、回退和手柄事件。这些只是有限场景，并非完整通关；未认证实体按钮操作或可听音频。详见测试报告。
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

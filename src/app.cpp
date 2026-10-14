@@ -54,6 +54,7 @@ void App::init() {
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
     if (!renderer)
         throw std::runtime_error(SDL_GetError());
+    previousVsync = settings.vsync;
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     auto &io = ImGui::GetIO();
@@ -205,11 +206,16 @@ void App::fullscreen() {
     previousDisplay = settings.display;
 }
 void App::hotplug() {
-    for (auto &p : pads)
+    for (size_t port = 0; port < pads.size(); ++port) {
+        auto &p = pads[port];
         if (p && !SDL_GameControllerGetAttached(p)) {
             SDL_GameControllerClose(p);
             p = nullptr;
+            previousMenu[port] = previousStart[port] = previousLeft[port] = previousRight[port] =
+                previousThumb[port] = previousBack[port] = false;
+            core.buttons[port] = 0;
         }
+    }
     for (int i = 0; i < SDL_NumJoysticks(); i++) {
         if (!SDL_IsGameController(i))
             continue;
@@ -291,8 +297,8 @@ void App::events() {
         if (!menu && k == SDLK_f) {
             settings.freeze = !settings.freeze;
             if (settings.freeze) {
-                settings.cameraX = world.scene.cameraX + 128;
-                settings.cameraY = world.scene.cameraY + 112;
+                settings.cameraX = world.scene.cameraX + core.width / 2.f;
+                settings.cameraY = world.scene.cameraY + core.height / 2.f;
             }
         }
         if (!menu && k == SDLK_r)
@@ -303,7 +309,9 @@ void App::events() {
             settings.showHud = !settings.showHud;
         if (!menu && (k == SDLK_EQUALS || k == SDLK_PLUS || k == SDLK_MINUS)) {
             settings.view = 2;
-            settings.zoom = std::clamp(settings.zoom + (k == SDLK_MINUS ? -1 : 1), 1, 8);
+            int current =
+                settings.pixelZoom(drawableWidth, drawableHeight, core.width, core.height);
+            settings.zoom = std::clamp(current + (k == SDLK_MINUS ? -1 : 1), 1, 8);
         }
         if ((mod & KMOD_CTRL) && k >= SDLK_1 && k <= SDLK_4) {
             settings.view = int(k - SDLK_1);
@@ -328,7 +336,7 @@ void App::input() {
     add(k[SDL_SCANCODE_DOWN], 5);
     add(k[SDL_SCANCODE_LEFT], 6);
     add(k[SDL_SCANCODE_RIGHT], 7);
-    add(k[SDL_SCANCODE_RETURN], 3);
+    add(k[SDL_SCANCODE_RETURN] && !(SDL_GetModState() & KMOD_ALT), 3);
     add(k[SDL_SCANCODE_RSHIFT], 2);
     add(k[SDL_SCANCODE_Z], 0);
     add(k[SDL_SCANCODE_X], 8);
@@ -436,6 +444,9 @@ bool App::play(const std::string &id, bool resume) {
         message = core.status;
         return false;
     }
+    // A present but corrupt/incompatible resume file must still use the normal
+    // cartridge selection path after Core falls back to a fresh boot.
+    hasResume = hasResume && core.status == "State restored";
     world.reset();
     settings.lastGame = id;
     settings.freeze = false;
@@ -564,12 +575,14 @@ void App::drawGame() {
     if (world.expanded) {
         updateTexture(worldTex, ww, wh, world.canvas.width, world.canvas.height,
                       world.canvas.pixels);
+        SDL_SetTextureBlendMode(worldTex, SDL_BLENDMODE_BLEND);
         SDL_RenderCopy(renderer, worldTex, nullptr, nullptr);
     } else {
         float scale =
             std::min(float(drawableWidth) / core.width, float(drawableHeight) / core.height);
         if (settings.view == 2)
-            scale = float(settings.zoom);
+            scale =
+                float(settings.pixelZoom(drawableWidth, drawableHeight, core.width, core.height));
         int w = int(core.width * scale), h = int(core.height * scale);
         SDL_Rect dest{(drawableWidth - w) / 2, (drawableHeight - h) / 2, w, h};
         SDL_RenderCopy(renderer, nativeTex, nullptr, &dest);
@@ -703,7 +716,12 @@ void App::optionsUi() {
                      "Le jeu garde son rythme SNES d'origine. Les vues modifient son affichage."));
         combo("View", "Vue", settings.view,
               {"Original framing", "Panorama", "Pixel world", "Stage atlas"});
-        slider("Pixel zoom", "Zoom en pixels", settings.zoom, 1, 8);
+        ImGui::PushID("Pixel zoom");
+        ImGui::TextWrapped("%s", tr("Pixel zoom"));
+        ImGui::SetNextItemWidth(-1);
+        ImGui::SliderInt("##value", &settings.zoom, 0, 8,
+                         settings.zoom == 0 ? tr("Auto (fit window)") : "%d×");
+        ImGui::PopID();
         combo("Quality", "Qualité", settings.quality, {"Lightweight", "Balanced", "Ultra"});
         check("Borderless fullscreen", "Plein écran sans bordure", settings.fullscreen);
         check("Span all displays", "Étendre sur tous les écrans", settings.span);
@@ -911,7 +929,7 @@ void App::menuUi() {
             tab = shownTab;
     }
     ImGui::Separator();
-    float footer = core.loaded ? 126 : 102;
+    float footer = core.loaded ? 126.f : 102.f;
     ImGui::BeginChild("page", {0, -footer}, ImGuiChildFlags_None);
     if (focusPage) {
         ImGui::SetScrollY(0);
@@ -1143,6 +1161,10 @@ void App::dialogs() {
     }
 }
 void App::render() {
+    if (settings.vsync != previousVsync) {
+        SDL_RenderSetVSync(renderer, settings.vsync && options.realtime);
+        previousVsync = settings.vsync;
+    }
     auto &col = ImGui::GetStyle().Colors;
     col[ImGuiCol_Text] = settings.highContrast ? ImVec4(1, 1, 1, 1) : ImVec4(.95f, .96f, .98f, 1);
     col[ImGuiCol_TextDisabled] =
@@ -1251,6 +1273,24 @@ void App::capture(const fs::path &p) {
 void App::report(const fs::path &p, double elapsed) const {
     auto &s = world.scene;
     std::ostringstream o;
+    SDL_RendererInfo rendererInfo{};
+    SDL_GetRendererInfo(renderer, &rendererInfo);
+    std::ostringstream controllers;
+    controllers << '[';
+    bool firstController = true;
+    for (size_t port = 0; port < pads.size(); ++port) {
+        auto *pad = pads[port];
+        if (!pad)
+            continue;
+        if (!firstController)
+            controllers << ',';
+        firstController = false;
+        controllers << "{\"port\":" << port + 1 << ",\"name\":"
+                    << jsonString(SDL_GameControllerName(pad) ? SDL_GameControllerName(pad) : "")
+                    << ",\"vendor\":" << SDL_GameControllerGetVendor(pad)
+                    << ",\"product\":" << SDL_GameControllerGetProduct(pad) << '}';
+    }
+    controllers << ']';
     o << std::setprecision(12) << "{\n\"version\":\"" << MCU_VERSION
       << "\",\n\"game\":" << jsonString(core.currentId)
       << ",\n\"loaded\":" << (core.loaded ? "true" : "false") << ",\n\"frames\":" << core.frame
@@ -1259,7 +1299,15 @@ void App::report(const fs::path &p, double elapsed) const {
       << ",\n\"audio_frames\":" << core.audioFrames << ",\n\"native_width\":" << core.width
       << ",\n\"native_height\":" << core.height << ",\n\"drawable_width\":" << drawableWidth
       << ",\n\"drawable_height\":" << drawableHeight << ",\n\"ppu_mode\":" << core.snapshot.mode
-      << ",\n\"ppu_blank\":" << core.snapshot.blank
+      << ",\n\"view\":" << settings.view << ",\n\"pixel_zoom\":" << settings.zoom
+      << ",\n\"effective_pixel_zoom\":"
+      << settings.pixelZoom(drawableWidth, drawableHeight, core.width, core.height)
+      << ",\n\"quality\":" << settings.quality
+      << ",\n\"renderer\":" << jsonString(rendererInfo.name ? rendererInfo.name : "unknown")
+      << ",\n\"vsync_requested\":" << (settings.vsync ? "true" : "false") << ",\n\"canvas_size\":["
+      << world.canvas.width << ',' << world.canvas.height << "],\n\"canvas_world\":["
+      << world.canvas.x << ',' << world.canvas.y << ',' << world.canvas.worldWidth << ','
+      << world.canvas.worldHeight << ']' << ",\n\"ppu_blank\":" << core.snapshot.blank
       << ",\n\"ppu_layers\":" << core.snapshot.mainLayers
       << ",\n\"expanded\":" << (world.expanded ? "true" : "false")
       << ",\n\"full_map\":" << (s.fullMap ? "true" : "false") << ",\n\"stage\":" << s.stage
@@ -1279,6 +1327,7 @@ void App::report(const fs::path &p, double elapsed) const {
                       ",\n\"locale\":" + jsonString(locale(settings.language).code) +
                       ",\n\"data_dir\":" + jsonString(settings.dataDir.u8string()) +
                       ",\n\"available_games\":" + std::to_string(availableGames()) +
+                      ",\n\"controllers\":" + controllers.str() +
                       ",\n\"missing_localized_glyphs\":" + std::to_string(missingGlyphs));
     atomicText(p, report);
 }

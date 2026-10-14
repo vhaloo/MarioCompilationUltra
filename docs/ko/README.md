@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.0
+# Mario Compilation Ultra 0.2.1
 
 PC에 맞게 조정할 수 있는 인터페이스와 실험적인 확장 화면을 제공하는 로컬 SNES 모음입니다. Super FX를 포함한 카트리지 동작은 Snes9x가 에뮬레이션합니다. 모든 게임을 역컴파일했다고 주장하지 않습니다.
 
-[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 다운로드와 바탕 화면에서 실행
 
@@ -40,6 +40,8 @@ sh ./Install-Linux.sh
 ## 화면 모드
 
 ![화면 모드](views.svg)
+
+기본 보기는 파노라마입니다. 픽셀 월드의 자동 설정은 원래 화면 전체를 보여 주는 가장 큰 정수 배율을 선택합니다. 수동 1~8배도 사용할 수 있습니다. 관측 지도는 탐색한 카메라 범위를, World는 불러온 영역을 표시합니다. 원래 카메라 밖의 장식 배경은 유효한 표시 영역을 반복합니다.
 
 World 지도는 현재 불러온 구역을 표시하며 게임의 모든 구역을 한 번에 보여 주지 않습니다. 마리오1, Lost Levels, 마리오2, 마리오3와 일반 Yoshi 장면은 이동하며 관찰한 지형을 모읍니다. 미지의 구역은 사선으로 표시합니다. 원래 카메라 밖에서는 효과와 스프라이트가 다를 수 있습니다. 특수 투영은 원본 화면을 사용합니다.
 
@@ -85,6 +87,8 @@ View/Back: 설정 · LT: 되감기 · RT: Select<br>
 | Linux | `$XDG_DATA_HOME/ValentinWittwe/MarioCompilationUltra/` or `~/.local/share/ValentinWittwe/MarioCompilationUltra/` |
 | macOS | `~/Library/Application Support/ValentinWittwe/MarioCompilationUltra/` |
 
+--data-dir 폴더는 기본 경로보다 우선합니다. Windows 바로 가기 업데이트도 이 옵션을 유지합니다. 로컬 파일에서 실제 폴더를 확인하세요.
+
 ## 게임이 계속 가져오기를 요구할 때
 
 파일을 옮겼거나 드라이브가 연결되지 않았으면 카트리지를 다시 선택하세요. ZIP에는 .sfc 또는 .smc 하나만 있어야 하며 암호화 없이 저장 또는 DEFLATE 압축이어야 합니다. 지원 판과 헤더를 확인하세요. 글꼴이나 SDL이 없으면 전체 패키지를 다시 풀어 주세요.
@@ -115,9 +119,9 @@ View/Back: 설정 · LT: 되감기 · RT: Select<br>
 
 ![정보](screenshots/5.png)
 
-## 패키지와 검증 · 0.2.0
+## 패키지와 검증 · 0.2.1
 
-자동 검사는 실행·컨트롤러 검증 63개, 열 개 카탈로그의 메시지 165개, 글꼴과 네 가지 크기의 실제 화면 240개를 확인합니다. 짧은 개인 카트리지 테스트는 모든 게임의 완주를 뜻하지 않습니다. 보고서와 릴리스 워크플로에서 검증된 동작과 미검증 하드웨어를 구분합니다.
+공개 검사는 85개 테스트, 10개 언어의 166개 메시지, 글꼴과 실제 화면 240장을 확인합니다. 비공개 Windows 검사는 6개 게임, 2,160개 표시 설정, 9개 저장 슬롯, 자동 재개, SRAM, 되감기와 컨트롤러 이벤트를 확인합니다. 제한된 시나리오이며 전체 캠페인 완료가 아닙니다. 실제 버튼 입력과 들리는 소리는 인증하지 않았습니다. 상세 보고서를 확인하세요.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

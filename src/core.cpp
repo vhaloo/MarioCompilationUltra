@@ -105,7 +105,7 @@ void Core::video(const void *data, unsigned w, unsigned h, size_t pitch) {
             a.native[y * w + x] = c;
         }
     }
-    mcuObserve(a.snapshot);
+    mcuObserve(a.snapshot, true);
     ++a.imageVersion;
 }
 size_t Core::audio(const int16_t *d, size_t n) {
@@ -199,7 +199,21 @@ bool Core::loadBytes(Cartridge c, const std::string &id) {
     frame = 0;
     imageVersion = 0;
     audioFrames = 0;
+    width = 256;
+    height = 224;
     native.assign(256 * 224, 0xff000000);
+    // Observer data belongs to the previous rendered cartridge until a fresh
+    // video callback arrives. Keep it invalid during this new boot, and avoid a
+    // large temporary snapshot on Windows' small default thread stack.
+    snapshot.ram.fill(0);
+    snapshot.sram.fill(0);
+    snapshot.vram.fill(0);
+    snapshot.palette.fill(0);
+    for (auto &layer : snapshot.layers)
+        layer = {};
+    snapshot.mode = snapshot.brightness = snapshot.mainLayers = 0;
+    snapshot.blank = 1;
+    snapshot.rasterValid = false;
     retro_system_av_info av{};
     retro_get_system_av_info(&av);
     fps = av.timing.fps;

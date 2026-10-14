@@ -15,7 +15,16 @@ $mcuShell = New-Object -ComObject WScript.Shell
 $mcuShortcut = $mcuShell.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Desktop')) 'Mario Compilation Ultra.lnk'))
 $mcuShortcut.TargetPath = Join-Path $mcuTarget 'MarioCompilationUltra.exe'
 $mcuShortcut.WorkingDirectory = $mcuTarget
-$mcuShortcut.Arguments = '--menu'
+# Keep an existing explicit local-data folder when updating the desktop launcher.
+# Only preserve this option; temporary test/game/report arguments are discarded.
+$mcuDataArgument = ''
+if ($mcuShortcut.Arguments -match '(?:^|\s)--data-dir\s+(?:"([^"]+)"|(\S+))') {
+    $mcuDataFolder = if ($Matches[1]) { $Matches[1] } else { $Matches[2] }
+    if ([IO.Path]::IsPathRooted($mcuDataFolder)) {
+        $mcuDataArgument = ' --data-dir "' + $mcuDataFolder + '"'
+    }
+}
+$mcuShortcut.Arguments = '--menu' + $mcuDataArgument
 $mcuShortcut.IconLocation = "$mcuTarget\MarioCompilationUltra.exe,0"
 $mcuShortcut.Description = 'Mario Compilation Ultra'
 $mcuShortcut.Save()

@@ -1,103 +1,124 @@
-# Validation report — 0.2.0
+# Validation report — 0.2.1
 
-This report describes measured checks, not a compatibility percentage or a
-claim that every campaign, boss, physical device or regional cartridge was tested.
+These are measured, bounded scenarios. They do not establish full campaign,
+boss, regional-edition or physical-device coverage.
 
-## Runtime, input and localization
+## Rendering defects and regression evidence
 
-The Windows x64 Release build passes **63 assertions in two CTest suites**:
+The reported All-Stars + World defect was reproduced using the same private
+state in the installed 0.2.0 and corrected executables. World's compilation tile
+arrays have different WRAM addresses from standalone World. Reading the wrong
+layout lifted terrain by sixteen rows. Both layouts and the two separate columns
+of vertical screens now have original synthetic regression fixtures. The native
+framebuffer CRC was identical before/after; no simulation frames advanced.
 
-- 28 engine/import/integrity/settings checks, including stored and DEFLATE ZIP
-  handling, corrupted inputs, copier headers, native CPU/video/audio execution,
-  original synthetic graphics, state checksums, restored RAM and bounded rewind.
-- 35 UI/controller/localization checks. A virtual gamepad visits and wraps every
-  menu page, starts a newly written synthetic cartridge, pauses/resumes, supplies
-  game input, saves/restores the exact framebuffer and disconnects safely.
-  The additional checks render all ten languages, verify no localized glyph is
-  missing, preserve Korean through settings, resolve regional locale variants,
-  and import a cartridge placed in a fresh default folder without manual setup.
+Observed terrain uses the emulator's actual per-row scroll offsets rather than
+final registers which can describe a status bar or dialog. Status rows are
+excluded, and restoring a state waits for fresh raster data before caching tiles.
+Decorative scenery samples a valid displayed window, avoiding unused streamed
+VRAM pages. Private pixel inspection found these artifacts after an earlier
+matrix had passed native-framebuffer checks; visual inspection remains part
+of validation.
 
-All **165 messages in ten UTF-8 catalogs** have matching keys and nonempty
-translations. The generated C++ table is checked against the catalogs. English
-and French retain their historical settings indices. Interface translation does
-not translate commercial cartridge text, graphics or story content.
+Panorama is the new default. Pixel world has automatic integer zoom alongside
+manual levels 1–8. Observed atlases fit explored camera bounds rather than an
+absolute origin thousands of pixels away. Distinct planar tiles decode once per
+frame, and expanded sampling does not exceed native world detail. The native
+camera uses original emulator pixels. Expanded scenery, sprites, effects and
+simulation beyond that camera retain experimental limits.
 
-Review of an earlier intermittent Windows synthetic-cartridge startup crash
-found that the pinned libretro loader probes a HiROM header at 0xffc0 even for
-32 KiB inputs. The host now supplies readable 64 KiB storage while passing the
-original 32 KiB length; cartridge bytes and checksums are unchanged. The tiny
-original test programs exercise this path. Retail copies in this collection
-are larger, but the public test fixture must also load without an out-of-bounds
-probe. Vendor source remains unmodified.
+## Public tests and localization
 
-The renamed Noto-derived OFL font covers every character in the interface
-catalogs and translated guides. Actual ImGui glyph lookup also verifies interface
-coverage. Fonts load from memory so a Unicode installation path works.
+The Windows Release build passes **85 assertions in two CTest suites**:
 
-## Real interface captures and illustrated guides
+- **47** engine/import/settings/rendering checks. Original synthetic fixtures
+  cover import bounds, corrupt inputs, native CPU/video/audio, state integrity,
+  exact restore, bounded rewind, automatic zoom, both World layouts, vertical
+  columns, raster/HUD separation, safe scenery and observed-atlas bounds.
+  Switching cartridges clears previous observations and high-resolution dimensions
+  before the first new frame; the regression failed before that reset.
+- **38** UI/controller/localization checks. An in-process SDL virtual controller
+  navigates menu pages, starts an original synthetic cartridge, pauses/resumes,
+  provides input, saves/restores and reconnects. Unplugging while Back is held
+  failed before the edge-state reset and passes after the correction.
+  All ten languages render with zero missing glyphs and persist their settings.
 
-The smoke tool renders all six actual pages in ten languages at 640×360,
-1280×720, 1920×1080 and 7680×1440: **240 ROM-free captures per platform**.
-It checks output dimensions, nonblank images, distinct pages, ten different
-translated controls pages, the final selection and zero missing glyphs.
-No cartridge is loaded or configured during public screenshot generation.
+The Windows CI controller suite repeats five times. These original fixtures
+contain no commercial cartridge program or extracted game graphics.
 
-The published gallery contains sixty crops of the 1920×1080 captures. Cropping
-removes the unused surround only. Ten geometric identities and ten view diagrams
-are original illustrations, clearly labelled as illustrative. They are not
-reconstructed Nintendo gameplay. All ten README/HTML guides are generated from
-translated source text; their generation and local references are checked.
-French and CJK guide pages and representative Cyrillic/CJK interface pixels were
-also inspected. Small windows use scrolling; automatic capture checks alone do
-not certify readability at every possible interface-scale setting.
+All **166 messages in ten UTF-8 catalogs** have matching, nonempty translations.
+The generated C++ table and renamed OFL font are checked against the catalogs
+and translated guides. English is first in the GitHub README and language links.
+Interface translation does not translate the commercial cartridge itself.
 
-## Private local cartridge checks
+The smoke tool generates **240 actual ROM-free menu captures per platform**:
+six pages in ten languages at 640×360, 1280×720, 1920×1080 and 7680×1440.
+It checks dimensions, nonblank/distinct pages and zero missing glyphs. Sixty
+1920×1080 crops form the public gallery. Ten README/HTML guides, original
+geometric identities and view diagrams have checked local references.
 
-The user's US All-Stars + World and Yoshi's Island copies remain local. Short
-gameplay checks reached ordinary scenes in SMB1, Lost Levels, SMB2, SMB3, World
-and Yoshi in 0.1.0. World loaded-area geometry, All-Stars selection, observed
-terrain, native framing and private save/resume were examined on those samples.
-The 0.2.0 update changes localization, layout, import discovery and documentation;
-it does not claim broader stage/edition coverage or complete campaigns.
+## Private six-game checks on Windows
 
-The installed Windows launch is checked through the actual desktop shortcut
-using the user's default application-data directory. All six compatible entries
-must report available. Cartridge files and private proof never enter the source
-tree or release archives. New code also detects missing cartridge paths and
-preserves a valid standalone World selection when importing the compilation.
+User cartridges, SRAM, states and gameplay images remain outside the repo.
+Testing uses isolated data folders; original progress and the launcher are
+checkpointed before changes.
 
-## Platform packages
+SMB1, The Lost Levels, SMB2 USA, SMB3, World and Yoshi's Island reached real
+gameplay checkpoints. The SDL controller path was exercised against the actual
+cartridge simulation: movement/jump, twelve SNES mappings, four stick directions,
+deadzone extremes, menu pause/resume and atlas switching. These tests use a
+process-local virtual controller, install no device/system driver and do not
+certify physical button presses.
 
-The [four-job workflow](../.github/workflows/build.yml) builds Windows x64,
-Linux x64, macOS Intel x64 and macOS Apple Silicon arm64. Each job runs CTest,
-catalog/font/guide checks, 240 ROM-free captures, the public-content audit and a
-portable launch from a separate working directory. Portable validation also
-checks all ten guide/catalog bundles, a Japanese Unicode installation path and
-a missing-ROM error without a blocking dialog. Windows repeats its controller
-suite five times as a disconnect stability check.
+The final private harness passed **4,818 assertions**, including:
 
-Actual [workflow results](https://github.com/vhaloo/MarioCompilationUltra/actions)
-for the release commit establish build completion; a workflow file alone does
-not. SHA-256 sums accompany four executable ZIPs and their corresponding source
-archive. The complete package must be extracted; the executable alone is insufficient.
+- **2,160 render configurations** across four views, automatic and all manual
+  pixel zooms, three quality settings, and 320×240, 1280×720, 2560×1080,
+  7680×1440 and 720×1280 output shapes. Settings which do not affect a view are
+  also checked in the base matrix. Native pixels stay unchanged; sampled native
+  camera pixels in the composed canvas match exactly.
+- All nine manual slots per game restore exact video and WRAM. Automatic resume
+  restores after a full core restart, and battery SRAM persists.
+- Three consecutive controller-trigger rewinds restore exact historical video
+  and WRAM in each game. Menu pause, focus loss/return, camera follow/freeze,
+  extreme camera directions, scenery/overlay toggles and keyboard view events
+  are exercised. Rendering changes do not mutate the original simulation.
+- A corrupt automatic resume still takes the requested All-Stars selection path.
+
+Separate 1,800-frame controller journeys in each game cover running, jumping,
+left/right/up/down, scrolling, SMB2 door entry, deaths/restarts and native fallback
+where encountered. They are short scenarios, not full campaign completion.
+
+Additional World scenarios use private RAM setup to let the real cartridge load
+selected rooms. Two vertical rooms and a Mode 7 boss were inspected in both
+standalone World and All-Stars + World. Mode 7 retains original framing. Layer
+priority, colour effects and animated objects outside the native camera can
+still differ; this is not an exact reimplementation of every off-camera effect.
+
+The installed executable is launched through the actual desktop shortcut.
+Its Direct3D path is checked at 7680×1440, with captures of all four views and
+runtime reports. Dummy/software benchmarks are diagnostic and do not represent
+GPU performance. The final Windows controller inventory contained no attached
+Xbox controller; physical-input validation remains open. Audio callbacks execute,
+but audible output is not certified by these automated tests.
+
+## Packages and content boundary
+
+The four-job [workflow](../.github/workflows/build.yml) builds Windows x64,
+Linux x64, macOS Intel x64 and macOS Apple Silicon arm64. It runs CTest,
+localization/font/guide checks, ROM-free captures, the public-source audit and
+portable validation from another working directory and a Unicode path.
+The actual [workflow results](https://github.com/vhaloo/MarioCompilationUltra/actions)
+establish completion; the workflow file alone does not. SHA-256 sums accompany
+four executable ZIPs and their corresponding source archive.
 
 **Both macOS packages are experimental and untested on a physical Mac.**
-Their automated runner checks do not establish real controller, sound, graphics,
-Gatekeeper or notarization behaviour. The app is ad-hoc signed, not notarized.
-Linux physical desktop gameplay is also untested. Windows private muted runtime
-checks do not certify audible output or every GPU/controller combination.
+They are ad-hoc signed, not notarized. Real Mac graphics, audio, controllers and
+Gatekeeper remain unverified. Physical Linux desktop gameplay is also untested.
 
-## Public-content boundary
-
-Tracked files and archive entries are audited for cartridge/save/state
-extensions, known retail SNES header signatures, private-directory names and
-state envelopes. Archive inspection includes nested archives and the pinned
-official SDL source tarball. These defined checks are backed by a manual review
-of new assets: only ROM-free interface captures and original geometry are public.
-
-No Nintendo ROM, game routine, sprite, music, extracted level pack or gameplay
-capture is distributed. Licensed emulator, interface, compression and font
-sources retain their notices. Original host code is MIT, while the complete
-executable includes the Snes9x noncommercial terms. Auditing is not a blanket
-legal certification. The collection remains an enhanced SNES simulation host,
-not five new native decompilations.
+Tracked files and archives are checked for cartridge/save/state payloads, retail
+headers and private directories; nested source archives are inspected. Only
+original geometry and ROM-free interface screenshots are public. No Nintendo
+ROM, extracted routine, sprite, music, level pack or gameplay capture is
+distributed. Licensed emulator/interface/compression/font sources retain their
+notices. The collection is an enhanced SNES host, not five native decompilations.

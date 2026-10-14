@@ -7,7 +7,7 @@
 namespace mcu {
 void Settings::clamp() {
     view = std::clamp(view, 0, 3);
-    zoom = std::clamp(zoom, 1, 8);
+    zoom = std::clamp(zoom, 0, 8);
     background = std::clamp(background, 0, 3);
     blur = std::clamp(blur, 0, 48);
     brightness = std::clamp(brightness, 10, 100);
@@ -17,6 +17,12 @@ void Settings::clamp() {
     quality = std::clamp(quality, 0, 2);
     uiScale = std::clamp(uiScale, 75, 175);
     deadzone = std::clamp(deadzone, 5, 60);
+}
+int Settings::pixelZoom(int width, int height, int nativeWidth, int nativeHeight) const {
+    if (zoom)
+        return std::clamp(zoom, 1, 8);
+    return std::max(1,
+                    std::min(width / std::max(1, nativeWidth), height / std::max(1, nativeHeight)));
 }
 void Settings::load(Library &l) {
     std::ifstream f(dataDir / "settings.ini");

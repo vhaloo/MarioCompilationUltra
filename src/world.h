@@ -25,13 +25,14 @@ class World {
     std::unordered_map<uint64_t, CachedTile> cache;
     std::vector<std::array<uint32_t, 256>> blockPixels;
     std::vector<uint32_t> scenery;
+    mutable std::array<std::unordered_map<uint16_t, std::array<uint32_t, 64>>, 4> decodedTiles;
     int sceneryW = 0, sceneryH = 0;
     uint64_t graphicsVersion = ~uint64_t(0);
-    std::array<uint32_t, 256 * 224> background{};
     int lastStage = -1, lastKind = -1, minX = 0, maxX = 256, minY = 0, maxY = 224;
     uint64_t lastFrame = ~uint64_t(0);
     uint32_t tilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
-    uint32_t bgPixel(const McuVideo &, int bg, int x, int y) const;
+    uint32_t preparedTilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
+    uint32_t bgPixel(const McuVideo &, int bg, int x, int y, bool prepared = false) const;
     uint32_t terrain(const Core &, const Scene &, int x, int y) const;
     uint32_t backdrop(const Core &, const Scene &, int x, int y) const;
     void remember(const Core &, const Scene &);
@@ -54,6 +55,12 @@ class World {
     void compose(const Core &, Settings &, int drawableWidth, int drawableHeight);
     uint32_t decodeTileForTest(const McuVideo &s, int bg, uint16_t a, int x, int y) const {
         return tilePixel(s, bg, a, x, y);
+    }
+    uint32_t sampleTerrainForTest(const Core &c, int x, int y) const {
+        return terrain(c, scene, x, y);
+    }
+    uint32_t sampleLayerForTest(const McuVideo &s, int bg, int x, int y) const {
+        return bgPixel(s, bg, x, y);
     }
 };
 } // namespace mcu

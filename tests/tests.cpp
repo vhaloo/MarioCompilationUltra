@@ -101,6 +101,12 @@ int main() {
               "Separate All-Stars coverage");
         fs::path dir = fs::temp_directory_path() / ("mcu-test-" + std::to_string(SDL_GetTicks64()));
         Settings s;
+        check(s.view == 1 && s.zoom == 0, "Readable panorama and automatic pixel zoom defaults");
+        check(s.pixelZoom(7680, 1440, 256, 224) == 6, "48:9 pixel view fits the native image");
+        check(s.pixelZoom(1280, 720, 256, 224) == 3, "16:9 automatic integer zoom");
+        check(s.pixelZoom(768, 1440, 256, 224) == 3,
+              "Portrait automatic zoom preserves the full image");
+        check(s.pixelZoom(320, 240, 512, 448) == 1, "Small windows keep a valid integer zoom");
         s.dataDir = dir;
         s.autoResume = false;
         s.rewind = true;
@@ -157,6 +163,134 @@ int main() {
             for (int i = 0; i < 24; i++)
                 core.tick();
             check(core.rewindCount() > 0 && core.rewind(), "Bounded rewind works");
+
+            // Original test graphics exercise both WRAM layouts without a commercial
+            // cartridge or extracted assets. One solid block is at world row 24.
+            core.currentId = "world";
+            core.cart.supported = true;
+            core.cart.family = Family::AllStarsWorld;
+            core.cart.bytes.resize(0x160008, 0);
+            core.snapshot.ram.fill(0);
+            core.snapshot.vram.fill(0);
+            core.snapshot.palette.fill(0);
+            for (auto &layer : core.snapshot.layers)
+                layer = {};
+            auto &ram = core.snapshot.ram;
+            ram[0x100] = 0x14;
+            ram[0x1c] = 192;
+            ram[0x5d] = 1;
+            ram[0xfbe + 0x100 * 2 + 1] = 0x80;
+            ram[0x1c700 + 24 * 16] = 1;
+            core.snapshot.mode = 1;
+            core.snapshot.mainLayers = 1;
+            core.snapshot.brightness = 15;
+            core.snapshot.palette[1] = 31;
+            for (int row = 0; row < 8; ++row)
+                core.snapshot.vram[row * 2] = 255;
+            ++core.imageVersion;
+            Settings renderSettings;
+            renderSettings.view = 1;
+            World layout;
+            layout.compose(core, renderSettings, 7680, 1440);
+            check(layout.scene.cameraY == 193, "Native first scanline uses the matching world row");
+            check(layout.sampleTerrainForTest(core, 0, 384) == 0xffff0000,
+                  "Compilation World terrain remains at its real vertical position");
+            check(layout.sampleTerrainForTest(core, 0, 128) == 0,
+                  "Compilation World does not duplicate terrain sixteen rows above");
+            check(layout.canvas.width <= 1195 && layout.canvas.height == 224,
+                  "Wide panorama avoids redundant resolution above native world pixels");
+            ram[0x5d] = 20;
+            renderSettings.view = 3;
+            renderSettings.quality = 2;
+            layout.compose(core, renderSettings, 7680, 1440);
+            check(uint64_t(layout.canvas.width) * layout.canvas.height <= 2 * 1024 * 1024,
+                  "A large stage atlas has a bounded sampling cost on an 8K desktop");
+            ram[0x5d] = 1;
+            renderSettings.view = 1;
+            renderSettings.quality = 1;
+            core.cart.family = Family::World;
+            ram[0x1c700 + 24 * 16] = 0;
+            ram[0x1c800 + 24 * 16] = 1;
+            ++core.imageVersion;
+            layout.reset();
+            layout.compose(core, renderSettings, 1280, 720);
+            check(layout.sampleTerrainForTest(core, 0, 384) == 0xffff0000,
+                  "Standalone World keeps its distinct WRAM tilemap layout");
+            ram[0x5b] = 1;
+            ram[0x5d] = 3;
+            ram[0x1c800 + 512 + 256 + 16] = 1;
+            ++core.imageVersion;
+            layout.reset();
+            layout.compose(core, renderSettings, 1280, 720);
+            check(layout.scene.width == 512 && layout.scene.height == 768 &&
+                      layout.sampleTerrainForTest(core, 256, 272) == 0xffff0000 &&
+                      layout.sampleTerrainForTest(core, 256, 288) == 0,
+                  "Vertical World screens store two separate 256-pixel columns");
+            ram[0x5b] = 0;
+            ram[0x5d] = 2;
+            core.snapshot.mainLayers = 3;
+            auto &back = core.snapshot.layers[1];
+            back.map = 0x4000;
+            back.tiles = 0x2000;
+            back.size = 1;
+            core.snapshot.palette[2] = 31 << 5;
+            for (int row = 0; row < 8; ++row) {
+                core.snapshot.vram[0x2000 + row * 2] = 255;
+                core.snapshot.vram[0x2020 + row * 2 + 1] = 255;
+            }
+            for (int i = 0; i < 1024; ++i)
+                core.snapshot.vram[0x4800 + i * 2] = 1;
+            Settings pixelSettings;
+            pixelSettings.view = 2;
+            pixelSettings.zoom = 1;
+            ++core.imageVersion;
+            layout.reset();
+            layout.compose(core, pixelSettings, 512, 224);
+            int px = int(300 - layout.canvas.x);
+            int py = int(layout.scene.cameraY + 50 - layout.canvas.y);
+            check(layout.canvas.pixels[py * layout.canvas.width + px] == 0xffff0000,
+                  "Decorative scenery does not expose unused streamed VRAM pages");
+            core.currentId = "smb3";
+            ram.fill(0);
+            ram[0x100] = 0xc0;
+            ram[0x22] = 1;
+            ram[0x55] = 1;
+            ram[0x70] = 128;
+            ram[0x82] = 145;
+            core.snapshot.layers[0] = back;
+            core.snapshot.layers[0].x = core.snapshot.layers[0].y = 256;
+            core.snapshot.rasterValid = true;
+            for (auto &row : core.snapshot.raster)
+                row[0] = {0, 0};
+            ++core.imageVersion;
+            layout.reset();
+            layout.compose(core, renderSettings, 1280, 720);
+            check(layout.sampleTerrainForTest(core, 16, 320) == 0xffff0000,
+                  "Observed terrain uses gameplay row scroll instead of the final HUD scroll");
+            check(layout.sampleTerrainForTest(core, 16, 440) == 0,
+                  "SMB3's status rows are not cached as terrain");
+            renderSettings.view = 3;
+            layout.compose(core, renderSettings, 1280, 720);
+            check(layout.canvas.y == 239 && layout.canvas.worldHeight == 224,
+                  "Observed atlas fits explored bounds instead of unused level coordinates");
+            core.snapshot.rasterValid = false;
+            ++core.imageVersion;
+            layout.reset();
+            layout.compose(core, renderSettings, 1280, 720);
+            check(layout.knownTiles() == 0,
+                  "Restore waits for fresh raster data before caching observed terrain");
+            core.snapshot.mode = 7;
+            ++core.imageVersion;
+            layout.compose(core, renderSettings, 1280, 720);
+            check(!layout.expanded && layout.canvas.pixels.empty(),
+                  "Special PPU projections retain the original image");
+            core.width = 512;
+            core.height = 448;
+            check(core.loadBytes(inspectRom(r, true), "test") && core.snapshot.blank &&
+                      core.snapshot.mode == 0 && !core.snapshot.rasterValid &&
+                      core.snapshot.ram[0x100] == 0 && core.width == 256 && core.height == 224 &&
+                      core.native.size() == core.width * core.height,
+                  "Selecting a cartridge cannot expose the previous game's observed state");
         }
         std::cout << checks << " checks passed; no commercial ROM fixtures\n";
         SDL_Quit();

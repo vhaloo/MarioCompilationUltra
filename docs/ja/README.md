@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.0
+# Mario Compilation Ultra 0.2.1
 
 PC向けの使いやすい画面と実験的な拡張表示を備えたローカルSNESコレクションです。Super FXを含むカートリッジの動作はSnes9xが再現します。全作品を逆コンパイルしたものではありません。
 
-[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## ダウンロードとデスクトップからの起動
 
@@ -40,6 +40,8 @@ sh ./Install-Linux.sh
 ## 表示モード
 
 ![表示モード](views.svg)
+
+初期表示はパノラマです。ピクセルワールドの自動設定では、元の画面全体が収まる最大の整数倍率になります。手動の1〜8倍も使えます。観測型アトラスは探索済み範囲、Worldは読み込み済みエリアに合わせます。元のカメラ外の装飾背景は有効な表示領域を繰り返します。
 
 Worldのアトラスは現在読み込まれたエリアを表示し、ゲーム全体を一度に表示するものではありません。マリオ1、Lost Levels、マリオ2、マリオ3と通常のヨッシー場面は移動中に見えた地形を蓄積します。未観測部分は斜線表示です。元のカメラの外では効果やスプライトが異なることがあります。特殊な投影は元の画面で表示します。
 
@@ -85,6 +87,8 @@ View/Back: 設定 · LT: 巻き戻し · RT: Select<br>
 | Linux | `$XDG_DATA_HOME/ValentinWittwe/MarioCompilationUltra/` or `~/.local/share/ValentinWittwe/MarioCompilationUltra/` |
 | macOS | `~/Library/Application Support/ValentinWittwe/MarioCompilationUltra/` |
 
+--data-dirで指定したフォルダーは既定の保存先より優先されます。Windowsショートカットの更新時も維持されます。ローカルファイル画面で実際の保存先を確認できます。
+
 ## 読み込みが必要と表示される場合
 
 ファイルを移動した、またはドライブを外した場合はカートリッジを再選択してください。ZIPは.sfcか.smcを1本だけ含み、暗号化なしの無圧縮またはDEFLATEである必要があります。対応版とヘッダーを確認します。フォントやSDLがない場合は、ZIP全体を再展開してください。
@@ -115,9 +119,9 @@ View/Back: 設定 · LT: 巻き戻し · RT: Select<br>
 
 ![このソフトについて](screenshots/5.png)
 
-## 配布パッケージと検証 · 0.2.0
+## 配布パッケージと検証 · 0.2.1
 
-自動検査は実行・コントローラーの63項目、10カタログ各165メッセージ、フォント、4サイズ計240画面を対象とします。短い非公開テストは全ゲームのクリアを意味しません。詳細報告と各版のワークフローで確認済みの動作と未検証の機器を区別します。
+公開検査は85項目、10言語166メッセージ、フォント、実画面240枚を確認します。非公開のWindows検査は6ゲーム、表示2,160条件、9保存枠、自動再開、SRAM、巻き戻し、コントローラーイベントを確認します。限定した場面の検査であり全編クリアではありません。実機ボタン操作と可聴音声は保証していません。詳細レポートをご覧ください。
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

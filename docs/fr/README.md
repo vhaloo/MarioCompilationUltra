@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.0
+# Mario Compilation Ultra 0.2.1
 
 Une collection SNES locale avec une interface PC adaptable et des vues de monde expérimentales. Snes9x assure la simulation des cartouches, y compris le Super FX. Le projet ne revendique pas une décompilation de tous les jeux.
 
-[Téléchargement et lancement sur le bureau](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Téléchargement et lancement sur le bureau](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Téléchargement et lancement sur le bureau
 
@@ -40,6 +40,8 @@ sh ./Install-Linux.sh
 ## Modes de vue
 
 ![Modes de vue](views.svg)
+
+Panorama est la vue par défaut. Dans Monde pixels, choisis Auto (adapter à la fenêtre) pour le plus grand zoom entier qui montre tout le cadre d’origine. Les zooms manuels 1–8 restent disponibles. Les atlas observés cadrent les zones explorées ; World cadre sa zone chargée. Le décor hors de la caméra d’origine répète une région affichée valide.
 
 L’atlas de World couvre la zone actuellement chargée, pas toutes les zones du jeu à la fois. Mario 1, Lost Levels, Mario 2, Mario 3 et les scènes ordinaires de Yoshi construisent une carte du terrain observé en avançant. Les zones inconnues restent hachurées. Hors du cadre d’origine, effets et sprites peuvent différer. Les projections spéciales reviennent à l’image d’origine.
 
@@ -85,6 +87,8 @@ Ce dossier contient settings.ini, les références locales aux cartouches, state
 | Linux | `$XDG_DATA_HOME/ValentinWittwe/MarioCompilationUltra/` or `~/.local/share/ValentinWittwe/MarioCompilationUltra/` |
 | macOS | `~/Library/Application Support/ValentinWittwe/MarioCompilationUltra/` |
 
+Un dossier indiqué par --data-dir remplace ce chemin par défaut. La mise à jour du raccourci Windows conserve cette option. La page Fichiers locaux montre le dossier réellement utilisé.
+
 ## Si un jeu demande encore une importation
 
 Choisis à nouveau la cartouche si son fichier a été déplacé ou si le disque est déconnecté. Le ZIP doit contenir un seul .sfc ou .smc, sans chiffrement, stocké ou compressé en DEFLATE. Vérifie les éditions et en-têtes pris en charge. Une police ou SDL manquante indique souvent que seul l’exécutable a été extrait ; extrais à nouveau tout le paquet.
@@ -115,9 +119,9 @@ Choisis à nouveau la cartouche si son fichier a été déplacé ou si le disque
 
 ![À propos](screenshots/5.png)
 
-## Paquets et validation · 0.2.0
+## Paquets et validation · 0.2.1
 
-Les contrôles automatiques couvrent 63 assertions de moteur/manette, les 165 messages des dix catalogues, les glyphes et 240 captures réelles en quatre tailles. Les essais privés courts ne constituent pas une fin de tous les jeux. Le rapport détaillé et le workflow de chaque version distinguent le vérifié du matériel non testé.
+Les contrôles publics couvrent 85 assertions d’exécution/manette, 166 messages dans dix catalogues, la police et 240 captures réelles de l’interface. Les contrôles privés Windows couvrent les six jeux, 2 160 configurations d’affichage, neuf sauvegardes, reprise, SRAM, rembobinage et événements manette. Ces scénarios ne constituent pas une partie complète ; les appuis physiques et le son audible ne sont pas certifiés. Consulte le rapport détaillé.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

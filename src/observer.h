@@ -9,7 +9,12 @@ struct McuVideo {
     std::array<uint8_t, 131072> ram{}, sram{};
     std::array<uint16_t, 256> palette{};
     McuLayer layers[4];
+    struct Scroll {
+        int x = 0, y = 0;
+    };
+    std::array<std::array<Scroll, 4>, 240> raster{};
+    bool rasterValid = false;
     int mode = 0, brightness = 0, blank = 1, mainLayers = 0;
 };
-void mcuObserve(McuVideo &);
+void mcuObserve(McuVideo &, bool rendered = false);
 void mcuObserveMemory(McuVideo &);

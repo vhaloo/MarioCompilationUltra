@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.0
+# Mario Compilation Ultra 0.2.1
 
 Raccolta SNES locale con interfaccia adattabile al PC e viste estese sperimentali. Snes9x emula le cartucce, incluso Super FX. Il progetto non dichiara di aver decompilato tutti i giochi.
 
-[Download e avvio dal desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download e avvio dal desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download e avvio dal desktop
 
@@ -40,6 +40,8 @@ sh ./Install-Linux.sh
 ## Modalità di vista
 
 ![Modalità di vista](views.svg)
+
+Panorama è la vista predefinita. In Mondo pixel, Auto sceglie il maggiore zoom intero che contiene tutto il quadro originale. Restano disponibili gli zoom manuali 1–8. Gli atlanti osservati inquadrano le zone esplorate; World inquadra l’area caricata. Lo sfondo esterno ripete una regione visibile valida.
 
 L’atlante di World copre l’area caricata, non tutte le aree insieme. Mario 1, Lost Levels, Mario 2, Mario 3 e le scene normali di Yoshi accumulano il terreno osservato durante il movimento. Le aree sconosciute sono tratteggiate. Fuori dalla camera originale effetti e sprite possono differire. Le proiezioni speciali usano l’immagine originale.
 
@@ -85,6 +87,8 @@ Questa cartella contiene settings.ini, riferimenti alle cartucce, states/, saves
 | Linux | `$XDG_DATA_HOME/ValentinWittwe/MarioCompilationUltra/` or `~/.local/share/ValentinWittwe/MarioCompilationUltra/` |
 | macOS | `~/Library/Application Support/ValentinWittwe/MarioCompilationUltra/` |
 
+--data-dir sostituisce il percorso predefinito. Gli aggiornamenti del collegamento Windows mantengono questa opzione. File locali mostra la cartella effettiva.
+
 ## Se un gioco richiede ancora l’importazione
 
 Scegli di nuovo la cartuccia se il file è stato spostato o l’unità scollegata. Lo ZIP deve contenere un solo .sfc o .smc, senza cifratura, memorizzato o DEFLATE. Controlla edizioni e intestazioni supportate. Se mancano font o SDL, estrai nuovamente il pacchetto completo.
@@ -115,9 +119,9 @@ Scegli di nuovo la cartuccia se il file è stato spostato o l’unità scollegat
 
 ![Informazioni](screenshots/5.png)
 
-## Pacchetti e verifica · 0.2.0
+## Pacchetti e verifica · 0.2.1
 
-I controlli automatici coprono 63 verifiche di motore/controller, 165 messaggi in dieci cataloghi, glifi e 240 schermate reali in quattro dimensioni. Brevi prove private non equivalgono al completamento dei giochi. Rapporto e workflow distinguono il verificato dall’hardware non testato.
+I controlli pubblici coprono 85 verifiche, 166 messaggi in dieci cataloghi, caratteri e 240 schermate reali. I controlli privati Windows coprono sei giochi, 2.160 configurazioni video, nove slot, ripresa, SRAM, riavvolgimento ed eventi del controller. Sono scenari limitati, non campagne complete; pressioni fisiche e audio udibile non sono certificati. Vedi il rapporto.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 
