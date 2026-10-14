@@ -20,6 +20,7 @@ def main():
     elif args.platform == 'macos':
         executable = folder / 'MarioCompilationUltra.app/Contents/MacOS/MarioCompilationUltra'
     assert executable.is_file(), executable
+    resource_dir = executable.parent if args.platform != 'macos' else folder / 'MarioCompilationUltra.app/Contents/Resources'
     environment = dict(os.environ, SDL_VIDEODRIVER='dummy', SDL_AUDIODRIVER='dummy')
     with tempfile.TemporaryDirectory(prefix='mcu-package-test-') as temporary:
         data = Path(temporary)
@@ -34,12 +35,12 @@ def main():
         assert report['loaded'] is False, report
         assert report['menu_tab'] == 0, report
         assert report['drawable_width'] == 640 and report['drawable_height'] == 360, report
-        assert (executable.parent / 'assets/Interface.otf').is_file()
+        assert (resource_dir / 'assets/Interface.otf').is_file()
         assert report['missing_localized_glyphs'] == 0 and report['available_games'] == 0
         for code in ['en','fr','es','ja','de','it','pt','ru','zh','ko']:
-            assert (executable.parent / f'assets/locales/{code}.json').is_file()
-            assert (executable.parent / f'docs/{code}/guide.html').is_file()
-            assert (executable.parent / f'docs/{code}/screenshots/0.png').is_file()
+            assert (resource_dir / f'assets/locales/{code}.json').is_file()
+            assert (resource_dir / f'docs/{code}/guide.html').is_file()
+            assert (resource_dir / f'docs/{code}/screenshots/0.png').is_file()
         # A bad path must report failure without opening a blocking GUI dialog.
         missing = subprocess.run(
             [str(executable), '--headless', '--software', '--frames', '1',

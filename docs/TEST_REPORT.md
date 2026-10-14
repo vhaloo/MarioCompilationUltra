@@ -22,6 +22,14 @@ translations. The generated C++ table is checked against the catalogs. English
 and French retain their historical settings indices. Interface translation does
 not translate commercial cartridge text, graphics or story content.
 
+Review of an earlier intermittent Windows synthetic-cartridge startup crash
+found that the pinned libretro loader probes a HiROM header at 0xffc0 even for
+32 KiB inputs. The host now supplies readable 64 KiB storage while passing the
+original 32 KiB length; cartridge bytes and checksums are unchanged. The tiny
+original test programs exercise this path. Retail copies in this collection
+are larger, but the public test fixture must also load without an out-of-bounds
+probe. Vendor source remains unmodified.
+
 The renamed Noto-derived OFL font covers every character in the interface
 catalogs and translated guides. Actual ImGui glyph lookup also verifies interface
 coverage. Fonts load from memory so a Unicode installation path works.

@@ -182,6 +182,15 @@ bool Core::loadBytes(Cartridge c, const std::string &id) {
     retro_game_info info{};
     info.data = cart.bytes.data();
     info.size = cart.bytes.size();
+    // The pinned libretro loader probes both 0x7fc0 and 0xffc0 for BS-X headers,
+    // even for a 32 KiB cartridge. Supply readable padding for that sniff without
+    // changing the actual ROM size, bytes, checksum or engine mapping.
+    std::vector<uint8_t> guarded;
+    if (cart.bytes.size() < 0x10000) {
+        guarded = cart.bytes;
+        guarded.resize(0x10000, 0);
+        info.data = guarded.data();
+    }
     if (!retro_load_game(&info)) {
         status = "SNES engine refused the cartridge";
         return false;
