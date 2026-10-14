@@ -1,0 +1,14 @@
+/build*/
+/dist/
+/private*/
+/user-data/
+*.sfc
+*.smc
+*.srm
+*.state
+*.mstate
+*.bmp
+*.log
+__pycache__/
+*.tmp
+local-config*

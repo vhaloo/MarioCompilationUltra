@@ -1,0 +1,78 @@
+name: Build and validate
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            platform: windows
+            arch: x64
+          - os: ubuntu-22.04
+            platform: linux
+            arch: x64
+          - os: macos-15-intel
+            platform: macos
+            arch: x64
+            deployment: '10.15'
+          - os: macos-15
+            platform: macos
+            arch: arm64
+            deployment: '11.0'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libasound2-dev libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxfixes-dev libxkbcommon-dev libwayland-dev libegl1-mesa-dev libgl1-mesa-dev
+      - name: Configure Windows
+        if: runner.os == 'Windows'
+        run: cmake -S . -B build -A x64 -DBUILD_TESTING=ON -DCMAKE_DISABLE_FIND_PACKAGE_SDL2=ON
+      - name: Configure Linux
+        if: runner.os == 'Linux'
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DCMAKE_DISABLE_FIND_PACKAGE_SDL2=ON
+      - name: Configure macOS
+        if: runner.os == 'macOS'
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DCMAKE_DISABLE_FIND_PACKAGE_SDL2=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=${{ matrix.deployment }}
+      - name: Build
+        run: cmake --build build --config Release --parallel 3
+      - name: Tests
+        run: ctest --test-dir build -C Release --output-on-failure
+      - name: Audit public source
+        run: python tools/audit_public.py --tree . --report build/public-audit.json
+      - name: ROM-free UI smoke
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+        shell: bash
+        run: |
+          exe=build/MarioCompilationUltra
+          if [ "${{ runner.os }}" = "Windows" ]; then exe=build/Release/MarioCompilationUltra.exe; fi
+          python tools/smoke_ui.py --exe "$exe" --out build/ui-smoke
+      - name: Package
+        run: python tools/package.py --build build --platform ${{ matrix.platform }} --arch ${{ matrix.arch }} --out dist --source
+      - name: Test installed portable executable
+        run: python tools/validate_package.py --folder dist/MarioCompilationUltra-0.1.0-${{ matrix.platform }}-${{ matrix.arch }} --platform ${{ matrix.platform }}
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: MCU-${{ matrix.platform }}-${{ matrix.arch }}
+          path: |
+            dist/*.zip
+            dist/SHA256SUMS.txt
+            build/public-audit.json
+            build/ui-smoke/summary.json
+          if-no-files-found: error
