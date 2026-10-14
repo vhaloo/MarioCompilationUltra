@@ -34,6 +34,13 @@ def main():
         assert report['menu_tab'] == 0, report
         assert report['drawable_width'] == 640 and report['drawable_height'] == 360, report
         assert (executable.parent / 'assets/Interface.ttf').is_file()
+        # A bad path must report failure without opening a blocking GUI dialog.
+        missing = subprocess.run(
+            [str(executable), '--headless', '--software', '--frames', '1',
+             '--data-dir', str(data / 'missing'), '--import', str(data / 'absent.sfc')],
+            cwd=data, env=environment, capture_output=True, text=True, timeout=15,
+        )
+        assert missing.returncode == 1 and missing.stderr.strip(), missing
     print(f'Portable {args.platform} executable launched from a separate working directory')
 
 

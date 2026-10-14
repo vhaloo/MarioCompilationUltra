@@ -155,8 +155,8 @@ int run(const std::vector<std::string> &args) {
     return 0;
 }
 int main(int argc, char **argv) {
+    std::vector<std::string> args;
     try {
-        std::vector<std::string> args;
 #ifdef _WIN32
         int count = 0;
         wchar_t **wide = CommandLineToArgvW(GetCommandLineW(), &count);
@@ -175,8 +175,9 @@ int main(int argc, char **argv) {
         return run(args);
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Mario Compilation Ultra", e.what(),
-                                 nullptr);
+        if (std::find(args.begin(), args.end(), "--headless") == args.end())
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Mario Compilation Ultra", e.what(),
+                                     nullptr);
         return 1;
     }
 }
