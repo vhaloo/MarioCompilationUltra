@@ -5,6 +5,20 @@
 #include <iomanip>
 #include <sstream>
 namespace mcu {
+void Settings::recommendedPicture() {
+    view = 1;
+    zoom = 0;
+    filter = 1;
+    aspect = 0;
+    quality = 1;
+    background = 0;
+    blur = 24;
+    brightness = 55;
+    scanlines = 0;
+    softEdges = true;
+    freeze = guide = locator = minimap = enemyMarkers = showHud = false;
+    inset = true;
+}
 void Settings::clamp() {
     view = std::clamp(view, 0, 3);
     zoom = std::clamp(zoom, 0, 8);
@@ -15,6 +29,8 @@ void Settings::clamp() {
     language = std::clamp(language, 0, LocaleCount - 1);
     volume = std::clamp(volume, 0, 100);
     quality = std::clamp(quality, 0, 2);
+    filter = std::clamp(filter, 0, 2);
+    aspect = std::clamp(aspect, 0, 1);
     uiScale = std::clamp(uiScale, 75, 175);
     deadzone = std::clamp(deadzone, 5, 60);
 }
@@ -57,6 +73,8 @@ void Settings::load(Library &l) {
         I(language);
         I(volume);
         I(quality);
+        I(filter);
+        I(aspect);
         I(uiScale);
         I(deadzone);
         I(display);
@@ -75,6 +93,7 @@ void Settings::load(Library &l) {
         B(showHud);
         B(highContrast);
         B(showStats);
+        B(softEdges);
 #undef I
 #undef B
     }
@@ -92,6 +111,8 @@ void Settings::save(const Library &l) const {
     S(language);
     S(volume);
     S(quality);
+    S(filter);
+    S(aspect);
     S(uiScale);
     S(deadzone);
     S(display);
@@ -110,6 +131,7 @@ void Settings::save(const Library &l) const {
     S(showHud);
     S(highContrast);
     S(showStats);
+    S(softEdges);
 #undef S
     o << "lastGame " << lastGame << '\n';
     for (auto &p : l.paths)

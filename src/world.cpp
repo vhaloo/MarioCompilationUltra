@@ -1,10 +1,15 @@
 #include "world.h"
+#include "presentation.h"
 #include <algorithm>
 #include <cmath>
 namespace mcu {
 static int word(const std::array<uint8_t, 131072> &r, int p) { return r[p] | (r[p + 1] << 8); }
 static int signedWord(const std::array<uint8_t, 131072> &r, int p) { return int16_t(word(r, p)); }
 static int wrap(int x, int n) { return ((x % n) + n) % n; }
+static int mirror(int x, int n) {
+    int p = wrap(x, n * 2);
+    return p < n ? p : n * 2 - p - 1;
+}
 static uint64_t key(int x, int y) { return uint64_t(uint32_t(x)) << 32 | uint32_t(y); }
 static uint32_t rgb(uint16_t q, int brightness) {
     int r = ((q & 31) * brightness + 7) / 15;
@@ -192,9 +197,12 @@ uint32_t World::backdrop(const Core &c, const Scene &s, int x, int y) const {
         if (!(v.mainLayers & (1 << bg)))
             continue;
         // Only the currently displayed part of a streamed tilemap is trustworthy.
-        // Repeat that decorative window, never unused VRAM pages or status tiles.
-        int nx = wrap(x - s.cameraX, int(c.width));
-        int ny = wrap(y - s.cameraY, int(c.height));
+        // Reflect the safe horizontal window so its edges join continuously.
+        // Clamp vertically: wrapping would repeat a sky/ground horizon or HUD row.
+        int nx = mirror(x - s.cameraX, int(c.width));
+        int top = s.kind <= 1 ? 32 : 8;
+        int bottom = s.kind == 3 ? 32 : 8;
+        int ny = std::clamp(y - s.cameraY, top, int(c.height) - bottom - 1);
         int dx = nx + (v.rasterValid ? v.raster[ny][bg].x : v.layers[bg].x);
         int dy = ny + (v.rasterValid ? v.raster[ny][bg].y : v.layers[bg].y + 1);
         auto p = !scenery.empty() ? scenery[ny * sceneryW + nx] : bgPixel(v, bg, dx, dy);
@@ -230,7 +238,9 @@ void World::remember(const Core &c, const Scene &s) {
     if (!s.valid || lastFrame == c.imageVersion)
         return;
     lastFrame = c.imageVersion;
-    if (s.stage != lastStage || s.kind != lastKind) {
+    if (s.stage != lastStage || s.kind != lastKind ||
+        (!s.fullMap && (std::abs(s.cameraX - previousCameraX) > 512 ||
+                        std::abs(s.cameraY - previousCameraY) > 448))) {
         cache.clear();
         minX = s.cameraX;
         maxX = minX + 256;
@@ -239,6 +249,8 @@ void World::remember(const Core &c, const Scene &s) {
         lastStage = s.stage;
         lastKind = s.kind;
     }
+    previousCameraX = s.cameraX;
+    previousCameraY = s.cameraY;
     minX = std::min(minX, s.cameraX);
     maxX = std::max(maxX, s.cameraX + 256);
     minY = std::min(minY, s.cameraY);
@@ -318,6 +330,8 @@ void World::prepareGraphics(const Core &c, const Scene &s) {
 }
 void World::compose(const Core &c, Settings &s, int dw, int dh) {
     scene = inspect(c);
+    if (!scene.valid && lastStage != -1)
+        reset();
     prepareGraphics(c, scene);
     remember(c, scene);
     if (scene.valid && !scene.fullMap) {
@@ -330,9 +344,26 @@ void World::compose(const Core &c, Settings &s, int dw, int dh) {
         for (int x = 0; x < 64; x++) {
             uint32_t p = 0xff172433;
             if (c.loaded && !c.native.empty()) {
-                int nx = x * int(c.width) / 64, ny = y * int(c.height) / 56;
-                p = scene.valid ? backdrop(c, scene, scene.cameraX + nx, scene.cameraY + ny)
-                                : c.native[ny * c.width + nx];
+                // Ambient colour comes from the emitted image, including layers and
+                // effects absent from a decoded BG2. Crop HUD rows and area-average
+                // before blurring so fine patterns do not turn into colour bands.
+                int cropTop = scene.valid && scene.kind <= 1 ? 32 : 8;
+                int cropBottom = scene.valid && scene.kind == 3 ? 32 : 8;
+                int rows = std::max(1, int(c.height) - cropTop - cropBottom);
+                int x0 = x * int(c.width) / 64, x1 = (x + 1) * int(c.width) / 64;
+                int y0 = cropTop + y * rows / 56, y1 = cropTop + (y + 1) * rows / 56;
+                int rr = 0, gg = 0, bb = 0, n = 0;
+                for (int py = y0; py < std::max(y0 + 1, y1); ++py)
+                    for (int px = x0; px < std::max(x0 + 1, x1); ++px) {
+                        auto q = scene.valid && s.background == 1
+                                     ? backdrop(c, scene, scene.cameraX + px, scene.cameraY + py)
+                                     : c.native[py * c.width + px];
+                        rr += (q >> 16) & 255;
+                        gg += (q >> 8) & 255;
+                        bb += q & 255;
+                        ++n;
+                    }
+                p = 0xff000000 | ((rr / n) << 16) | ((gg / n) << 8) | bb / n;
             }
             backdropPixels[y * 64 + x] = p;
         }
@@ -342,7 +373,8 @@ void World::compose(const Core &c, Settings &s, int dw, int dh) {
     }
     auto sc = scene;
     int w = std::clamp(dw, 1, 16384), h = std::clamp(dh, 1, 8192);
-    float aspect = float(w) / h;
+    float pixelAspect = s.view == 2 ? 1.f : displayPixelAspect(s.aspect, c.width, c.height);
+    float aspect = float(w) / (h * pixelAspect);
     if (s.view == 3) {
         float left = 0, top = 0;
         float fw = float(sc.width), fh = float(sc.height);
@@ -366,7 +398,7 @@ void World::compose(const Core &c, Settings &s, int dw, int dh) {
     } else {
         float scale =
             s.view == 1 ? float(h) / c.height : float(s.pixelZoom(w, h, c.width, c.height));
-        canvas.worldWidth = w / scale;
+        canvas.worldWidth = w / (scale * pixelAspect);
         canvas.worldHeight = h / scale;
         float cx = sc.cameraX + c.width / 2.f, cy = sc.cameraY + c.height / 2.f;
         if (s.freeze) {
@@ -423,18 +455,21 @@ void World::compose(const Core &c, Settings &s, int dw, int dh) {
                 continue;
             }
             uint32_t p = 0;
-            if (wx >= 0 && wx < sc.width && wy >= 0 && wy < sc.height)
+            if (s.view != 3 && wx >= 0 && wx < sc.width && wy >= 0 && wy < sc.height)
                 p = s.background <= 1   ? backdrop(c, sc, wx, wy)
                     : s.background == 3 ? 0xff000000
                                         : 0xff101c29;
             auto t = terrain(c, scene, wx, wy);
             if (t)
                 p = t;
-            if (p && !sc.fullMap && cache.find(key(wx / 8, wy / 8)) == cache.end()) {
-                int factor = ((wx / 16 + wy / 16) & 1) ? 72 : 88;
-                p = 0xff000000 | ((((p >> 16) & 255) * factor / 100) << 16) |
-                    ((((p >> 8) & 255) * factor / 100) << 8) | ((p & 255) * factor / 100);
-            }
+            bool known = sc.fullMap || cache.find(key(wx / 8, wy / 8)) != cache.end();
+            // A decorative tilemap is not evidence of terrain. Unknown areas
+            // reveal the ambient surround rather than an invented sharp scene.
+            if (!known)
+                p = 0;
+            else if (p && s.softEdges && s.view != 3 && !s.freeze)
+                p = fadePixel(
+                    p, extensionOpacity(wx, wy, sc.cameraX, sc.cameraY, c.width, c.height, known));
             canvas.pixels[y * canvas.width + x] = p;
         }
 }

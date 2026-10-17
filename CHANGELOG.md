@@ -1,5 +1,26 @@
 # Releases
 
+## 0.2.2 — 2026-10-17
+
+- Add Crisp, Nearest and Smooth image filters. Crisp uses a bounded integer
+  pre-scale followed by fractional filtering; pixel-world mode retains exact
+  integer scaling. The native image is presented separately at full resolution.
+- Add square-pixel and TV 4:3 framing, plus a Recommended picture button which
+  preserves language, audio, saves and window preferences.
+- Replace unknown-region checkerboards with an ambient surround sampled from the
+  actual image. Area averaging and a separable blur preserve colours from every
+  game, including effects absent from a single decoded background layer.
+- Fade distant panorama terrain, reflect safe decorative edges, exclude status
+  rows and discard observed terrain after room transitions. The atlas shows
+  terrain without repeating a decorative background over the entire stage.
+- Enlarge the atlas close-up on large displays; show it when the map becomes
+  smaller than the close-up. Scanlines follow source rows and are disabled below
+  2×, keeping their pattern stable at fractional sizes.
+- Record simulation ticks and presentation intervals in resettable measurement
+  windows. Refresh all ten catalogs, illustrated guides and UI captures.
+- Add original-pixel presentation regressions and private six-game comparisons
+  across filters, aspects, window shapes, scenery and native fallback.
+
 ## 0.2.1 — 2026-10-14
 
 - Correct World’s compilation-specific Map16 addresses and vertical screen columns.

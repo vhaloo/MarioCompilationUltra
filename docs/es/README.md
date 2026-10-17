@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.1
+# Mario Compilation Ultra 0.2.2
 
 Colección local de SNES con una interfaz adaptable para PC y vistas ampliadas experimentales. Snes9x simula las cartuchos, incluido Super FX. El proyecto no afirma haber descompilado todos los juegos.
 
-[Descarga e inicio desde el escritorio](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Descarga e inicio desde el escritorio](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.2) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Descarga e inicio desde el escritorio
 
@@ -41,9 +41,9 @@ sh ./Install-Linux.sh
 
 ![Modos de vista](views.svg)
 
-Panorama es la vista predeterminada. En Mundo de píxeles, elige Automático (ajustar a ventana) para el mayor zoom entero que muestre el cuadro original completo. Hay zooms manuales 1–8. Los atlas observados encuadran lo explorado; World encuadra su área cargada. El fondo exterior repite una región visible válida.
+Imagen recomendada: Panorama, zoom Auto, filtro Nítido, píxeles cuadrados, bordes suaves y fondo ambiental atenuado. Pantalla → Imagen recomendada aplica estos ajustes sin cambiar idioma, sonido ni partidas. También hay filtros Píxeles exactos y Suave y formato Televisión 4:3. Mundo de píxeles mantiene zoom entero y píxeles cuadrados. Las líneas siguen las filas del juego y se desactivan bajo 2× para evitar muaré.
 
-El atlas de World cubre el área cargada, no todas las áreas del juego a la vez. Mario 1, Lost Levels, Mario 2, Mario 3 y escenas normales de Yoshi acumulan terreno observado al avanzar. Lo desconocido queda rayado. Fuera de la cámara original pueden variar efectos y sprites. Las proyecciones especiales usan la imagen original.
+El atlas de World cubre el área cargada. Las otras escenas ampliadas comunes cartografían el terreno observado al avanzar. Las zonas desconocidas dejan ver el fondo ambiental. El atlas muestra terreno decodificado y una vista cercana más grande permite jugar. Fuera de la cámara original, efectos y sprites pueden diferir; no se simulan objetos fuera de cámara. Las proyecciones especiales mantienen el encuadre original.
 
 Los perfiles de memoria ampliados y la selección automática All-Stars usan las ediciones estadounidenses indicadas. Una edición reconocida sin perfil verificado usa el encuadre original. La traducción de interfaz no traduce la historia ni los gráficos del cartucho comercial. No se afirma una nueva descompilación nativa de los cinco juegos.
 
@@ -119,9 +119,9 @@ Vuelve a elegir el cartucho si moviste el archivo o desconectaste la unidad. El 
 
 ![Acerca de](screenshots/5.png)
 
-## Paquetes y validación · 0.2.1
+## Paquetes y validación · 0.2.2
 
-Las pruebas públicas cubren 85 comprobaciones, 166 mensajes en diez catálogos, fuentes y 240 capturas reales. Las pruebas privadas de Windows cubren seis juegos, 2.160 configuraciones de pantalla, nueve ranuras, reanudación, SRAM, rebobinado y eventos del mando. Son escenarios limitados, no campañas completas; los botones físicos y el sonido audible no están certificados. Consulta el informe.
+Las pruebas públicas cubren 102 comprobaciones en tres suites, 176 mensajes en diez catálogos, fuentes y 240 capturas reales. Las pruebas privadas de Windows incluyen seis juegos, 2.160 configuraciones de regresión, 1.188 casos de imagen, partidas, SRAM, reanudación y rebobinado. Se midió Direct3D desde el acceso directo en las cuatro vistas a 7680×1440. Son escenas limitadas, no campañas completas; los botones físicos y el sonido audible siguen sin verificar. Consulta el informe.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

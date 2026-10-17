@@ -113,6 +113,9 @@ int main() {
         s.fullscreen = false;
         Library l;
         s.zoom = 99;
+        s.filter = 2;
+        s.aspect = 1;
+        s.softEdges = false;
         s.clamp();
         check(s.zoom == 8, "Settings bounds");
         l.paths["world"] = fs::u8path("space é/own rom.sfc");
@@ -121,7 +124,8 @@ int main() {
         t.dataDir = dir;
         Library ll;
         t.load(ll);
-        check(ll.paths == l.paths && t.zoom == 8, "UTF-8 settings round trip");
+        check(ll.paths == l.paths && t.zoom == 8 && t.filter == 2 && t.aspect == 1 && !t.softEdges,
+              "UTF-8 paths and picture settings round trip");
         World world;
         McuVideo v;
         v.mode = 1;
@@ -273,6 +277,14 @@ int main() {
             layout.compose(core, renderSettings, 1280, 720);
             check(layout.canvas.y == 239 && layout.canvas.worldHeight == 224,
                   "Observed atlas fits explored bounds instead of unused level coordinates");
+            int unknownX = int(std::ceil((300 - layout.canvas.x) * layout.canvas.width /
+                                         layout.canvas.worldWidth));
+            int unknownY = int(std::ceil((300 - layout.canvas.y) * layout.canvas.height /
+                                         layout.canvas.worldHeight));
+            check(unknownX >= 0 && unknownX < layout.canvas.width && unknownY >= 0 &&
+                      unknownY < layout.canvas.height &&
+                      layout.canvas.pixels[unknownY * layout.canvas.width + unknownX] == 0,
+                  "Unknown atlas regions reveal ambient scenery without invented sharp tiles");
             core.snapshot.rasterValid = false;
             ++core.imageVersion;
             layout.reset();
@@ -284,6 +296,8 @@ int main() {
             layout.compose(core, renderSettings, 1280, 720);
             check(!layout.expanded && layout.canvas.pixels.empty(),
                   "Special PPU projections retain the original image");
+            check(layout.knownTiles() == 0,
+                  "Leaving a valid scene discards cached terrain from the previous room");
             core.width = 512;
             core.height = 448;
             check(core.loadBytes(inspectRom(r, true), "test") && core.snapshot.blank &&

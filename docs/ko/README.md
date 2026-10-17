@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.1
+# Mario Compilation Ultra 0.2.2
 
 PC에 맞게 조정할 수 있는 인터페이스와 실험적인 확장 화면을 제공하는 로컬 SNES 모음입니다. Super FX를 포함한 카트리지 동작은 Snes9x가 에뮬레이션합니다. 모든 게임을 역컴파일했다고 주장하지 않습니다.
 
-[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.2) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 다운로드와 바탕 화면에서 실행
 
@@ -41,9 +41,9 @@ sh ./Install-Linux.sh
 
 ![화면 모드](views.svg)
 
-기본 보기는 파노라마입니다. 픽셀 월드의 자동 설정은 원래 화면 전체를 보여 주는 가장 큰 정수 배율을 선택합니다. 수동 1~8배도 사용할 수 있습니다. 관측 지도는 탐색한 카메라 범위를, World는 불러온 영역을 표시합니다. 원래 카메라 밖의 장식 배경은 유효한 표시 영역을 반복합니다.
+권장 화면: 파노라마, 자동 확대, 선명한 필터, 정사각형 픽셀, 부드러운 가장자리와 어두운 주변 배경. 화면 → 권장 화면 설정은 언어, 소리, 저장 데이터를 바꾸지 않습니다. 최근접 픽셀, 부드러운 필터와 TV 4:3도 선택할 수 있습니다. 픽셀 월드는 정수 배율과 정사각형 픽셀을 유지합니다. 주사선은 게임의 행을 따르며 모아레를 막기 위해 2배 미만에서는 꺼집니다.
 
-World 지도는 현재 불러온 구역을 표시하며 게임의 모든 구역을 한 번에 보여 주지 않습니다. 마리오1, Lost Levels, 마리오2, 마리오3와 일반 Yoshi 장면은 이동하며 관찰한 지형을 모읍니다. 미지의 구역은 사선으로 표시합니다. 원래 카메라 밖에서는 효과와 스프라이트가 다를 수 있습니다. 특수 투영은 원본 화면을 사용합니다.
+World 지도는 현재 불러온 영역을 보여 줍니다. 다른 일반 확장 장면은 이동 중 관찰한 지형을 기록합니다. 알 수 없는 영역에는 주변 배경이 보입니다. 지도는 해석한 지형을 보여 주고 더 큰 실시간 확대 화면으로 플레이할 수 있습니다. 원래 카메라 밖의 효과와 스프라이트는 다를 수 있으며 카메라 밖 물체는 시뮬레이션하지 않습니다. 특수 투영은 원래 구도를 유지합니다.
 
 확장 메모리 프로필과 All-Stars 자동 선택은 목록의 미국판을 대상으로 합니다. 인식되지만 검증된 프로필이 없는 판은 원본 화면을 사용합니다. 인터페이스 번역은 상용 카트리지의 이야기나 그래픽을 번역하지 않습니다. 다섯 게임 전체를 새로 네이티브 역컴파일했다고 주장하지 않습니다.
 
@@ -119,9 +119,9 @@ View/Back: 설정 · LT: 되감기 · RT: Select<br>
 
 ![정보](screenshots/5.png)
 
-## 패키지와 검증 · 0.2.1
+## 패키지와 검증 · 0.2.2
 
-공개 검사는 85개 테스트, 10개 언어의 166개 메시지, 글꼴과 실제 화면 240장을 확인합니다. 비공개 Windows 검사는 6개 게임, 2,160개 표시 설정, 9개 저장 슬롯, 자동 재개, SRAM, 되감기와 컨트롤러 이벤트를 확인합니다. 제한된 시나리오이며 전체 캠페인 완료가 아닙니다. 실제 버튼 입력과 들리는 소리는 인증하지 않았습니다. 상세 보고서를 확인하세요.
+공개 검사는 3개 모음의 102개 테스트, 10개 언어의 176개 메시지, 글꼴과 실제 화면 240장을 확인합니다. 비공개 Windows 검사는 6개 게임, 2,160개 회귀 표시 설정, 1,188개 화면 조건, 저장, SRAM, 자동 재개와 되감기를 포함합니다. 바탕 화면 바로 가기로 7680×1440에서 네 가지 보기의 Direct3D를 측정했습니다. 제한된 장면이며 전체 캠페인 완료가 아닙니다. 실제 버튼과 들리는 소리는 미확인입니다. 상세 보고서를 확인하세요.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

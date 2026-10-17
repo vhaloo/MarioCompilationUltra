@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.1
+# Mario Compilation Ultra 0.2.2
 
 本地SNES合集，提供可调整的电脑界面和实验性扩展视图。Snes9x负责模拟卡带，包括Super FX。本项目并未声称已反编译所有游戏。
 
-[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.2) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 下载与桌面启动
 
@@ -41,9 +41,9 @@ sh ./Install-Linux.sh
 
 ![视图模式](views.svg)
 
-默认视图为全景。在像素世界中选择自动设置，即可使用能完整显示原始画面的最大整数倍率，也可手动选择1至8倍。观测地图根据已探索的相机范围取景；World显示已加载的区域。原始相机外的装饰背景重复有效的可见区域。
+推荐画面：全景、自动缩放、清晰滤镜、方形像素、柔和边缘及调暗的环境背景。在屏幕设置中选择推荐画面设置，不会改变语言、声音或存档。还可选择最近邻、平滑滤镜及电视4:3。像素世界始终保持整数缩放和方形像素。扫描线跟随游戏图像行，在低于2倍时关闭以避免摩尔纹。
 
-World地图册显示当前加载的区域，并非一次显示游戏所有区域。马里奥1、Lost Levels、马里奥2、马里奥3和Yoshi普通场景在移动时积累已观察地形。未知区域以斜线表示。原镜头外的效果与精灵可能不同。特殊投影使用原始画面。
+World图集显示当前加载的区域。其他常规扩展场景会在移动时绘制已观察地形的地图。未知区域显示环境背景。图集展示解码地形，并提供更大的实时近景用于游玩。原始镜头外的效果和精灵可能不同，且不模拟镜头外物体。特殊投影保持原始画幅。
 
 扩展内存配置与All-Stars自动选择针对所列美版。已识别但没有已验证配置的版本使用原始画面。界面翻译不会翻译商业卡带的剧情或图像。项目并不声称实现了全部五款游戏的新原生反编译版本。
 
@@ -119,9 +119,9 @@ View/Back：设置 · LT：倒带 · RT：Select<br>
 
 ![关于](screenshots/5.png)
 
-## 软件包与验证 · 0.2.1
+## 软件包与验证 · 0.2.2
 
-公开检查涵盖85项测试、十种语言的166条消息、字体覆盖和240张真实界面截图。Windows本地私密检查涵盖六款游戏、2160种显示配置、九个存档槽、自动恢复、SRAM、回退和手柄事件。这些只是有限场景，并非完整通关；未认证实体按钮操作或可听音频。详见测试报告。
+公开检查涵盖三个测试套件的102项断言、十种语言的176条消息、字体覆盖和240张真实界面截图。Windows私密测试包括六款游戏、2160种回归显示配置、1188种画面情形、存档、SRAM、自动恢复和回退。已通过桌面快捷方式以7680×1440测量四种视图的Direct3D表现。这些是有限场景，并非完整通关；实体按钮和可听音频仍未验证。详见测试报告。
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

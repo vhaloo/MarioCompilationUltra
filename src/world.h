@@ -28,7 +28,8 @@ class World {
     mutable std::array<std::unordered_map<uint16_t, std::array<uint32_t, 64>>, 4> decodedTiles;
     int sceneryW = 0, sceneryH = 0;
     uint64_t graphicsVersion = ~uint64_t(0);
-    int lastStage = -1, lastKind = -1, minX = 0, maxX = 256, minY = 0, maxY = 224;
+    int lastStage = -1, lastKind = -1, minX = 0, maxX = 256, minY = 0, maxY = 224,
+        previousCameraX = 0, previousCameraY = 0;
     uint64_t lastFrame = ~uint64_t(0);
     uint32_t tilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
     uint32_t preparedTilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;

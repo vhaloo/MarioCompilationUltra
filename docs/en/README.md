@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.1
+# Mario Compilation Ultra 0.2.2
 
 A local SNES collection with an adaptive PC interface and experimental world views. Snes9x supplies the cartridge simulation, including Super FX. No decompilation of every game is claimed.
 
-[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.2) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download and desktop startup
 
@@ -41,9 +41,9 @@ sh ./Install-Linux.sh
 
 ![View modes](views.svg)
 
-Panorama is the default view. In Pixel world, choose Auto (fit window) for the largest whole-number zoom that shows the original frame. Manual zooms 1–8 are still available. Observed atlases fit explored camera bounds; World fits its loaded area. Decorative scenery outside the original camera repeats a safe displayed region.
+Recommended picture: Panorama, Auto zoom, Crisp filter, square pixels, soft edges and a dimmed ambient surround. Use Screen → Recommended picture to apply it without changing language, sound or saves. Nearest and Smooth filters and TV 4:3 are also available. Pixel world always retains square pixels and integer zoom. Scanlines follow game rows and turn off below 2× to avoid moiré.
 
-World’s atlas covers the currently loaded area, not every area of the game at once. Mario 1, Lost Levels, Mario 2, Mario 3 and ordinary Yoshi scenes build a map from observed terrain as you move. Unknown areas stay hatched. Outside the original camera, effects and sprites may differ. Special projections fall back to the original image.
+World’s atlas covers the currently loaded area. Other ordinary expanded scenes build a map from terrain observed while moving. Unknown regions reveal the ambient surround. The atlas shows decoded terrain, with a larger live close-up for play. Outside the original camera, effects and sprites can differ; off-camera objects are not simulated. Special projections keep original framing.
 
 Expanded memory profiles and automatic All-Stars selection target the listed US editions. A recognized edition without a verified profile uses original framing. Interface translation does not translate the commercial cartridge’s story or graphics. No new native decompilation of all five games is claimed.
 
@@ -119,9 +119,9 @@ Choose cartridge again if its file was moved or a drive is disconnected. ZIPs mu
 
 ![About](screenshots/5.png)
 
-## Packages and validation · 0.2.1
+## Packages and validation · 0.2.2
 
-Public checks cover 85 runtime/controller assertions, 166 messages in ten catalogs, font coverage and 240 actual interface captures. Private Windows checks cover six real cartridges, 2,160 display configurations, nine save slots, automatic resume, SRAM, rewind and controller events. These are bounded scenarios, not full campaign completion; physical gamepad presses and audible output are not certified. See the detailed report.
+Public checks cover 102 assertions in three suites, 176 messages in ten catalogs, font coverage and 240 actual interface captures. Private Windows checks include six games, 2,160 regression display configurations, 1,188 picture cases, saves, SRAM, resume and rewind. Direct3D was measured from the desktop shortcut in all four views at 7680×1440. These are bounded scenes, not complete campaigns; physical gamepad buttons and audible output remain unverified. See the detailed report.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

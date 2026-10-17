@@ -1,7 +1,34 @@
-# Validation report — 0.2.1
+# Validation report — 0.2.2
 
 These are measured, bounded scenarios. They do not establish full campaign,
 boss, regional-edition or physical-device coverage.
+
+## Picture pipeline
+
+All six game profiles share the same presentation pipeline. Crisp scales to a
+bounded integer intermediate texture with nearest sampling, then performs only
+the remaining fractional scale with linear sampling. Nearest and Smooth remain
+available. Pixel world always uses nearest sampling and integer zoom. Other
+views support both raw square pixels (256×224 = 8:7) and TV 4:3 framing.
+
+The emitted framebuffer is drawn separately after the world canvas, so the
+atlas sampling budget cannot reduce the live image's source resolution. A
+larger atlas close-up appears when the map becomes smaller than that close-up.
+Scanlines follow source rows, stay inside the game presentation, and turn off
+below 2× rather than introducing a fixed display-pixel pattern.
+
+Ambient colours are area-averaged from the actual image, with status rows cropped,
+then softened using three separable blur passes. Unknown terrain is transparent
+over this surround; no checkerboard or invented sharp terrain is drawn. Known
+panorama terrain fades smoothly with distance. Safe decorative scenery reflects
+horizontally, clamps vertically and excludes status rows. Atlas terrain is drawn
+without repeating decorative scenery across the entire map. Leaving a valid
+scene or making a large observed-camera jump clears old terrain.
+
+The Recommended picture button applies Panorama, Auto zoom, Crisp, square pixels,
+soft transitions and a dimmed ambient surround, with annotations hidden. It
+preserves language, sound, window, resume and save preferences. All settings
+remain individually available.
 
 ## Rendering defects and regression evidence
 
@@ -29,24 +56,29 @@ simulation beyond that camera retain experimental limits.
 
 ## Public tests and localization
 
-The Windows Release build passes **85 assertions in two CTest suites**:
+The Windows Release build passes **102 assertions in three CTest suites**:
 
-- **47** engine/import/settings/rendering checks. Original synthetic fixtures
+- **49** engine/import/settings/rendering checks. Original synthetic fixtures
   cover import bounds, corrupt inputs, native CPU/video/audio, state integrity,
   exact restore, bounded rewind, automatic zoom, both World layouts, vertical
   columns, raster/HUD separation, safe scenery and observed-atlas bounds.
   Switching cartridges clears previous observations and high-resolution dimensions
   before the first new frame; the regression failed before that reset.
-- **38** UI/controller/localization checks. An in-process SDL virtual controller
+- **39** UI/controller/localization checks. An in-process SDL virtual controller
   navigates menu pages, starts an original synthetic cartridge, pauses/resumes,
   provides input, saves/restores and reconnects. Unplugging while Back is held
   failed before the edge-state reset and passes after the correction.
   All ten languages render with zero missing glyphs and persist their settings.
+- **14** presentation checks. Original pixel patterns verify exact integer output,
+  reduced fractional blending compared with ordinary bilinear filtering,
+  transparency through intermediate targets, clipping, square/TV/portrait
+  geometry, monotonic edge fades, blur edges and preservation of nonvisual
+  preferences by the picture preset. Picture settings persist with UTF-8 paths.
 
 The Windows CI controller suite repeats five times. These original fixtures
 contain no commercial cartridge program or extracted game graphics.
 
-All **166 messages in ten UTF-8 catalogs** have matching, nonempty translations.
+All **176 messages in ten UTF-8 catalogs** have matching, nonempty translations.
 The generated C++ table and renamed OFL font are checked against the catalogs
 and translated guides. English is first in the GitHub README and language links.
 Interface translation does not translate the commercial cartridge itself.
@@ -85,6 +117,14 @@ The final private harness passed **4,818 assertions**, including:
   are exercised. Rendering changes do not mutate the original simulation.
 - A corrupt automatic resume still takes the requested All-Stars selection path.
 
+A further **1,188 private picture cases / 5,308 assertions** exercise all three
+filters, both aspect choices, all four views and five output shapes, plus
+background/scanline/soft-edge combinations, atlas quality limits and forced
+special-projection fallback. Nearest and integer output samples are compared with an
+independent full-resolution SDL reference, not only with an unchanged input
+buffer. Forty-eight matched before/after scene captures retain identical native
+framebuffer CRCs. This is scenario coverage, not a percentage of visual accuracy.
+
 Separate 1,800-frame controller journeys in each game cover running, jumping,
 left/right/up/down, scrolling, SMB2 door entry, deaths/restarts and native fallback
 where encountered. They are short scenarios, not full campaign completion.
@@ -101,6 +141,18 @@ runtime reports. Dummy/software benchmarks are diagnostic and do not represent
 GPU performance. The final Windows controller inventory contained no attached
 Xbox controller; physical-input validation remains open. Audio callbacks execute,
 but audible output is not certified by these automated tests.
+
+Performance reports count simulated ticks and presentations in resettable
+measurement windows, and expose rate and 95th-percentile render/frame intervals.
+They can be reset per scene with `metrics reset`; captures and disk writes should
+be kept outside the measured interval.
+
+One actual Windows shortcut run covers all six games × four views using
+Direct3D at 7680×1440. Each measured interval contains 120 presentations after
+warm-up. Rates range from **59.91 to 60.08 presentations/s**, with 95th-percentile
+intervals of **17.15–18.63 ms**. These are short measured scenes on this PC, not
+a guarantee for every level or another computer. The six 1,800-frame controller
+journeys and both World-edition vertical/Mode 7 scenarios are also rerun.
 
 ## Packages and content boundary
 

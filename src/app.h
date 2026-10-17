@@ -1,9 +1,11 @@
 #pragma once
 #include "world.h"
 #include "localization.h"
+#include "presentation.h"
 #include <SDL.h>
 #include <array>
 #include <functional>
+#include <memory>
 #include <imgui.h>
 namespace mcu {
 struct Options {
@@ -15,6 +17,8 @@ class App {
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
     SDL_Texture *nativeTex = nullptr, *worldTex = nullptr, *backgroundTex = nullptr;
+    std::unique_ptr<Blitter> nativeBlitter, worldBlitter, insetBlitter;
+    SDL_FRect nativeRect{}, insetRect{};
     int nw = 0, nh = 0, ww = 0, wh = 0, tab = 0, selected = 0, dialog = 0, dialogSlot = 0;
     std::string pendingGame, message;
     bool browser = false, pathEdit = false, releaseInput = false, focusPage = true,
@@ -35,6 +39,10 @@ class App {
     bool bootstrap = false;
     int bootstrapTarget = 0, bootstrapPhase = 0;
     uint64_t bootstrapAge = 0;
+    uint64_t simulationTicks = 0, presentationFrames = 0, metricsStarted = 0,
+             previousPresentation = 0;
+    std::vector<double> renderTimes, presentationIntervals;
+    void resetMetrics();
     const char *tr(const char *en, const char * = nullptr) const {
         return translate(settings.language, en);
     }

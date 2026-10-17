@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.1
+# Mario Compilation Ultra 0.2.2
 
 Une collection SNES locale avec une interface PC adaptable et des vues de monde expérimentales. Snes9x assure la simulation des cartouches, y compris le Super FX. Le projet ne revendique pas une décompilation de tous les jeux.
 
-[Téléchargement et lancement sur le bureau](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Téléchargement et lancement sur le bureau](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.2) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Téléchargement et lancement sur le bureau
 
@@ -41,9 +41,9 @@ sh ./Install-Linux.sh
 
 ![Modes de vue](views.svg)
 
-Panorama est la vue par défaut. Dans Monde pixels, choisis Auto (adapter à la fenêtre) pour le plus grand zoom entier qui montre tout le cadre d’origine. Les zooms manuels 1–8 restent disponibles. Les atlas observés cadrent les zones explorées ; World cadre sa zone chargée. Le décor hors de la caméra d’origine répète une région affichée valide.
+Image recommandée : Panorama, zoom Auto, filtre Net, pixels carrés, raccords doux et fond ambiant atténué. Écran → Image recommandée applique ces choix sans toucher à la langue, au son ou aux sauvegardes. Les filtres Pixels nets et Doux ainsi que le format Télévision 4:3 restent disponibles. Le monde pixel garde un zoom entier et des pixels carrés. Les lignes de balayage suivent les lignes du jeu et s’effacent sous 2× pour éviter le moiré.
 
-L’atlas de World couvre la zone actuellement chargée, pas toutes les zones du jeu à la fois. Mario 1, Lost Levels, Mario 2, Mario 3 et les scènes ordinaires de Yoshi construisent une carte du terrain observé en avançant. Les zones inconnues restent hachurées. Hors du cadre d’origine, effets et sprites peuvent différer. Les projections spéciales reviennent à l’image d’origine.
+L’atlas de World couvre la zone actuellement chargée. Les autres scènes ordinaires étendues cartographient le terrain observé en avançant. Les régions inconnues laissent apparaître le fond ambiant. L’atlas montre le terrain décodé et une vue rapprochée agrandie permet de jouer. Hors du cadre d’origine, effets et sprites peuvent différer ; les objets hors caméra ne sont pas simulés. Les projections spéciales gardent le cadrage d’origine.
 
 Les profils mémoire étendus et la sélection All-Stars automatique visent les éditions américaines listées. Une édition reconnue sans profil vérifié utilise le cadrage d’origine. Traduire l’interface ne traduit pas l’histoire ou les graphismes de la cartouche commerciale. Le projet ne revendique pas une nouvelle décompilation native des cinq jeux.
 
@@ -119,9 +119,9 @@ Choisis à nouveau la cartouche si son fichier a été déplacé ou si le disque
 
 ![À propos](screenshots/5.png)
 
-## Paquets et validation · 0.2.1
+## Paquets et validation · 0.2.2
 
-Les contrôles publics couvrent 85 assertions d’exécution/manette, 166 messages dans dix catalogues, la police et 240 captures réelles de l’interface. Les contrôles privés Windows couvrent les six jeux, 2 160 configurations d’affichage, neuf sauvegardes, reprise, SRAM, rembobinage et événements manette. Ces scénarios ne constituent pas une partie complète ; les appuis physiques et le son audible ne sont pas certifiés. Consulte le rapport détaillé.
+Les contrôles publics couvrent 102 assertions dans trois suites, 176 messages dans dix catalogues, la police et 240 captures réelles de l’interface. Les tests privés Windows couvrent six jeux, 2 160 configurations de régression, 1 188 cas de rendu, les sauvegardes, la SRAM, la reprise et le rembobinage. Direct3D a été mesuré depuis le raccourci dans les quatre vues en 7680×1440. Ces scènes ne constituent pas des campagnes complètes ; les boutons physiques et le son audible restent non vérifiés. Consulte le rapport détaillé.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

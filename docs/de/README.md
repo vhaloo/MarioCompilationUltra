@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.1
+# Mario Compilation Ultra 0.2.2
 
 Lokale SNES-Sammlung mit anpassbarer PC-Oberfläche und experimentellen Weltansichten. Snes9x emuliert die Module einschließlich Super FX. Eine vollständige Dekompilierung aller Spiele wird nicht behauptet.
 
-[Download und Start vom Desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download und Start vom Desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.2) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download und Start vom Desktop
 
@@ -41,9 +41,9 @@ sh ./Install-Linux.sh
 
 ![Ansichtsmodi](views.svg)
 
-Panorama ist die Standardansicht. Die automatische Einstellung der Pixelwelt wählt den größten ganzzahligen Zoom für das vollständige Originalbild. Manuelle Stufen 1–8 bleiben verfügbar. Beobachtete Atlanten passen sich erkundeten Kamerabereichen an; World zeigt den geladenen Bereich. Der dekorative Hintergrund wiederholt einen gültigen sichtbaren Ausschnitt.
+Empfohlenes Bild: Panorama, Auto-Zoom, klarer Filter, quadratische Pixel, weiche Ränder und gedimmter Umgebungsrahmen. Bildschirm → Empfohlene Bildeinstellung ändert weder Sprache noch Ton oder Spielstände. Nächste-Pixel- und weicher Filter sowie TV 4:3 sind ebenfalls verfügbar. Die Pixelwelt behält ganzzahligen Zoom und quadratische Pixel. Scanlines folgen Spielzeilen und werden unter 2× gegen Moiré ausgeblendet.
 
-Worlds Atlas zeigt den aktuell geladenen Bereich, nicht alle Spielbereiche zugleich. Mario 1, Lost Levels, Mario 2, Mario 3 und normale Yoshi-Szenen sammeln beim Bewegen beobachtetes Gelände. Unbekannte Bereiche bleiben schraffiert. Außerhalb der Originalkamera können Effekte und Sprites abweichen. Sonderprojektionen nutzen das Originalbild.
+Worlds Atlas zeigt das aktuell geladene Gebiet. Andere normale erweiterte Szenen kartieren beim Bewegen beobachtetes Gelände. Unbekannte Bereiche zeigen den Umgebungsrahmen. Der Atlas zeigt dekodiertes Gelände; eine größere Live-Nahansicht ermöglicht das Spielen. Außerhalb der Originalkamera können Effekte und Sprites abweichen; Objekte außerhalb werden nicht simuliert. Spezialprojektionen behalten den Originalausschnitt.
 
 Erweiterte Speicherprofile und die automatische All-Stars-Auswahl gelten für die aufgeführten US-Ausgaben. Erkannte Ausgaben ohne geprüftes Profil verwenden den Originalausschnitt. Die Oberfläche übersetzt weder Geschichte noch Grafiken des kommerziellen Moduls. Eine neue native Dekompilierung aller fünf Spiele wird nicht behauptet.
 
@@ -119,9 +119,9 @@ Wähle das Modul erneut, wenn die Datei verschoben oder das Laufwerk getrennt wu
 
 ![Über das Programm](screenshots/5.png)
 
-## Pakete und Prüfung · 0.2.1
+## Pakete und Prüfung · 0.2.2
 
-Öffentliche Prüfungen umfassen 85 Laufzeit-/Controller-Tests, 166 Meldungen in zehn Katalogen, Schriftabdeckung und 240 echte Bildschirmaufnahmen. Private Windows-Prüfungen betreffen sechs Spiele, 2.160 Anzeigevarianten, neun Speicherplätze, Fortsetzen, SRAM, Zurückspulen und Controller-Ereignisse. Keine vollständigen Kampagnen; physische Tastendrücke und hörbarer Ton sind nicht bestätigt. Siehe Prüfbericht.
+Öffentliche Prüfungen umfassen 102 Tests in drei Suiten, 176 Meldungen in zehn Katalogen, Schriftabdeckung und 240 echte Aufnahmen. Private Windows-Tests umfassen sechs Spiele, 2.160 Anzeige-Regressionen, 1.188 Bildfälle, Spielstände, SRAM, Fortsetzen und Zurückspulen. Direct3D wurde über die Desktop-Verknüpfung in vier Ansichten bei 7680×1440 gemessen. Begrenzte Szenen, keine vollständigen Kampagnen; physische Tasten und hörbarer Ton bleiben ungeprüft. Siehe Prüfbericht.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

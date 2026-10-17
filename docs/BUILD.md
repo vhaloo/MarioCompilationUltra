@@ -43,6 +43,20 @@ Presentation commands include `view`, `zoom`, `quality`, `background`, `freeze`,
 `menu`, `tab` and `language`. State commands are `save`, `load`, `rewind` and
 `game`. Captures and dumps belong outside the source tree.
 
+Picture commands include `filter 0|1|2` (nearest/crisp/smooth), `aspect 0|1`
+(square/TV), `softEdges 0|1`, `scanlines 0..80` and `picture recommended`.
+`metrics reset` starts an independent measurement window; `report PATH` writes
+its simulation/presentation counts, rate and 95th-percentile frame intervals.
+These counts measure work inside that window even when cartridges change or
+save states are loaded. Reports also include the core's last operation status.
+
+The presentation suite uses original pixel patterns with an SDL software renderer.
+The crisp filter uses texture scale modes and an optional render target, bounded
+to four million intermediate pixels. Unsupported targets fall back to nearest
+sampling. The relevant SDL contracts are documented at
+[texture scale modes](https://wiki.libsdl.org/SDL2/SDL_SetTextureScaleMode) and
+[render targets](https://wiki.libsdl.org/SDL2/SDL_SetRenderTarget).
+
 The runtime/unit suite executes an original, tiny 65C816 program created in
 memory. The UI suite uses an SDL virtual gamepad and a newly written synthetic
 cartridge; no retail ROM fixture is committed. The smoke suite renders the

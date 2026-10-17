@@ -112,6 +112,16 @@ int main() {
                 step();
             check(a.core.loadState(1) && a.core.native == video,
                   "Saved framebuffer restores immediately");
+            a.scriptCommand("metrics", "reset");
+            for (int i = 0; i < 3; ++i)
+                step();
+            a.scriptCommand("report", (data / "metrics.json").u8string());
+            auto reportBytes = readFile(data / "metrics.json");
+            std::string report(reportBytes.begin(), reportBytes.end());
+            check(a.core.frame > 3 && report.find("\"simulation_ticks\":3,") != std::string::npos &&
+                      report.find("\"presentation_frames\":3,") != std::string::npos &&
+                      report.find("\"frame_interval_ms_p95\":") != std::string::npos,
+                  "Measurement resets count actual ticks and presentations after state restore");
             press(SDL_CONTROLLER_BUTTON_BACK);
             press(SDL_CONTROLLER_BUTTON_B);
             check(!a.menu, "Controller back returns to gameplay");

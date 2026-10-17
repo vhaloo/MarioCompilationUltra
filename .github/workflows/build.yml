@@ -79,7 +79,7 @@ jobs:
       - name: Package
         run: python tools/package.py --build build --platform ${{ matrix.platform }} --arch ${{ matrix.arch }} --out dist --source
       - name: Test installed portable executable
-        run: python tools/validate_package.py --folder dist/MarioCompilationUltra-0.2.1-${{ matrix.platform }}-${{ matrix.arch }} --platform ${{ matrix.platform }}
+        run: python tools/validate_package.py --folder dist/MarioCompilationUltra-0.2.2-${{ matrix.platform }}-${{ matrix.arch }} --platform ${{ matrix.platform }}
       - name: Upload
         uses: actions/upload-artifact@v4
         with:

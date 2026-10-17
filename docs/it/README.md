@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.1
+# Mario Compilation Ultra 0.2.2
 
 Raccolta SNES locale con interfaccia adattabile al PC e viste estese sperimentali. Snes9x emula le cartucce, incluso Super FX. Il progetto non dichiara di aver decompilato tutti i giochi.
 
-[Download e avvio dal desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download e avvio dal desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.2) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download e avvio dal desktop
 
@@ -41,9 +41,9 @@ sh ./Install-Linux.sh
 
 ![Modalità di vista](views.svg)
 
-Panorama è la vista predefinita. In Mondo pixel, Auto sceglie il maggiore zoom intero che contiene tutto il quadro originale. Restano disponibili gli zoom manuali 1–8. Gli atlanti osservati inquadrano le zone esplorate; World inquadra l’area caricata. Lo sfondo esterno ripete una regione visibile valida.
+Immagine consigliata: Panorama, zoom Auto, filtro Nitido, pixel quadrati, bordi morbidi e sfondo ambientale attenuato. Schermo → Immagine consigliata non cambia lingua, audio o salvataggi. Sono disponibili anche Pixel esatti, Morbido e TV 4:3. Il mondo pixel mantiene zoom intero e pixel quadrati. Le linee seguono le righe del gioco e si disattivano sotto 2× per evitare il moiré.
 
-L’atlante di World copre l’area caricata, non tutte le aree insieme. Mario 1, Lost Levels, Mario 2, Mario 3 e le scene normali di Yoshi accumulano il terreno osservato durante il movimento. Le aree sconosciute sono tratteggiate. Fuori dalla camera originale effetti e sprite possono differire. Le proiezioni speciali usano l’immagine originale.
+L’atlante di World mostra l’area caricata. Le altre normali scene estese mappano il terreno osservato durante il movimento. Le aree sconosciute lasciano vedere lo sfondo ambientale. L’atlante mostra il terreno decodificato e una vista ravvicinata più grande permette di giocare. Fuori dalla camera originale effetti e sprite possono differire; gli oggetti fuori campo non sono simulati. Le proiezioni speciali mantengono l’inquadratura originale.
 
 I profili di memoria e la selezione automatica All-Stars riguardano le edizioni USA elencate. Un’edizione riconosciuta senza profilo verificato usa l’inquadratura originale. Tradurre l’interfaccia non traduce storia o grafica della cartuccia commerciale. Non si dichiara una nuova decompilazione nativa dei cinque giochi.
 
@@ -119,9 +119,9 @@ Scegli di nuovo la cartuccia se il file è stato spostato o l’unità scollegat
 
 ![Informazioni](screenshots/5.png)
 
-## Pacchetti e verifica · 0.2.1
+## Pacchetti e verifica · 0.2.2
 
-I controlli pubblici coprono 85 verifiche, 166 messaggi in dieci cataloghi, caratteri e 240 schermate reali. I controlli privati Windows coprono sei giochi, 2.160 configurazioni video, nove slot, ripresa, SRAM, riavvolgimento ed eventi del controller. Sono scenari limitati, non campagne complete; pressioni fisiche e audio udibile non sono certificati. Vedi il rapporto.
+I controlli pubblici coprono 102 verifiche in tre suite, 176 messaggi in dieci cataloghi, caratteri e 240 schermate reali. I test privati Windows includono sei giochi, 2.160 configurazioni di regressione, 1.188 casi immagine, salvataggi, SRAM, ripresa e riavvolgimento. Direct3D è stato misurato dal collegamento sul desktop nelle quattro viste a 7680×1440. Sono scene limitate, non campagne complete; pulsanti fisici e audio udibile restano non verificati. Vedi il rapporto.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 
