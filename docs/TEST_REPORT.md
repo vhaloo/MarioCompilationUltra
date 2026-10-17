@@ -56,7 +56,7 @@ simulation beyond that camera retain experimental limits.
 
 ## Public tests and localization
 
-The Windows Release build passes **102 assertions in three CTest suites**:
+The Windows Release build passes **104 assertions in three CTest suites**:
 
 - **49** engine/import/settings/rendering checks. Original synthetic fixtures
   cover import bounds, corrupt inputs, native CPU/video/audio, state integrity,
@@ -64,11 +64,16 @@ The Windows Release build passes **102 assertions in three CTest suites**:
   columns, raster/HUD separation, safe scenery and observed-atlas bounds.
   Switching cartridges clears previous observations and high-resolution dimensions
   before the first new frame; the regression failed before that reset.
-- **39** UI/controller/localization checks. An in-process SDL virtual controller
+- **41** UI/controller/localization checks. An in-process SDL virtual controller
   navigates menu pages, starts an original synthetic cartridge, pauses/resumes,
   provides input, saves/restores and reconnects. Unplugging while Back is held
   failed before the edge-state reset and passes after the correction.
   All ten languages render with zero missing glyphs and persist their settings.
+  Holding run/right with a retained menu focus reproduced an empty ImGui window
+  switcher over gameplay. Menu navigation is now disabled during play, stale
+  windowing targets are cleared and the regression verifies both uninterrupted
+  input and returning from a menu while run is held. The fixture fails before
+  this correction and passes after it; real journey captures are also inspected.
 - **14** presentation checks. Original pixel patterns verify exact integer output,
   reduced fractional blending compared with ordinary bilinear filtering,
   transparency through intermediate targets, clipping, square/TV/portrait

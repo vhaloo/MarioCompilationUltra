@@ -18,6 +18,8 @@
   2×, keeping their pattern stable at fractional sizes.
 - Record simulation ticks and presentation intervals in resettable measurement
   windows. Refresh all ten catalogs, illustrated guides and UI captures.
+- Route controller navigation to visible menus only. Holding the run button
+  during play no longer opens an empty interface window over the game.
 - Add original-pixel presentation regressions and private six-game comparisons
   across filters, aspects, window shapes, scenery and native fallback.
 

@@ -62,6 +62,10 @@ void App::init() {
     ImGui::CreateContext();
     auto &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
+    // This application has one fixed options window. ImGui's window switcher
+    // is not an application shortcut and must not react to game controls.
+    ImGui::GetCurrentContext()->ConfigNavWindowingKeyNext = 0;
+    ImGui::GetCurrentContext()->ConfigNavWindowingKeyPrev = 0;
     io.IniFilename = nullptr;
     io.LogFilename = nullptr;
     char *base = SDL_GetBasePath();
@@ -1228,6 +1232,18 @@ void App::render() {
     SDL_SetRenderDrawColor(renderer, 12, 19, 28, 255);
     SDL_RenderClear(renderer);
     drawGame();
+    auto &io = ImGui::GetIO();
+    const int navigation = ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
+    if (menu || browser || dialog)
+        io.ConfigFlags |= navigation;
+    else {
+        io.ConfigFlags &= ~navigation;
+        // A previously focused or implicit window can survive a direct game
+        // launch. Holding SNES Y (Xbox X) must not open a blank window list.
+        auto &context = *ImGui::GetCurrentContext();
+        context.NavWindowingTarget = context.NavWindowingTargetAnim = nullptr;
+        context.NavWindowingToggleLayer = false;
+    }
     ImGui_ImplSDLRenderer2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
@@ -1362,9 +1378,9 @@ void App::report(const fs::path &p, double elapsed) const {
     o << std::setprecision(12) << "{\n\"version\":\"" << MCU_VERSION
       << "\",\n\"game\":" << jsonString(core.currentId)
       << ",\n\"loaded\":" << (core.loaded ? "true" : "false") << ",\n\"frames\":" << core.frame
-      << ",\n\"core_status\":" << jsonString(core.status)
-      << ",\n\"snes_hz\":" << core.fps << ",\n\"elapsed_seconds\":" << elapsed
-      << ",\n\"measured_seconds\":" << measured << ",\n\"simulation_ticks\":" << simulationTicks
+      << ",\n\"core_status\":" << jsonString(core.status) << ",\n\"snes_hz\":" << core.fps
+      << ",\n\"elapsed_seconds\":" << elapsed << ",\n\"measured_seconds\":" << measured
+      << ",\n\"simulation_ticks\":" << simulationTicks
       << ",\n\"simulation_fps\":" << (measured > 0 ? simulationTicks / measured : 0)
       << ",\n\"presentation_frames\":" << presentationFrames
       << ",\n\"presentation_fps\":" << (measured > 0 ? presentationFrames / measured : 0)

@@ -1,6 +1,7 @@
 #include "app.h"
 #include <iostream>
 #include <cstring>
+#include <imgui_internal.h>
 using namespace mcu;
 static int checks = 0;
 static void check(bool b, const char *m) {
@@ -101,6 +102,32 @@ int main() {
             for (int i = 0; i < 5; i++)
                 step();
             check(!a.menu && a.core.frame > before, "Controller resumes gameplay");
+            a.settings.recommendedPicture();
+            // Reproduce a retained menu focus, as seen when launching straight
+            // into a game before a normal visible menu frame has retired it.
+            ImGui::SetWindowFocus("##menu");
+            SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_X, 1);
+            SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_DPAD_RIGHT, 1);
+            bool cleanGame = true;
+            auto runFrame = a.core.frame;
+            for (int i = 0; i < 80; ++i) {
+                step();
+                cleanGame &= ImGui::GetDrawData()->TotalVtxCount == 0 &&
+                             GImGui->NavWindowingTarget == nullptr &&
+                             GImGui->NavWindowingTargetAnim == nullptr;
+            }
+            check(cleanGame && a.core.frame == runFrame + 80 && (a.core.buttons[0] & 130) == 130,
+                  "Holding run and right cannot draw an invisible-menu window switcher over play");
+            press(SDL_CONTROLLER_BUTTON_BACK);
+            press(SDL_CONTROLLER_BUTTON_START);
+            step();
+            check(!a.menu && ImGui::GetDrawData()->TotalVtxCount == 0 &&
+                      GImGui->NavWindowingTarget == nullptr &&
+                      GImGui->NavWindowingTargetAnim == nullptr,
+                  "Returning from a menu with run held leaves no navigation overlay");
+            SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_X, 0);
+            SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_DPAD_RIGHT, 0);
+            step();
             SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_A, 1);
             step();
             check((a.core.buttons[0] & 1) != 0, "Bottom button maps to SNES B");

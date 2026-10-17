@@ -121,7 +121,7 @@ Scegli di nuovo la cartuccia se il file è stato spostato o l’unità scollegat
 
 ## Pacchetti e verifica · 0.2.2
 
-I controlli pubblici coprono 102 verifiche in tre suite, 176 messaggi in dieci cataloghi, caratteri e 240 schermate reali. I test privati Windows includono sei giochi, 2.160 configurazioni di regressione, 1.188 casi immagine, salvataggi, SRAM, ripresa e riavvolgimento. Direct3D è stato misurato dal collegamento sul desktop nelle quattro viste a 7680×1440. Sono scene limitate, non campagne complete; pulsanti fisici e audio udibile restano non verificati. Vedi il rapporto.
+I controlli pubblici coprono 104 verifiche in tre suite, 176 messaggi in dieci cataloghi, caratteri e 240 schermate reali. I test privati Windows includono sei giochi, 2.160 configurazioni di regressione, 1.188 casi immagine, salvataggi, SRAM, ripresa e riavvolgimento. Direct3D è stato misurato dal collegamento sul desktop nelle quattro viste a 7680×1440. Sono scene limitate, non campagne complete; pulsanti fisici e audio udibile restano non verificati. Vedi il rapporto.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

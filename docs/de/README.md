@@ -121,7 +121,7 @@ Wähle das Modul erneut, wenn die Datei verschoben oder das Laufwerk getrennt wu
 
 ## Pakete und Prüfung · 0.2.2
 
-Öffentliche Prüfungen umfassen 102 Tests in drei Suiten, 176 Meldungen in zehn Katalogen, Schriftabdeckung und 240 echte Aufnahmen. Private Windows-Tests umfassen sechs Spiele, 2.160 Anzeige-Regressionen, 1.188 Bildfälle, Spielstände, SRAM, Fortsetzen und Zurückspulen. Direct3D wurde über die Desktop-Verknüpfung in vier Ansichten bei 7680×1440 gemessen. Begrenzte Szenen, keine vollständigen Kampagnen; physische Tasten und hörbarer Ton bleiben ungeprüft. Siehe Prüfbericht.
+Öffentliche Prüfungen umfassen 104 Tests in drei Suiten, 176 Meldungen in zehn Katalogen, Schriftabdeckung und 240 echte Aufnahmen. Private Windows-Tests umfassen sechs Spiele, 2.160 Anzeige-Regressionen, 1.188 Bildfälle, Spielstände, SRAM, Fortsetzen und Zurückspulen. Direct3D wurde über die Desktop-Verknüpfung in vier Ansichten bei 7680×1440 gemessen. Begrenzte Szenen, keine vollständigen Kampagnen; physische Tasten und hörbarer Ton bleiben ungeprüft. Siehe Prüfbericht.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

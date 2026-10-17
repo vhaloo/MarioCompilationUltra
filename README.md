@@ -127,7 +127,7 @@ Choose cartridge again if its file was moved or a drive is disconnected. ZIPs mu
 
 ## Packages and validation · 0.2.2
 
-Public checks cover 102 assertions in three suites, 176 messages in ten catalogs, font coverage and 240 actual interface captures. Private Windows checks include six games, 2,160 regression display configurations, 1,188 picture cases, saves, SRAM, resume and rewind. Direct3D was measured from the desktop shortcut in all four views at 7680×1440. These are bounded scenes, not complete campaigns; physical gamepad buttons and audible output remain unverified. See the detailed report.
+Public checks cover 104 assertions in three suites, 176 messages in ten catalogs, font coverage and 240 actual interface captures. Private Windows checks include six games, 2,160 regression display configurations, 1,188 picture cases, saves, SRAM, resume and rewind. Direct3D was measured from the desktop shortcut in all four views at 7680×1440. These are bounded scenes, not complete campaigns; physical gamepad buttons and audible output remain unverified. See the detailed report.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](docs/TEST_REPORT.md) · [Build](docs/BUILD.md) · [Source / research](docs/RESEARCH.md)
 
