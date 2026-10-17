@@ -1,5 +1,6 @@
 #include "world.h"
 #include <SDL.h>
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <iostream>
