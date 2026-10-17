@@ -20,6 +20,8 @@
   windows. Refresh all ten catalogs, illustrated guides and UI captures.
 - Route controller navigation to visible menus only. Holding the run button
   during play no longer opens an empty interface window over the game.
+- Keep transparent observed sky over the ambient surround after scrolling,
+  preventing black panels where a background layer cannot reproduce the sky.
 - Add original-pixel presentation regressions and private six-game comparisons
   across filters, aspects, window shapes, scenery and native fallback.
 

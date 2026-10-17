@@ -56,14 +56,19 @@ simulation beyond that camera retain experimental limits.
 
 ## Public tests and localization
 
-The Windows Release build passes **104 assertions in three CTest suites**:
+The Windows Release build passes **106 assertions in three CTest suites**:
 
-- **49** engine/import/settings/rendering checks. Original synthetic fixtures
+- **51** engine/import/settings/rendering checks. Original synthetic fixtures
   cover import bounds, corrupt inputs, native CPU/video/audio, state integrity,
   exact restore, bounded rewind, automatic zoom, both World layouts, vertical
   columns, raster/HUD separation, safe scenery and observed-atlas bounds.
   Switching cartridges clears previous observations and high-resolution dimensions
   before the first new frame; the regression failed before that reset.
+  A transparent observed tile is scrolled out of the live camera and must remain
+  transparent over the ambient surround. This regression reproduced the black
+  sky panels found in moving gameplay captures and fails before the correction.
+  Both ambient styles sample the emitted image; selecting unblurred scenery
+  cannot drop its sky gradients or other layers in favour of a decoded BG2.
 - **41** UI/controller/localization checks. An in-process SDL virtual controller
   navigates menu pages, starts an original synthetic cartridge, pauses/resumes,
   provides input, saves/restores and reconnects. Unplugging while Back is held

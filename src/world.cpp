@@ -355,9 +355,7 @@ void World::compose(const Core &c, Settings &s, int dw, int dh) {
                 int rr = 0, gg = 0, bb = 0, n = 0;
                 for (int py = y0; py < std::max(y0 + 1, y1); ++py)
                     for (int px = x0; px < std::max(x0 + 1, x1); ++px) {
-                        auto q = scene.valid && s.background == 1
-                                     ? backdrop(c, scene, scene.cameraX + px, scene.cameraY + py)
-                                     : c.native[py * c.width + px];
+                        auto q = c.native[py * c.width + px];
                         rr += (q >> 16) & 255;
                         gg += (q >> 8) & 255;
                         bb += q & 255;
@@ -455,11 +453,13 @@ void World::compose(const Core &c, Settings &s, int dw, int dh) {
                 continue;
             }
             uint32_t p = 0;
-            if (s.view != 3 && wx >= 0 && wx < sc.width && wy >= 0 && wy < sc.height)
+            if (sc.fullMap && s.view != 3 && wx >= 0 && wx < sc.width && wy >= 0 && wy < sc.height)
                 p = s.background <= 1   ? backdrop(c, sc, wx, wy)
                     : s.background == 3 ? 0xff000000
                                         : 0xff101c29;
             auto t = terrain(c, scene, wx, wy);
+            // Observed BG1 transparency belongs over the ambient surround. The
+            // current BG2 alone cannot reproduce another camera's sky/HDMA.
             if (t)
                 p = t;
             bool known = sc.fullMap || cache.find(key(wx / 8, wy / 8)) != cache.end();

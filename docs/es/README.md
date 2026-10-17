@@ -121,7 +121,7 @@ Vuelve a elegir el cartucho si moviste el archivo o desconectaste la unidad. El 
 
 ## Paquetes y validación · 0.2.2
 
-Las pruebas públicas cubren 104 comprobaciones en tres suites, 176 mensajes en diez catálogos, fuentes y 240 capturas reales. Las pruebas privadas de Windows incluyen seis juegos, 2.160 configuraciones de regresión, 1.188 casos de imagen, partidas, SRAM, reanudación y rebobinado. Se midió Direct3D desde el acceso directo en las cuatro vistas a 7680×1440. Son escenas limitadas, no campañas completas; los botones físicos y el sonido audible siguen sin verificar. Consulta el informe.
+Las pruebas públicas cubren 106 comprobaciones en tres suites, 176 mensajes en diez catálogos, fuentes y 240 capturas reales. Las pruebas privadas de Windows incluyen seis juegos, 2.160 configuraciones de regresión, 1.188 casos de imagen, partidas, SRAM, reanudación y rebobinado. Se midió Direct3D desde el acceso directo en las cuatro vistas a 7680×1440. Son escenas limitadas, no campañas completas; los botones físicos y el sonido audible siguen sin verificar. Consulta el informe.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

@@ -1,5 +1,6 @@
 #include "world.h"
 #include <SDL.h>
+#include <cmath>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
@@ -285,6 +286,33 @@ int main() {
                       unknownY < layout.canvas.height &&
                       layout.canvas.pixels[unknownY * layout.canvas.width + unknownX] == 0,
                   "Unknown atlas regions reveal ambient scenery without invented sharp tiles");
+            // Observe a transparent BG1 tile, then scroll it outside the camera.
+            // A decoded BG2 is not the native sky (which may use HDMA/other layers).
+            for (int row : {10, 11})
+                core.snapshot.vram[0x4000 + (row * 32 + 2) * 2] = 2;
+            renderSettings.view = 1;
+            ++core.imageVersion;
+            layout.reset();
+            layout.compose(core, renderSettings, 1280, 720);
+            ram[0x5e] = 64;
+            ++core.imageVersion;
+            layout.compose(core, renderSettings, 1280, 720);
+            int skyX = int(
+                std::ceil((16 - layout.canvas.x) * layout.canvas.width / layout.canvas.worldWidth));
+            int skyY = int(std::ceil((320 - layout.canvas.y) * layout.canvas.height /
+                                     layout.canvas.worldHeight));
+            check(layout.sampleTerrainForTest(core, 16, 320) == 0 &&
+                      layout.canvas.pixels[skyY * layout.canvas.width + skyX] == 0,
+                  "Transparent observed tiles leave the ambient surround visible after scrolling");
+            auto originalPixels = core.native;
+            core.native.assign(core.native.size(), 0xff123456);
+            renderSettings.background = 1;
+            ++core.imageVersion;
+            layout.compose(core, renderSettings, 1280, 720);
+            check(std::all_of(layout.backdropPixels.begin(), layout.backdropPixels.end(),
+                              [](auto p) { return p == 0xff123456; }),
+                  "Sharp ambient scenery retains the emitted image's layers and colour effects");
+            core.native = std::move(originalPixels);
             core.snapshot.rasterValid = false;
             ++core.imageVersion;
             layout.reset();

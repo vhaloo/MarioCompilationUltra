@@ -121,7 +121,7 @@ Choisis à nouveau la cartouche si son fichier a été déplacé ou si le disque
 
 ## Paquets et validation · 0.2.2
 
-Les contrôles publics couvrent 104 assertions dans trois suites, 176 messages dans dix catalogues, la police et 240 captures réelles de l’interface. Les tests privés Windows couvrent six jeux, 2 160 configurations de régression, 1 188 cas de rendu, les sauvegardes, la SRAM, la reprise et le rembobinage. Direct3D a été mesuré depuis le raccourci dans les quatre vues en 7680×1440. Ces scènes ne constituent pas des campagnes complètes ; les boutons physiques et le son audible restent non vérifiés. Consulte le rapport détaillé.
+Les contrôles publics couvrent 106 assertions dans trois suites, 176 messages dans dix catalogues, la police et 240 captures réelles de l’interface. Les tests privés Windows couvrent six jeux, 2 160 configurations de régression, 1 188 cas de rendu, les sauvegardes, la SRAM, la reprise et le rembobinage. Direct3D a été mesuré depuis le raccourci dans les quatre vues en 7680×1440. Ces scènes ne constituent pas des campagnes complètes ; les boutons physiques et le son audible restent non vérifiés. Consulte le rapport détaillé.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 
