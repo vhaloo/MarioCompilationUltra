@@ -1,5 +1,6 @@
 #pragma once
 #include "core.h"
+#include "complete_map.h"
 #include <unordered_map>
 namespace mcu {
 struct Marker {
@@ -24,17 +25,23 @@ class World {
     };
     std::unordered_map<uint64_t, CachedTile> cache;
     std::vector<std::array<uint32_t, 256>> blockPixels;
+    std::vector<std::array<uint32_t, 256>> secondaryPixels;
+    std::vector<std::array<uint16_t, 4>> blockAttributes;
     std::vector<uint32_t> scenery;
     mutable std::array<std::unordered_map<uint16_t, std::array<uint32_t, 64>>, 4> decodedTiles;
+    mutable std::vector<int> completeIndex;
+    mutable std::vector<std::array<uint32_t, 256>> completeBlocks;
     int sceneryW = 0, sceneryH = 0;
     uint64_t graphicsVersion = ~uint64_t(0);
     int lastStage = -1, lastKind = -1, minX = 0, maxX = 256, minY = 0, maxY = 224,
         previousCameraX = 0, previousCameraY = 0;
     uint64_t lastFrame = ~uint64_t(0);
+    bool wholeLevel = false;
     uint32_t tilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
     uint32_t preparedTilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
     uint32_t bgPixel(const McuVideo &, int bg, int x, int y, bool prepared = false) const;
     uint32_t terrain(const Core &, const Scene &, int x, int y) const;
+    const std::array<uint32_t, 256> *completeBlock(const Core &, int id) const;
     uint32_t backdrop(const Core &, const Scene &, int x, int y) const;
     void remember(const Core &, const Scene &);
     void prepareGraphics(const Core &, const Scene &);
@@ -42,6 +49,7 @@ class World {
   public:
     Canvas canvas;
     Scene scene;
+    CompleteMap complete;
     std::vector<uint32_t> backdropPixels;
     bool expanded = false;
     size_t knownTiles() const { return cache.size(); }
@@ -51,8 +59,9 @@ class World {
         lastFrame = ~uint64_t(0);
         cache.clear();
         graphicsVersion = ~uint64_t(0);
+        complete.reset();
     }
-    Scene inspect(const Core &) const;
+    Scene inspect(const Core &, bool completeView = false) const;
     void compose(const Core &, Settings &, int drawableWidth, int drawableHeight);
     uint32_t decodeTileForTest(const McuVideo &s, int bg, uint16_t a, int x, int y) const {
         return tilePixel(s, bg, a, x, y);

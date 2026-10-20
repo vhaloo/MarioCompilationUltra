@@ -118,6 +118,7 @@ int main() {
         s.filter = 2;
         s.aspect = 1;
         s.softEdges = false;
+        s.view = 4;
         s.clamp();
         check(s.zoom == 8, "Settings bounds");
         l.paths["world"] = fs::u8path("space é/own rom.sfc");
@@ -128,6 +129,7 @@ int main() {
         t.load(ll);
         check(ll.paths == l.paths && t.zoom == 8 && t.filter == 2 && t.aspect == 1 && !t.softEdges,
               "UTF-8 paths and picture settings round trip");
+        check(t.view == 4, "Full level map selection survives the settings round trip");
         World world;
         McuVideo v;
         v.mode = 1;
@@ -258,6 +260,7 @@ int main() {
                   "Decorative scenery does not expose unused streamed VRAM pages");
             core.currentId = "smb3";
             ram.fill(0);
+            ram[0x70a] = 1;
             ram[0x100] = 0xc0;
             ram[0x22] = 1;
             ram[0x55] = 1;
@@ -277,7 +280,7 @@ int main() {
                   "SMB3's status rows are not cached as terrain");
             renderSettings.view = 3;
             layout.compose(core, renderSettings, 1280, 720);
-            check(layout.canvas.y == 239 && layout.canvas.worldHeight == 224,
+            check(layout.canvas.y == 240 && layout.canvas.worldHeight == 224,
                   "Observed atlas fits explored bounds instead of unused level coordinates");
             int unknownX = int(std::ceil((300 - layout.canvas.x) * layout.canvas.width /
                                          layout.canvas.worldWidth));

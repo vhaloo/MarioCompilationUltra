@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.2
+# Mario Compilation Ultra 0.3.0
 
 本地SNES合集，提供可调整的电脑界面和实验性扩展视图。Snes9x负责模拟卡带，包括Super FX。本项目并未声称已反编译所有游戏。
 
-[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.2) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.3.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 下载与桌面启动
 
@@ -43,7 +43,7 @@ sh ./Install-Linux.sh
 
 推荐画面：全景、自动缩放、清晰滤镜、方形像素、柔和边缘及调暗的环境背景。在屏幕设置中选择推荐画面设置，不会改变语言、声音或存档。还可选择最近邻、平滑滤镜及电视4:3。像素世界始终保持整数缩放和方形像素。扫描线跟随游戏图像行，在低于2倍时关闭以避免摩尔纹。
 
-World图集显示当前加载的区域。其他常规扩展场景会在移动时绘制已观察地形的地图。未知区域显示环境背景。图集展示解码地形，并提供更大的实时近景用于游玩。原始镜头外的效果和精灵可能不同，且不模拟镜头外物体。特殊投影保持原始画幅。
+完整地图（Ctrl+5）在六款游戏中均可从首个可操作画面显示已加载区域的全部地形，无需预先探索。穿门或水管后切换地图，不会拼接彼此分离的房间。Mario World 会显示存在的两个地形层。箭头标示玩家，空余位置足够时还会显示实时近景。原有四种视图仍然保留；除 World 外，它们继续积累已观察地形。角色、移动平台及特效仍采用原游戏的模拟和激活范围。没有地形布局的特殊场景保留原生画面。按下左摇杆即可循环：图集→完整地图→全景。
 
 扩展内存配置与All-Stars自动选择针对所列美版。已识别但没有已验证配置的版本使用原始画面。界面翻译不会翻译商业卡带的剧情或图像。项目并不声称实现了全部五款游戏的新原生反编译版本。
 
@@ -62,7 +62,7 @@ World图集显示当前加载的区域。其他常规扩展场景会在移动时
 X：SNES A · S：SNES X · C/V：L/R<br>
 Enter：Start · 右Shift：Select<br>
 Esc/F10：设置 · Backspace：倒带<br>
-Ctrl+1/2/3/4：切换视图 · +/-：像素缩放<br>
+Ctrl+1/2/3/4/5：切换视图 · +/-：像素缩放<br>
 F：固定镜头 · I/J/K/L：移动镜头 · R：跟随<br>
 F1–F9：读档 · Shift+F1–F9：存档 · F12：截图<br>
 <br>
@@ -70,7 +70,7 @@ F1–F9：读档 · Shift+F1–F9：存档 · F12：截图<br>
 左摇杆 / 方向键：移动 · 下/右：B/A<br>
 左/上：Y/X · 肩键：L/R · Start：Start<br>
 View/Back：设置 · LT：倒带 · RT：Select<br>
-按左摇杆：地图 · LB/RB：设置页<br>
+按左摇杆：图集 / 完整地图 / 全景 · LB/RB：菜单分页<br>
 菜单：方向键 + 下键确认 + 右键返回
 
 ## 存档与声音
@@ -119,9 +119,9 @@ View/Back：设置 · LT：倒带 · RT：Select<br>
 
 ![关于](screenshots/5.png)
 
-## 软件包与验证 · 0.2.2
+## 软件包与验证 · 0.3.0
 
-公开检查涵盖三个测试套件的106项断言、十种语言的176条消息、字体覆盖和240张真实界面截图。Windows私密测试包括六款游戏、2160种回归显示配置、1188种画面情形、存档、SRAM、自动恢复和回退。已通过桌面快捷方式以7680×1440测量四种视图的Direct3D表现。这些是有限场景，并非完整通关；实体按钮和可听音频仍未验证。详见测试报告。
+公开检查涵盖四个套件的156项断言、每种语言179条消息、字体覆盖和240张真实界面截图。私密检查涵盖六款游戏、首帧地图、横向和纵向地形、105个经典区域、115个Mario 2区域、210个Mario 3房间、两个版本的1024个World关卡表项及222个Yoshi房间表项。这些是有限的加载、地形、像素及功能测试，并非完整通关。实体按钮、可听音频及实体Linux/Mac游戏运行仍未验证。详见报告。
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

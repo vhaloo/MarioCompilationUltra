@@ -1,7 +1,7 @@
 set(SNES_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/vendor/snes9x)
 set(SNES_SOURCES apu/apu.cpp apu/bapu/dsp/sdsp.cpp apu/bapu/smp/smp.cpp apu/bapu/smp/smp_state.cpp bsx.cpp c4.cpp c4emu.cpp cheats.cpp cheats2.cpp clip.cpp conffile.cpp controls.cpp cpu.cpp cpuexec.cpp cpuops.cpp crosshairs.cpp dma.cpp dsp.cpp dsp1.cpp dsp2.cpp dsp3.cpp dsp4.cpp fxinst.cpp fxemu.cpp gfx.cpp globals.cpp memmap.cpp obc1.cpp msu1.cpp ppu.cpp stream.cpp sa1.cpp sa1cpu.cpp screenshot.cpp sdd1.cpp sdd1emu.cpp seta.cpp seta010.cpp seta011.cpp seta018.cpp snapshot.cpp snes9x.cpp spc7110.cpp srtc.cpp tile.cpp tileimpl-n1x1.cpp tileimpl-n2x1.cpp tileimpl-h2x1.cpp sha256.cpp bml.cpp movie.cpp fscompat.cpp libretro/libretro.cpp filter/snes_ntsc.c)
 list(TRANSFORM SNES_SOURCES PREPEND "${SNES_ROOT}/")
-add_library(mcu_core STATIC ${SNES_SOURCES} src/observer.cpp)
+add_library(mcu_core STATIC ${SNES_SOURCES} src/observer.cpp src/map_probe.cpp)
 target_include_directories(mcu_core PRIVATE ${SNES_ROOT} ${SNES_ROOT}/apu ${SNES_ROOT}/apu/bapu ${SNES_ROOT}/libretro ${SNES_ROOT}/libretro/libretro-common/include ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_compile_definitions(mcu_core PRIVATE __LIBRETRO__ RIGHTSHIFT_IS_SAR ALLOW_CPU_OVERCLOCK)
 if(NOT WIN32)

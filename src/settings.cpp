@@ -20,7 +20,7 @@ void Settings::recommendedPicture() {
     inset = true;
 }
 void Settings::clamp() {
-    view = std::clamp(view, 0, 3);
+    view = std::clamp(view, 0, 4);
     zoom = std::clamp(zoom, 0, 8);
     background = std::clamp(background, 0, 3);
     blur = std::clamp(blur, 0, 48);

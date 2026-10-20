@@ -3,17 +3,17 @@
 
 [English](docs/en/README.md) · [Français](docs/fr/README.md) · [Español](docs/es/README.md) · [日本語](docs/ja/README.md) · [Deutsch](docs/de/README.md) · [Italiano](docs/it/README.md) · [Português](docs/pt/README.md) · [Русский](docs/ru/README.md) · [简体中文](docs/zh/README.md) · [한국어](docs/ko/README.md)
 
-# Mario Compilation Ultra 0.2.2
+# Mario Compilation Ultra 0.3.0
 
 A local SNES collection with an adaptive PC interface and experimental world views. Snes9x supplies the cartridge simulation, including Super FX. No decompilation of every game is claimed.
 
-[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.2) · [HTML](docs/en/guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.3.0) · [HTML](docs/en/guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download and desktop startup
 
 | Windows x64 | Linux x64 | macOS Intel x64 | macOS Apple Silicon arm64 |
 |---|---|---|---|
-| [ZIP](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.2.2/MarioCompilationUltra-0.2.2-windows-x64.zip) | [ZIP](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.2.2/MarioCompilationUltra-0.2.2-linux-x64.zip) | [ZIP — experimental](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.2.2/MarioCompilationUltra-0.2.2-macos-x64.zip) | [ZIP — experimental](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.2.2/MarioCompilationUltra-0.2.2-macos-arm64.zip) |
+| [ZIP](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.3.0/MarioCompilationUltra-0.3.0-windows-x64.zip) | [ZIP](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.3.0/MarioCompilationUltra-0.3.0-linux-x64.zip) | [ZIP — experimental](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.3.0/MarioCompilationUltra-0.3.0-macos-x64.zip) | [ZIP — experimental](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.3.0/MarioCompilationUltra-0.3.0-macos-arm64.zip) |
 
 All four packages contain all ten interface languages, illustrated guides, licences and original desktop icons.
 
@@ -49,7 +49,7 @@ sh ./Install-Linux.sh
 
 Recommended picture: Panorama, Auto zoom, Crisp filter, square pixels, soft edges and a dimmed ambient surround. Use Screen → Recommended picture to apply it without changing language, sound or saves. Nearest and Smooth filters and TV 4:3 are also available. Pixel world always retains square pixels and integer zoom. Scanlines follow game rows and turn off below 2× to avoid moiré.
 
-World’s atlas covers the currently loaded area. Other ordinary expanded scenes build a map from terrain observed while moving. Unknown regions reveal the ambient surround. The atlas shows decoded terrain, with a larger live close-up for play. Outside the original camera, effects and sprites can differ; off-camera objects are not simulated. Special projections keep original framing.
+Full level map (Ctrl+5) shows all decoded terrain in the loaded area from its first playable frame, for all six games. No camera tour is needed. Doors and pipes replace it with the next area's map; disconnected rooms are not stitched together. Mario World includes both terrain planes where present. A player arrow and a live close-up, when there is spare space, help you play. The four existing views remain: Original, Panorama, Pixel world and Stage atlas. The older views in games other than World still accumulate observed terrain. Off-camera actors, moving platforms and special effects retain the original simulation and activation range; the terrain map does not turn them all on. Special arenas without a terrain layout retain their native view. Press the left stick to cycle Stage atlas → Full level map → Panorama.
 
 Expanded memory profiles and automatic All-Stars selection target the listed US editions. A recognized edition without a verified profile uses original framing. Interface translation does not translate the commercial cartridge’s story or graphics. No new native decompilation of all five games is claimed.
 
@@ -68,7 +68,7 @@ Arrows: move · Z: jump · A: run / grab<br>
 X: SNES A · S: SNES X · C/V: L/R<br>
 Enter: Start · Right Shift: Select<br>
 Esc/F10: options · Backspace: rewind<br>
-Ctrl+1/2/3/4: views · +/-: pixel zoom<br>
+Ctrl+1/2/3/4/5: views · +/-: pixel zoom<br>
 F: freeze camera · I/J/K/L: pan · R: follow<br>
 F1–F9: load · Shift+F1–F9: save · F12: screenshot<br>
 <br>
@@ -76,7 +76,7 @@ GAMEPAD<br>
 Left stick / D-pad: move · bottom/right: B/A<br>
 left/top: Y/X · bumpers: L/R · Start: Start<br>
 View/Back: options · LT: rewind · RT: Select<br>
-Left stick click: atlas · LB/RB: menu sections<br>
+Left stick click: atlas / full map / panorama · LB/RB: menu sections<br>
 Menus: D-pad + bottom confirm + right back
 
 ## Saves & sound
@@ -125,9 +125,9 @@ Choose cartridge again if its file was moved or a drive is disconnected. ZIPs mu
 
 ![About](docs/en/screenshots/5.png)
 
-## Packages and validation · 0.2.2
+## Packages and validation · 0.3.0
 
-Public checks cover 106 assertions in three suites, 176 messages in ten catalogs, font coverage and 240 actual interface captures. Private Windows checks include six games, 2,160 regression display configurations, 1,188 picture cases, saves, SRAM, resume and rewind. Direct3D was measured from the desktop shortcut in all four views at 7680×1440. These are bounded scenes, not complete campaigns; physical gamepad buttons and audible output remain unverified. See the detailed report.
+Public checks cover 156 assertions in four suites, 179 messages per language, font coverage and 240 actual interface captures. Private checks cover all six games, first-frame map preparation, horizontal and vertical geometry, 105 classic areas, 115 Mario 2 areas, 210 Mario 3 rooms, 1,024 World level-table entries in two editions, and 222 Yoshi room entries. These are bounded loader, geometry, pixel and runtime tests, not completed campaigns. Physical controller buttons, audible output and physical Linux/Mac gameplay remain unverified. See the detailed report.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](docs/TEST_REPORT.md) · [Build](docs/BUILD.md) · [Source / research](docs/RESEARCH.md)
 

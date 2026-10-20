@@ -20,24 +20,25 @@ def main():
 <rect x="53" y="110" width="207" height="225" rx="14" fill="none" stroke="#ecd477" stroke-opacity=".45" stroke-dasharray="7 7"/>
 <g font-family="system-ui,Arial,sans-serif"><text x="310" y="152" fill="#eef5f1" font-size="52" font-weight="700">MARIO COMPILATION ULTRA</text><text x="312" y="215" fill="#a0d1b6" font-size="27">{tr('YOUR CARTRIDGES. A BIGGER VIEW.')}</text><text x="312" y="267" fill="#acc0cc" font-size="20">Windows · Linux · macOS · 10 / {escape(language['name'])}</text><text x="312" y="314" fill="#99aebc" font-size="18">{tr('Illustrative geometry; no Nintendo artwork')}</text></g></svg>'''
         (output / 'hero.svg').write_text(hero, encoding='utf8')
-        svg = '''<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="790" viewBox="0 0 1440 790" role="img"><defs><linearGradient id="unknown" x2="0" y2="1"><stop stop-color="#304c5b"/><stop offset="1" stop-color="#19332f"/></linearGradient></defs><rect width="1440" height="790" rx="24" fill="#101a26"/><g font-family="system-ui,Arial,sans-serif">'''
-        for index, mode in enumerate(['Original framing', 'Panorama', 'Pixel world', 'Stage atlas']):
+        svg = '''<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1135" viewBox="0 0 1440 1135" role="img"><defs><linearGradient id="unknown" x2="0" y2="1"><stop stop-color="#304c5b"/><stop offset="1" stop-color="#19332f"/></linearGradient></defs><rect width="1440" height="1135" rx="24" fill="#101a26"/><g font-family="system-ui,Arial,sans-serif">'''
+        for index, mode in enumerate(['Original framing', 'Panorama', 'Pixel world', 'Stage atlas', 'Full level map']):
             x, y = 28 + (index % 2) * 712, 28 + (index // 2) * 345
-            svg += f'<g transform="translate({x},{y})"><rect width="684" height="320" rx="15" fill="#192734" stroke="#344857"/><text x="24" y="44" fill="#e8f3ed" font-size="25">{index + 1} · {tr(mode)}</text>'
-            svg += '<rect x="24" y="68" width="636" height="192" rx="8" fill="#101b27"/>'
-            if index != 0:
+            card = 1384 if index == 4 else 684
+            svg += f'<g transform="translate({x},{y})"><rect width="{card}" height="320" rx="15" fill="#192734" stroke="#344857"/><text x="24" y="44" fill="#e8f3ed" font-size="25">{index + 1} · {tr(mode)}</text>'
+            svg += f'<rect x="24" y="68" width="{card-48}" height="192" rx="8" fill="#101b27"/>'
+            if index not in {0, 4}:
                 svg += '<rect x="24" y="68" width="116" height="192" fill="url(#unknown)"/><rect x="570" y="68" width="90" height="192" fill="url(#unknown)"/>'
-            for tile in range(10 if index else 5):
-                xx = 154 + tile * (38 if index == 3 else 40)
+            for tile in range(32 if index == 4 else 10 if index else 5):
+                xx = (54 if index == 4 else 154) + tile * (40 if index == 4 else 38 if index == 3 else 40)
                 if index == 0: xx = 233 + tile * 40
-                hh = [18, 30, 54, 74, 44, 44, 32, 18, 38, 64][tile]
+                hh = [18, 30, 54, 74, 44, 44, 32, 18, 38, 64][tile % 10]
                 svg += f'<rect x="{xx}" y="{232-hh}" width="34" height="{hh}" rx="3" fill="#85bda4"/>'
-            w = 210 if index in {0, 3} else 290
+            w = 70 if index == 4 else 210 if index in {0, 3} else 290
             svg += f'<rect x="222" y="93" width="{w}" height="150" fill="none" stroke="#ecd477" stroke-width="2" stroke-dasharray="6 4"/><circle cx="295" cy="{164 if index==3 else 142}" r="9" fill="#ecd477"/>'
             if index == 3:
                 svg += '<rect x="495" y="155" width="150" height="94" rx="4" fill="#142332" stroke="#a0d1b6" stroke-width="2"/><rect x="506" y="224" width="128" height="12" fill="#85bda4"/><circle cx="535" cy="211" r="8" fill="#ecd477"/>'
             svg += f'<text x="24" y="294" fill="#a8c5c9" font-size="18">Ctrl+{index+1} · {tr("Native camera")}</text></g>'
-        svg += f'<text x="30" y="746" fill="#b6cbd2" font-size="18">{tr("Known terrain")} / {tr("Unknown area")} · {tr("Player")} · {tr("Illustrative geometry; no Nintendo artwork")}</text></g></svg>'
+        svg += f'<text x="30" y="1091" fill="#b6cbd2" font-size="18">{tr("Known terrain")} / {tr("Unknown area")} · {tr("Player")} · {tr("Illustrative geometry; no Nintendo artwork")}</text></g></svg>'
         (output / 'views.svg').write_text(svg, encoding='utf8')
     # The icon uses the same original shapes as the vector identity.
     icon = Image.new('RGBA', (1024, 1024), (0, 0, 0, 0))

@@ -1,5 +1,26 @@
 # Releases
 
+## 0.3.0 — 2026-10-20
+
+- Add a fifth view, **Full level map**, for all six games. The entire loaded
+  area's terrain is available at entry, without exploring first. Ctrl+5 selects
+  it; the left stick cycles atlas, full map and panorama.
+- Read each game's own level layout locally. The two classic games run their
+  cartridge's column decoder in a bounded checkpoint which is then restored.
+  Mario 2, Mario 3, World and Yoshi use their complete loaded terrain tables.
+- Include World's second terrain plane, correct per-screen pipe colours and
+  align its map with the emitted camera. Correct the other games' first
+  scanline, vertical Mario 3 geometry and Yoshi room identity after doors/pipes.
+- Keep the four existing views. Fit the entire new map to any window shape,
+  show a player locator, and place a close-up only where it cannot cover terrain.
+- Translate the mode and explanations into all ten languages, refresh the
+  illustrated guides and actual ROM-free interface captures, and add a fourth
+  public test suite with original fixtures.
+
+Rooms separated by doors or pipes switch maps. Off-camera actors keep the
+original activation range; special arenas without a decoded terrain layout
+keep their native view. Physical macOS gameplay remains experimental and untested.
+
 ## 0.2.2 — 2026-10-17
 
 - Add Crisp, Nearest and Smooth image filters. Crisp uses a bounded integer

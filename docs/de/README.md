@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.2
+# Mario Compilation Ultra 0.3.0
 
 Lokale SNES-Sammlung mit anpassbarer PC-Oberfläche und experimentellen Weltansichten. Snes9x emuliert die Module einschließlich Super FX. Eine vollständige Dekompilierung aller Spiele wird nicht behauptet.
 
-[Download und Start vom Desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.2) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download und Start vom Desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.3.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download und Start vom Desktop
 
@@ -43,7 +43,7 @@ sh ./Install-Linux.sh
 
 Empfohlenes Bild: Panorama, Auto-Zoom, klarer Filter, quadratische Pixel, weiche Ränder und gedimmter Umgebungsrahmen. Bildschirm → Empfohlene Bildeinstellung ändert weder Sprache noch Ton oder Spielstände. Nächste-Pixel- und weicher Filter sowie TV 4:3 sind ebenfalls verfügbar. Die Pixelwelt behält ganzzahligen Zoom und quadratische Pixel. Scanlines folgen Spielzeilen und werden unter 2× gegen Moiré ausgeblendet.
 
-Worlds Atlas zeigt das aktuell geladene Gebiet. Andere normale erweiterte Szenen kartieren beim Bewegen beobachtetes Gelände. Unbekannte Bereiche zeigen den Umgebungsrahmen. Der Atlas zeigt dekodiertes Gelände; eine größere Live-Nahansicht ermöglicht das Spielen. Außerhalb der Originalkamera können Effekte und Sprites abweichen; Objekte außerhalb werden nicht simuliert. Spezialprojektionen behalten den Originalausschnitt.
+Gesamte Karte (Strg+5) zeigt in allen sechs Spielen das vollständige Gelände der geladenen Zone ab dem ersten spielbaren Bild, ohne Erkundung. Türen und Röhren wechseln die Karte; getrennte Räume werden nicht verbunden. Mario World zeigt beide vorhandenen Geländeebenen. Ein Pfeil markiert die Spielfigur; bei freiem Platz erscheint eine Nahansicht. Die vier bisherigen Ansichten bleiben erhalten und sammeln außerhalb von World weiterhin beobachtetes Gelände. Figuren, bewegliche Plattformen und Effekte behalten die ursprüngliche Simulation und Aktivierungsreichweite. Spezialarenen ohne Geländekarte nutzen die Originalansicht. Linken Stick drücken: Atlas → Gesamte Karte → Panorama.
 
 Erweiterte Speicherprofile und die automatische All-Stars-Auswahl gelten für die aufgeführten US-Ausgaben. Erkannte Ausgaben ohne geprüftes Profil verwenden den Originalausschnitt. Die Oberfläche übersetzt weder Geschichte noch Grafiken des kommerziellen Moduls. Eine neue native Dekompilierung aller fünf Spiele wird nicht behauptet.
 
@@ -62,7 +62,7 @@ Pfeile: bewegen · Z: springen · A: rennen / greifen<br>
 X: SNES A · S: SNES X · C/V: L/R<br>
 Enter: Start · rechte Umschalttaste: Select<br>
 Esc/F10: Optionen · Rücktaste: zurückspulen<br>
-Strg+1/2/3/4: Ansichten · +/-: Pixelzoom<br>
+Strg+1/2/3/4/5: Ansichten · +/-: Pixelzoom<br>
 F: Kamera fixieren · I/J/K/L: schwenken · R: folgen<br>
 F1–F9: laden · Umschalt+F1–F9: speichern · F12: Screenshot<br>
 <br>
@@ -70,7 +70,7 @@ GAMEPAD<br>
 Linker Stick / Steuerkreuz: bewegen · unten/rechts: B/A<br>
 links/oben: Y/X · Schultertasten: L/R · Start: Start<br>
 View/Back: Optionen · LT: zurückspulen · RT: Select<br>
-Linker Stick drücken: Atlas · LB/RB: Menüseiten<br>
+Linken Stick drücken: Atlas / gesamte Karte / Panorama · LB/RB: Menüseiten<br>
 Menüs: Steuerkreuz + unten bestätigen + rechts zurück
 
 ## Speicherstände und Ton
@@ -119,9 +119,9 @@ Wähle das Modul erneut, wenn die Datei verschoben oder das Laufwerk getrennt wu
 
 ![Über das Programm](screenshots/5.png)
 
-## Pakete und Prüfung · 0.2.2
+## Pakete und Prüfung · 0.3.0
 
-Öffentliche Prüfungen umfassen 106 Tests in drei Suiten, 176 Meldungen in zehn Katalogen, Schriftabdeckung und 240 echte Aufnahmen. Private Windows-Tests umfassen sechs Spiele, 2.160 Anzeige-Regressionen, 1.188 Bildfälle, Spielstände, SRAM, Fortsetzen und Zurückspulen. Direct3D wurde über die Desktop-Verknüpfung in vier Ansichten bei 7680×1440 gemessen. Begrenzte Szenen, keine vollständigen Kampagnen; physische Tasten und hörbarer Ton bleiben ungeprüft. Siehe Prüfbericht.
+Öffentliche Prüfungen: 156 Tests in vier Suiten, 179 Meldungen je Sprache, Schriftabdeckung und 240 echte Aufnahmen. Private Prüfungen betreffen sechs Spiele, sofortige Karten, horizontale und vertikale Geometrie, 105 klassische Gebiete, 115 Mario-2-Gebiete, 210 Mario-3-Räume, 1.024 World-Leveleinträge in zwei Editionen und 222 Yoshi-Raumeinträge. Begrenzte Lade-, Geometrie-, Pixel- und Funktionstests, keine vollständigen Kampagnen. Physische Tasten, hörbarer Ton und echtes Linux/Mac-Spiel bleiben ungeprüft. Siehe Prüfbericht.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

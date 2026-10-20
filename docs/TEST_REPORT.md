@@ -1,186 +1,129 @@
-# Validation report — 0.2.2
+# Validation report — 0.3.0
 
-These are measured, bounded scenarios. They do not establish full campaign,
-boss, regional-edition or physical-device coverage.
+These are bounded tests, not completed campaigns or a guarantee about every
+special effect, regional revision or physical device. The full-map runtime
+coverage uses the US All-Stars + World compilation, US Yoshi 1.0 and standalone
+US World. The compatibility list identifies supported profiles; it is not a
+claim that every edition has been played through.
 
-## Picture pipeline
+## Whole loaded area at entry
 
-All six game profiles share the same presentation pipeline. Crisp scales to a
-bounded integer intermediate texture with nearest sampling, then performs only
-the remaining fractional scale with linear sampling. Nearest and Smooth remain
-available. Pixel world always uses nearest sampling and integer zoom. Other
-views support both raw square pixels (256×224 = 8:7) and TV 4:3 framing.
+The fifth view, **Full level map**, reads the entire loaded area's terrain on
+its first valid playable frame. It does not need an exploration pass. Ctrl+5
+selects it; left-stick click cycles Stage atlas, Full level map and Panorama.
+The four previous views remain available. A player arrow is always present in
+the fifth view. A live close-up is placed in spare space, shrunk when necessary,
+and omitted if it would cover terrain. The authoritative native image is also
+drawn separately at full source resolution.
 
-The emitted framebuffer is drawn separately after the world canvas, so the
-atlas sampling budget cannot reduce the live image's source resolution. A
-larger atlas close-up appears when the map becomes smaller than that close-up.
-Scanlines follow source rows, stay inside the game presentation, and turn off
-below 2× rather than introducing a fixed display-pixel pattern.
+| Game | Full terrain source |
+|---|---|
+| Mario Bros. 1 | The local cartridge's column decoder, with its own graphics tables |
+| The Lost Levels | Its separate local decoder and header/graphics interpretation |
+| Mario Bros. 2 USA | Loaded area Map16 RAM, including horizontal and vertical pages |
+| Mario Bros. 3 | Loaded Map16 RAM and the cartridge's current tileset definitions |
+| Mario World | ROM-indexed Map16 screen directories for both terrain planes |
+| Yoshi's Island | SRAM screen directory and the Super FX-produced Map16 RAM |
 
-Ambient colours are area-averaged from the actual image, with status rows cropped,
-then softened using three separable blur passes. Unknown terrain is transparent
-over this surround; no checkerboard or invented sharp terrain is drawn. Known
-panorama terrain fades smoothly with distance. Safe decorative scenery reflects
-horizontally, clamps vertically and excludes status rows. Atlas terrain is drawn
-without repeating decorative scenery across the entire map. Leaving a valid
-scene or making a large observed-camera jump clears old terrain.
+Classic preparation is bounded by 512 columns, 100,000 instructions per column,
+4,000,000 instructions in total and a 4 MiB state checkpoint. Both success and
+aborted decoding restore the engine checkpoint. Public fixtures exercise both
+entry points and both exit paths without commercial instructions or assets.
 
-The Recommended picture button applies Panorama, Auto zoom, Crisp, square pixels,
-soft transitions and a dimmed ambient surround, with annotations hidden. It
-preserves language, sound, window, resume and save preferences. All settings
-remain individually available.
+Doors and pipes replace the map with the destination area's map. Disconnected
+rooms are not stitched into invented geography. Actors, moving platforms and
+special effects retain the original game's activation range and simulation.
+World boss modes without a Map16 layout, Yoshi special projections and invalid
+loading states retain native framing. The fifth view also supports ordinary
+Yoshi mode-2 terrain; the older views retain their previous projection guard.
 
-## Rendering defects and regression evidence
+## Public checks
 
-The reported All-Stars + World defect was reproduced using the same private
-state in the installed 0.2.0 and corrected executables. World's compilation tile
-arrays have different WRAM addresses from standalone World. Reading the wrong
-layout lifted terrain by sixteen rows. Both layouts and the two separate columns
-of vertical screens now have original synthetic regression fixtures. The native
-framebuffer CRC was identical before/after; no simulation frames advanced.
+The Windows Release build passes **156 assertions in four CTest suites**:
 
-Observed terrain uses the emulator's actual per-row scroll offsets rather than
-final registers which can describe a status bar or dialog. Status rows are
-excluded, and restoring a state waits for fresh raster data before caching tiles.
-Decorative scenery samples a valid displayed window, avoiding unused streamed
-VRAM pages. Private pixel inspection found these artifacts after an earlier
-matrix had passed native-framebuffer checks; visual inspection remains part
-of validation.
+- 45 complete-map checks: layouts, vertical pages, graphics banks/quadrants,
+  unsupported bounds, two-plane offsets and priority, pipe-colour variants,
+  emitted-camera alignment, room identity, and transactional decoder limits.
+- 52 unit/runtime checks: importer, ZIP integrity, UTF-8 settings, progress,
+  rewind, core rendering and the existing World/scene reconstruction.
+- 45 controller/UI checks using a process-local SDL virtual controller,
+  including the fifth view, shortcut, disconnect and reconnect behaviour.
+- 14 presentation checks using original test pixels.
 
-Panorama is the new default. Pixel world has automatic integer zoom alongside
-manual levels 1–8. Observed atlases fit explored camera bounds rather than an
-absolute origin thousands of pixels away. Distinct planar tiles decode once per
-frame, and expanded sampling does not exceed native world detail. The native
-camera uses original emulator pixels. Expanded scenery, sprites, effects and
-simulation beyond that camera retain experimental limits.
+All ten catalogs contain 179 messages. Font coverage is checked. The real
+application produced 240 ROM-free menu captures: six pages, ten languages and
+four window sizes (640×360, 1280×720, 1920×1080, 7680×1440). The committed
+localized galleries use the 1920×1080 application captures. Documentation
+links, SVG structure and generated text are checked separately.
 
-## Public tests and localization
+## Private cartridge checks
 
-The Windows Release build passes **106 assertions in three CTest suites**:
+Owned cartridges, progress files and gameplay captures remain outside the
+public repository and packages.
 
-- **51** engine/import/settings/rendering checks. Original synthetic fixtures
-  cover import bounds, corrupt inputs, native CPU/video/audio, state integrity,
-  exact restore, bounded rewind, automatic zoom, both World layouts, vertical
-  columns, raster/HUD separation, safe scenery and observed-atlas bounds.
-  Switching cartridges clears previous observations and high-resolution dimensions
-  before the first new frame; the regression failed before that reset.
-  A transparent observed tile is scrolled out of the live camera and must remain
-  transparent over the ambient surround. This regression reproduced the black
-  sky panels found in moving gameplay captures and fails before the correction.
-  Both ambient styles sample the emitted image; selecting unblurred scenery
-  cannot drop its sky gradients or other layers in favour of a decoded BG2.
-- **41** UI/controller/localization checks. An in-process SDL virtual controller
-  navigates menu pages, starts an original synthetic cartridge, pauses/resumes,
-  provides input, saves/restores and reconnects. Unplugging while Back is held
-  failed before the edge-state reset and passes after the correction.
-  All ten languages render with zero missing glyphs and persist their settings.
-  Holding run/right with a retained menu focus reproduced an empty ImGui window
-  switcher over gameplay. Menu navigation is now disabled during play, stale
-  windowing targets are cleared and the regression verifies both uninterrupted
-  input and returning from a menu while run is held. The fixture fails before
-  this correction and passes after it; real journey captures are also inspected.
-- **14** presentation checks. Original pixel patterns verify exact integer output,
-  reduced fractional blending compared with ordinary bilinear filtering,
-  transparency through intermediate targets, clipping, square/TV/portrait
-  geometry, monotonic edge fades, blur edges and preservation of nonvisual
-  preferences by the picture preset. Picture settings persist with UTF-8 paths.
+| Check | Observed result |
+|---|---|
+| First complete map, all six games | 462 assertions, whole bounds visible without exploration; engine state, pixels, RAM, SRAM and host clocks preserved |
+| Subsequent simulation | Twenty future serialized frames per game remain identical after map preparation |
+| Runtime/controller/progress | 5,820 checks; movement, jump, all nine manual slots, pause, analog/deadzone mappings, SRAM, resume and exact historical rewind |
+| Display regression | 2,610 recorded configurations across all five views, output shapes, zoom/quality and overlay settings; native output preserved |
+| Classic geometry | 34 Mario 1 and 71 Lost Levels area streams decoded; definitions bounded; state preserved |
+| Mario 2 geometry | 115 area entries; 1,035 samples agree with the cartridge's collision-address routine |
+| Mario 3 geometry | 210 root/linked rooms, including four vertical rooms; 2,520 samples agree with the cartridge's collision-address routine |
+| World loading | 1,024 level-table entries across standalone and compilation cartridges; 976 terrain maps, including 52 two-plane cases; 48 native fallbacks |
+| World sampled terrain | 797,410 checked pixels agree with the native BG planes; overlapping opaque planes are excluded from this comparison and covered by the public priority fixture |
+| Yoshi room loading | 222 room-table entries; 217 full maps with valid definitions; five loading, special-projection or unused entries retain native view |
+| Yoshi ordinary entrances | 69 maps obtained from 72 overworld slots; the first six ordinary stages align pixel-for-pixel in checked terrain samples |
+| Continuous input | 1,800 real-cartridge ticks per game through the SDL controller path, cycling views; observed transitions include the first Mario 2 door |
+| Optimized compositor | Thirty gameplay output captures remain byte-identical to the reference compositor; a public fixture also checks unaligned two-plane spans and negative origins |
 
-The Windows CI controller suite repeats five times. These original fixtures
-contain no commercial cartridge program or extracted game graphics.
+Loader/table sweeps include linked, unused or repeated entries; their counts
+are not counts of distinct campaigns completed. Fake entrances in the Yoshi
+room sweep can face blank space, so that sweep establishes layout/definition
+integrity rather than pixel coverage of all those rooms. Ordinary-entrance
+pixel checks are separate. Geometry tests run the cartridge's own loader or
+address routine; they do not replace natural gameplay tests.
 
-All **176 messages in ten UTF-8 catalogs** have matching, nonempty translations.
-The generated C++ table and renamed OFL font are checked against the catalogs
-and translated guides. English is first in the GitHub README and language links.
-Interface translation does not translate the commercial cartridge itself.
+## Picture and performance
 
-The smoke tool generates **240 actual ROM-free menu captures per platform**:
-six pages in ten languages at 640×360, 1280×720, 1920×1080 and 7680×1440.
-It checks dimensions, nonblank/distinct pages and zero missing glyphs. Sixty
-1920×1080 crops form the public gallery. Ten README/HTML guides, original
-geometric identities and view diagrams have checked local references.
+Crisp uses a bounded nearest-sampled integer intermediate followed by the
+remaining fractional linear scale. Nearest, Smooth, square pixels and TV 4:3
+remain available. Pixel world keeps integer scaling. Ambient colours come from
+the real frame with status rows cropped; unknown terrain stays transparent.
+Scanlines follow source rows and turn off below 2×. Original scenery effects
+and sprites remain authoritative inside the native camera.
 
-## Private six-game checks on Windows
+Full-map terrain resolves Map16 once per row span, with frame-local decoded
+block pixels. Canvas sampling is bounded independently of an 8K output. The
+Windows host prefers Direct3D 11 while respecting explicit SDL overrides and
+retaining renderer fallback.
 
-User cartridges, SRAM, states and gameplay images remain outside the repo.
-Testing uses isolated data folders; original progress and the launcher are
-checkpointed before changes.
+Hidden-window Direct3D 11 checks on this Windows machine (RTX 5070) passed the
+same 462 full-map assertions. Representative uncapped 120-tick runs measured
+about 84–161 ticks/s at 1280×720 and 58–113 ticks/s at 7680×1440 with the default
+map budget and Crisp. These are bounded throughput observations, not physical
+display pacing or a promise of 60 fps in every room. Higher quality costs more.
 
-SMB1, The Lost Levels, SMB2 USA, SMB3, World and Yoshi's Island reached real
-gameplay checkpoints. The SDL controller path was exercised against the actual
-cartridge simulation: movement/jump, twelve SNES mappings, four stick directions,
-deadzone extremes, menu pause/resume and atlas switching. These tests use a
-process-local virtual controller, install no device/system driver and do not
-certify physical button presses.
+SDL reported no physical controller during this verification. Actual cartridge
+input was tested with a process-local virtual SDL controller, without OS input
+injection or driver changes. Physical Xbox buttons and audible output remain
+unverified in this release run.
 
-The final private harness passed **4,818 assertions**, including:
+## Packages and privacy
 
-- **2,160 render configurations** across four views, automatic and all manual
-  pixel zooms, three quality settings, and 320×240, 1280×720, 2560×1080,
-  7680×1440 and 720×1280 output shapes. Settings which do not affect a view are
-  also checked in the base matrix. Native pixels stay unchanged; sampled native
-  camera pixels in the composed canvas match exactly.
-- All nine manual slots per game restore exact video and WRAM. Automatic resume
-  restores after a full core restart, and battery SRAM persists.
-- Three consecutive controller-trigger rewinds restore exact historical video
-  and WRAM in each game. Menu pause, focus loss/return, camera follow/freeze,
-  extreme camera directions, scenery/overlay toggles and keyboard view events
-  are exercised. Rendering changes do not mutate the original simulation.
-- A corrupt automatic resume still takes the requested All-Stars selection path.
+CI builds and tests Windows x64, Linux x64, macOS Intel x64 and macOS Apple
+Silicon arm64. Canonical release archives are audited after downloading from
+the intended CI run. Installed Windows files are compared with that package;
+local ROMs, SRAM and existing preferences are preserved, apart from selecting
+the requested new view. The desktop shortcut keeps its explicit local data
+folder and normal menu launch.
 
-A further **1,188 private picture cases / 5,308 assertions** exercise all three
-filters, both aspect choices, all four views and five output shapes, plus
-background/scanline/soft-edge combinations, atlas quality limits and forced
-special-projection fallback. Nearest and integer output samples are compared with an
-independent full-resolution SDL reference, not only with an unchanged input
-buffer. Forty-eight matched before/after scene captures retain identical native
-framebuffer CRCs. This is scenario coverage, not a percentage of visual accuracy.
-
-Separate 1,800-frame controller journeys in each game cover running, jumping,
-left/right/up/down, scrolling, SMB2 door entry, deaths/restarts and native fallback
-where encountered. They are short scenarios, not full campaign completion.
-
-Additional World scenarios use private RAM setup to let the real cartridge load
-selected rooms. Two vertical rooms and a Mode 7 boss were inspected in both
-standalone World and All-Stars + World. Mode 7 retains original framing. Layer
-priority, colour effects and animated objects outside the native camera can
-still differ; this is not an exact reimplementation of every off-camera effect.
-
-The installed executable is launched through the actual desktop shortcut.
-Its Direct3D path is checked at 7680×1440, with captures of all four views and
-runtime reports. Dummy/software benchmarks are diagnostic and do not represent
-GPU performance. The final Windows controller inventory contained no attached
-Xbox controller; physical-input validation remains open. Audio callbacks execute,
-but audible output is not certified by these automated tests.
-
-Performance reports count simulated ticks and presentations in resettable
-measurement windows, and expose rate and 95th-percentile render/frame intervals.
-They can be reset per scene with `metrics reset`; captures and disk writes should
-be kept outside the measured interval.
-
-One actual Windows shortcut run covers all six games × four views using
-Direct3D at 7680×1440. Each measured interval contains 120 presentations after
-warm-up. Rates range from **59.91 to 60.08 presentations/s**, with 95th-percentile
-intervals of **17.15–18.63 ms**. These are short measured scenes on this PC, not
-a guarantee for every level or another computer. The six 1,800-frame controller
-journeys and both World-edition vertical/Mode 7 scenarios are also rerun.
-
-## Packages and content boundary
-
-The four-job [workflow](../.github/workflows/build.yml) builds Windows x64,
-Linux x64, macOS Intel x64 and macOS Apple Silicon arm64. It runs CTest,
-localization/font/guide checks, ROM-free captures, the public-source audit and
-portable validation from another working directory and a Unicode path.
-The actual [workflow results](https://github.com/vhaloo/MarioCompilationUltra/actions)
-establish completion; the workflow file alone does not. SHA-256 sums accompany
-four executable ZIPs and their corresponding source archive.
-
-**Both macOS packages are experimental and untested on a physical Mac.**
-They are ad-hoc signed, not notarized. Real Mac graphics, audio, controllers and
+**Both macOS packages are experimental and untested on a physical Mac.** They
+are ad-hoc signed, not notarized. Physical Mac graphics, audio, controllers and
 Gatekeeper remain unverified. Physical Linux desktop gameplay is also untested.
 
-Tracked files and archives are checked for cartridge/save/state payloads, retail
-headers and private directories; nested source archives are inspected. Only
-original geometry and ROM-free interface screenshots are public. No Nintendo
-ROM, extracted routine, sprite, music, level pack or gameplay capture is
-distributed. Licensed emulator/interface/compression/font sources retain their
-notices. The collection is an enhanced SNES host, not five native decompilations.
+Tracked files and all release archives are checked for cartridge/save/state
+payloads, retail headers and private directories. Only original geometry and
+ROM-free interface captures are public. No Nintendo ROM, extracted routine,
+sprite, music, level pack or gameplay capture is distributed. Licensed core,
+interface, compression and font sources retain their notices.

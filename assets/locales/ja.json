@@ -64,7 +64,6 @@
   "Invalid ZIP directory": "ZIPディレクトリが不正です",
   "Invalid ZIP directory bounds": "ZIPディレクトリの範囲が不正です",
   "Invalid stored ROM": "格納されたROMが不正です",
-  "KEYBOARD\nArrows: move · Z: jump · A: run / grab\nX: SNES A · S: SNES X · C/V: L/R\nEnter: Start · Right Shift: Select\nEsc/F10: options · Backspace: rewind\nCtrl+1/2/3/4: views · +/-: pixel zoom\nF: freeze camera · I/J/K/L: pan · R: follow\nF1–F9: load · Shift+F1–F9: save · F12: screenshot\n\nGAMEPAD\nLeft stick / D-pad: move · bottom/right: B/A\nleft/top: Y/X · bumpers: L/R · Start: Start\nView/Back: options · LT: rewind · RT: Select\nLeft stick click: atlas · LB/RB: menu sections\nMenus: D-pad + bottom confirm + right back": "キーボード\n矢印: 移動 · Z: ジャンプ · A: ダッシュ / つかむ\nX: SNES A · S: SNES X · C/V: L/R\nEnter: Start · 右Shift: Select\nEsc/F10: 設定 · Backspace: 巻き戻し\nCtrl+1/2/3/4: 表示切替 · +/-: ピクセル倍率\nF: カメラ固定 · I/J/K/L: カメラ移動 · R: 追跡\nF1–F9: 読込 · Shift+F1–F9: 保存 · F12: 撮影\n\nゲームパッド\n左スティック / 方向キー: 移動 · 下/右: B/A\n左/上: Y/X · ショルダー: L/R · Start: Start\nView/Back: 設定 · LT: 巻き戻し · RT: Select\n左スティック押込: アトラス · LB/RB: 設定ページ\nメニュー: 方向キー + 下で決定 + 右で戻る",
   "Known terrain": "確認済みの地形",
   "Language": "言語",
   "Lightweight": "軽量",
@@ -174,5 +173,9 @@
   "Soft panorama edges": "パノラマの境界をぼかす",
   "Vertical sync": "垂直同期",
   "Pixel world keeps square pixels and integer zoom. The crisp filter balances sharp detail and even pixels at other sizes.": "ピクセルワールドでは正方形ピクセルと整数倍率を維持します。それ以外のサイズでは、くっきりフィルターが細部とピクセルの均一さを両立します。",
-  "World's atlas decodes the loaded level. Other expanded scenes accumulate observed terrain. Faded scenery is decorative; off-camera objects are not simulated. Special projections use original framing.": "Worldのアトラスは読み込み済みのステージを解析します。他の拡張画面は観測した地形を蓄積します。薄い背景は装飾で、画面外の物体はシミュレーションしません。特殊な投影では元の画角を使用します。"
+  "World's atlas decodes the loaded level. Other expanded scenes accumulate observed terrain. Faded scenery is decorative; off-camera objects are not simulated. Special projections use original framing.": "Worldのアトラスは読み込み済みのステージを解析します。他の拡張画面は観測した地形を蓄積します。薄い背景は装飾で、画面外の物体はシミュレーションしません。特殊な投影では元の画角を使用します。",
+  "Full level map": "全体マップ",
+  "Show full level map": "全体マップを表示",
+  "Full level map reads the entire loaded area before exploration. Doors and pipes switch to the next area's map. The original game controls which actors are active.": "探索前に読み込み済みエリア全体を表示します。ドアや土管で移動すると移動先の地図に切り替わります。キャラクターや仕掛けの動作範囲は元のゲームに従います。",
+  "KEYBOARD\nArrows: move · Z: jump · A: run / grab\nX: SNES A · S: SNES X · C/V: L/R\nEnter: Start · Right Shift: Select\nEsc/F10: options · Backspace: rewind\nCtrl+1/2/3/4/5: views · +/-: pixel zoom\nF: freeze camera · I/J/K/L: pan · R: follow\nF1–F9: load · Shift+F1–F9: save · F12: screenshot\n\nGAMEPAD\nLeft stick / D-pad: move · bottom/right: B/A\nleft/top: Y/X · bumpers: L/R · Start: Start\nView/Back: options · LT: rewind · RT: Select\nLeft stick click: atlas / full map / panorama · LB/RB: menu sections\nMenus: D-pad + bottom confirm + right back": "キーボード\n矢印: 移動 · Z: ジャンプ · A: ダッシュ / つかむ\nX: SNES A · S: SNES X · C/V: L/R\nEnter: Start · 右Shift: Select\nEsc/F10: 設定 · Backspace: 巻き戻し\nCtrl+1/2/3/4/5: 表示切替 · +/-: ピクセル倍率\nF: カメラ固定 · I/J/K/L: カメラ移動 · R: 追跡\nF1–F9: 読込 · Shift+F1–F9: 保存 · F12: 撮影\n\nゲームパッド\n左スティック / 方向キー: 移動 · 下/右: B/A\n左/上: Y/X · ショルダー: L/R · Start: Start\nView/Back: 設定 · LT: 巻き戻し · RT: Select\n左スティック押し込み：アトラス / 全体マップ / パノラマ · LB/RB：メニュー切替\nメニュー: 方向キー + 下で決定 + 右で戻る"
 }

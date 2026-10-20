@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.2.2
+# Mario Compilation Ultra 0.3.0
 
 Raccolta SNES locale con interfaccia adattabile al PC e viste estese sperimentali. Snes9x emula le cartucce, incluso Super FX. Il progetto non dichiara di aver decompilato tutti i giochi.
 
-[Download e avvio dal desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.2.2) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download e avvio dal desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.3.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download e avvio dal desktop
 
@@ -43,7 +43,7 @@ sh ./Install-Linux.sh
 
 Immagine consigliata: Panorama, zoom Auto, filtro Nitido, pixel quadrati, bordi morbidi e sfondo ambientale attenuato. Schermo → Immagine consigliata non cambia lingua, audio o salvataggi. Sono disponibili anche Pixel esatti, Morbido e TV 4:3. Il mondo pixel mantiene zoom intero e pixel quadrati. Le linee seguono le righe del gioco e si disattivano sotto 2× per evitare il moiré.
 
-L’atlante di World mostra l’area caricata. Le altre normali scene estese mappano il terreno osservato durante il movimento. Le aree sconosciute lasciano vedere lo sfondo ambientale. L’atlante mostra il terreno decodificato e una vista ravvicinata più grande permette di giocare. Fuori dalla camera originale effetti e sprite possono differire; gli oggetti fuori campo non sono simulati. Le proiezioni speciali mantengono l’inquadratura originale.
+Mappa completa (Ctrl+5) mostra tutto il terreno dell’area caricata dal primo fotogramma giocabile in tutti i sei giochi, senza esplorazione. Porte e tubi cambiano mappa; le stanze separate non vengono unite. Mario World include entrambi i piani di terreno presenti. Una freccia indica il giocatore e, se c’è spazio, appare una vista ravvicinata. Restano le quattro viste precedenti, che fuori da World accumulano il terreno osservato. Personaggi, piattaforme mobili ed effetti conservano la simulazione e la portata di attivazione originali. Le arene speciali senza mappa mantengono la vista nativa. Premi lo stick sinistro: Atlante → Mappa completa → Panorama.
 
 I profili di memoria e la selezione automatica All-Stars riguardano le edizioni USA elencate. Un’edizione riconosciuta senza profilo verificato usa l’inquadratura originale. Tradurre l’interfaccia non traduce storia o grafica della cartuccia commerciale. Non si dichiara una nuova decompilazione nativa dei cinque giochi.
 
@@ -62,7 +62,7 @@ Frecce: muovi · Z: salta · A: corri / afferra<br>
 X: SNES A · S: SNES X · C/V: L/R<br>
 Invio: Start · Maiusc destro: Select<br>
 Esc/F10: opzioni · Backspace: riavvolgi<br>
-Ctrl+1/2/3/4: viste · +/-: zoom in pixel<br>
+Ctrl+1/2/3/4/5: viste · +/-: zoom in pixel<br>
 F: blocca camera · I/J/K/L: sposta camera · R: segui<br>
 F1–F9: carica · Maiusc+F1–F9: salva · F12: cattura<br>
 <br>
@@ -70,7 +70,7 @@ GAMEPAD<br>
 Stick sinistro / croce: muovi · basso/destra: B/A<br>
 sinistra/alto: Y/X · dorsali: L/R · Start: Start<br>
 View/Back: opzioni · LT: riavvolgi · RT: Select<br>
-Premi stick sinistro: atlante · LB/RB: pagine<br>
+Clic stick sinistro: atlante / mappa completa / panorama · LB/RB: sezioni<br>
 Menu: croce + basso conferma + destra indietro
 
 ## Salvataggi e audio
@@ -119,9 +119,9 @@ Scegli di nuovo la cartuccia se il file è stato spostato o l’unità scollegat
 
 ![Informazioni](screenshots/5.png)
 
-## Pacchetti e verifica · 0.2.2
+## Pacchetti e verifica · 0.3.0
 
-I controlli pubblici coprono 106 verifiche in tre suite, 176 messaggi in dieci cataloghi, caratteri e 240 schermate reali. I test privati Windows includono sei giochi, 2.160 configurazioni di regressione, 1.188 casi immagine, salvataggi, SRAM, ripresa e riavvolgimento. Direct3D è stato misurato dal collegamento sul desktop nelle quattro viste a 7680×1440. Sono scene limitate, non campagne complete; pulsanti fisici e audio udibile restano non verificati. Vedi il rapporto.
+I controlli pubblici coprono 156 verifiche in quattro suite, 179 messaggi per lingua, caratteri e 240 schermate reali. I test privati riguardano sei giochi, mappe immediate, geometrie orizzontali e verticali, 105 aree classiche, 115 aree Mario 2, 210 stanze Mario 3, 1.024 voci World in due edizioni e 222 voci Yoshi. Sono test limitati di caricamento, geometria, pixel e funzioni, non campagne complete. Pulsanti fisici, audio udibile e gioco su Linux/Mac reali restano non verificati. Vedi il rapporto.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <cstdint>
+#include <vector>
 struct McuLayer {
     int map = 0, tiles = 0, x = 0, y = 0, size = 0, tile16 = 0;
 };
@@ -18,3 +19,6 @@ struct McuVideo {
 };
 void mcuObserve(McuVideo &, bool rendered = false);
 void mcuObserveMemory(McuVideo &);
+// Runs the cartridge's column decoder inside a temporary engine checkpoint.
+// The caller must select a supported classic-game profile first.
+bool mcuClassicColumns(std::vector<uint8_t> &, bool lostLevels = false);

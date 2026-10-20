@@ -21,6 +21,10 @@ void App::init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER) != 0)
         throw std::runtime_error(SDL_GetError());
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+#ifdef _WIN32
+    // Prefer the modern Windows backend while respecting explicit SDL overrides.
+    SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "direct3d11", SDL_HINT_DEFAULT);
+#endif
     if (!fs::exists(settings.dataDir / "settings.ini")) {
         auto *locales = SDL_GetPreferredLocales();
         if (locales)
@@ -330,7 +334,7 @@ void App::events() {
                 settings.pixelZoom(drawableWidth, drawableHeight, core.width, core.height);
             settings.zoom = std::clamp(current + (k == SDLK_MINUS ? -1 : 1), 1, 8);
         }
-        if ((mod & KMOD_CTRL) && k >= SDLK_1 && k <= SDLK_4) {
+        if ((mod & KMOD_CTRL) && k >= SDLK_1 && k <= SDLK_5) {
             settings.view = int(k - SDLK_1);
             settings.freeze = false;
         }
@@ -404,7 +408,7 @@ void App::input() {
                 tab = (tab + 1) % 6, focusPage = true;
         }
         if (!menu && thumb && !previousThumb[p])
-            settings.view = settings.view == 3 ? 1 : 3;
+            settings.view = settings.view == 3 ? 4 : settings.view == 4 ? 1 : 3;
         previousMenu[p] = m;
         previousStart[p] = start;
         previousLeft[p] = left;
@@ -618,7 +622,7 @@ void App::drawGame() {
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
     }
     insetRect = {};
-    if (world.expanded && settings.view == 3 && settings.inset) {
+    if (world.expanded && settings.view >= 3 && settings.inset) {
         float ratio =
             core.width * displayPixelAspect(settings.aspect, core.width, core.height) / core.height;
         float h = std::min(drawableHeight * .42f, 560.f);
@@ -630,6 +634,38 @@ void App::drawGame() {
             return;
         float margin = std::clamp(drawableHeight * .016f, 8.f, 24.f);
         insetRect = {drawableWidth - w - margin, drawableHeight - h - margin, w, h};
+        if (settings.view == 4) {
+            auto &cv = world.canvas;
+            SDL_FRect map{(world.complete.x - cv.x) * drawableWidth / cv.worldWidth,
+                          (world.complete.y - cv.y) * drawableHeight / cv.worldHeight,
+                          world.complete.width * drawableWidth / cv.worldWidth,
+                          world.complete.height * drawableHeight / cv.worldHeight};
+            bool placed = false;
+            // Keep the entire map visible. Place the close-up in letterbox
+            // space, or omit it when no useful free corner exists.
+            for (int attempt = 0; attempt < 4 && h >= 96 && !placed; ++attempt) {
+                for (auto pos :
+                     {SDL_FPoint{drawableWidth - w - margin, drawableHeight - h - margin},
+                      SDL_FPoint{margin, drawableHeight - h - margin},
+                      SDL_FPoint{drawableWidth - w - margin, margin}, SDL_FPoint{margin, margin}}) {
+                    SDL_FRect candidate{pos.x, pos.y, w, h};
+                    SDL_FRect padded{map.x - 8, map.y - 8, map.w + 16, map.h + 16};
+                    if (!SDL_HasIntersectionF(&candidate, &padded)) {
+                        insetRect = candidate;
+                        placed = true;
+                        break;
+                    }
+                }
+                if (!placed) {
+                    h *= .7f;
+                    w = h * ratio;
+                }
+            }
+            if (!placed) {
+                insetRect = {};
+                return;
+            }
+        }
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         for (int spread = 8; spread >= 2; spread -= 2) {
             SDL_FRect shadow{insetRect.x - spread, insetRect.y - spread, w + spread * 2,
@@ -764,7 +800,7 @@ void App::optionsUi() {
             "%s", tr("The game keeps its original SNES clock. View options change presentation.",
                      "Le jeu garde son rythme SNES d'origine. Les vues modifient son affichage."));
         combo("View", "Vue", settings.view,
-              {"Original framing", "Panorama", "Pixel world", "Stage atlas"});
+              {"Original framing", "Panorama", "Pixel world", "Stage atlas", "Full level map"});
         combo("Image filter", "Filtre d'image", settings.filter,
               {"Nearest pixels", "Crisp (recommended)", "Smooth"});
         combo("Aspect ratio", "Proportions", settings.aspect, {"Square pixels", "TV 4:3"});
@@ -810,6 +846,12 @@ void App::optionsUi() {
             settings.freeze = false;
         if (button("Show stage atlas", "Afficher l'atlas"))
             settings.view = 3, settings.freeze = false;
+        if (button("Show full level map", "Afficher la carte entière"))
+            settings.view = 4, settings.freeze = false;
+        ImGui::TextWrapped("%s",
+                           tr("Full level map reads the entire loaded area before exploration. "
+                              "Doors and pipes switch to the next area's map. The original "
+                              "game controls which actors are active."));
         check("Native camera guide", "Guide du cadre d'origine", settings.guide);
         check("Player locator", "Repère du joueur", settings.locator);
         check("Minimap", "Minicarte", settings.minimap);
@@ -878,15 +920,16 @@ void App::optionsUi() {
             "%s",
             tr("KEYBOARD\nArrows: move · Z: jump · A: run / grab\nX: SNES A · S: SNES X · C/V: "
                "L/R\nEnter: Start · Right Shift: Select\nEsc/F10: options · Backspace: "
-               "rewind\nCtrl+1/2/3/4: views · +/-: pixel zoom\nF: freeze camera · I/J/K/L: pan "
+               "rewind\nCtrl+1/2/3/4/5: views · +/-: pixel zoom\nF: freeze camera · I/J/K/L: pan "
                "· R: follow\nF1–F9: load · Shift+F1–F9: save · F12: "
                "screenshot\n\nGAMEPAD\nLeft stick / D-pad: move · bottom/right: B/A\nleft/top: "
                "Y/X · bumpers: L/R · Start: Start\nView/Back: options · LT: rewind · RT: "
-               "Select\nLeft stick click: atlas · LB/RB: menu sections\nMenus: D-pad + bottom "
+               "Select\nLeft stick click: atlas / full map / panorama · LB/RB: menu "
+               "sections\nMenus: D-pad + bottom "
                "confirm + right back",
                "CLAVIER\nFlèches : bouger · Z : sauter · A : courir / saisir\nX : SNES A · S : "
                "SNES X · C/V : L/R\nEntrée : Start · Maj droite : Select\nÉchap/F10 : options "
-               "· Retour arrière : rembobiner\nCtrl+1/2/3/4 : vues · +/- : zoom en pixels\nF : "
+               "· Retour arrière : rembobiner\nCtrl+1/2/3/4/5 : vues · +/- : zoom en pixels\nF : "
                "figer · I/J/K/L : déplacer la caméra · R : suivre\nF1–F9 : charger · "
                "Maj+F1–F9 : enregistrer · F12 : capture\n\nMANETTE\nStick gauche / croix : "
                "bouger · bas/droite : B/A\ngauche/haut : Y/X · gâchettes hautes : L/R · Start "
@@ -1260,7 +1303,7 @@ void App::render() {
             d->AddRect(xy(float(sc.cameraX), float(sc.cameraY)),
                        xy(float(sc.cameraX + 256), float(sc.cameraY + core.height)),
                        IM_COL32(250, 244, 178, 170), 0, 0, 1);
-        if (settings.locator) {
+        if (settings.locator || settings.view == 4) {
             auto p = xy(float(sc.playerX + 8), float(sc.playerY));
             d->AddTriangleFilled({p.x - 6, p.y - 15}, {p.x + 6, p.y - 15}, {p.x, p.y - 5},
                                  IM_COL32(255, 249, 184, 245));
@@ -1274,12 +1317,16 @@ void App::render() {
                     d->AddCircleFilled(p, 3, IM_COL32(242, 154, 78, 225));
             }
         if (settings.minimap) {
+            bool full = settings.view == 4 && world.complete.ready;
+            int left = full ? world.complete.x : 0, top = full ? world.complete.y : 0;
+            int width = full ? world.complete.width : sc.width;
+            int height = full ? world.complete.height : sc.height;
             float mw = std::min(280.f, size.x * .3f),
-                  mh = std::clamp(mw * sc.height / sc.width, 28.f, 90.f);
+                  mh = std::clamp(mw * height / width, 28.f, 90.f);
             ImVec2 p{size.x - mw - 16, 16};
             d->AddRectFilled(p, {p.x + mw, p.y + mh}, IM_COL32(9, 18, 27, 215), 5);
             auto map = [&](float x, float y) {
-                return ImVec2(p.x + x * mw / sc.width, p.y + y * mh / sc.height);
+                return ImVec2(p.x + (x - left) * mw / width, p.y + (y - top) * mh / height);
             };
             d->AddRect(map(float(sc.cameraX), float(sc.cameraY)),
                        map(float(sc.cameraX + 256), float(sc.cameraY + 224)),
@@ -1405,6 +1452,15 @@ void App::report(const fs::path &p, double elapsed) const {
       << world.canvas.worldHeight << ']' << ",\n\"ppu_blank\":" << core.snapshot.blank
       << ",\n\"ppu_layers\":" << core.snapshot.mainLayers
       << ",\n\"expanded\":" << (world.expanded ? "true" : "false")
+      << ",\n\"complete_map_requested\":" << (settings.view == 4 ? "true" : "false")
+      << ",\n\"complete_map_ready\":"
+      << (settings.view == 4 && world.expanded && world.complete.ready ? "true" : "false")
+      << ",\n\"complete_map_source\":"
+      << jsonString(settings.view == 4 && world.expanded ? world.complete.source : "")
+      << ",\n\"complete_map_layers\":"
+      << (settings.view == 4 && world.expanded ? (world.complete.secondary ? 2 : 1) : 0)
+      << ",\n\"complete_map_bounds\":[" << world.complete.x << ',' << world.complete.y << ','
+      << world.complete.width << ',' << world.complete.height << ']'
       << ",\n\"full_map\":" << (s.fullMap ? "true" : "false") << ",\n\"stage\":" << s.stage
       << ",\n\"camera\":[" << s.cameraX << ',' << s.cameraY << "],\n\"player\":[" << s.playerX
       << ',' << s.playerY << "],\n\"level_size\":[" << s.width << ',' << s.height

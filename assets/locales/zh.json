@@ -64,7 +64,6 @@
   "Invalid ZIP directory": "ZIP目录无效",
   "Invalid ZIP directory bounds": "ZIP目录边界无效",
   "Invalid stored ROM": "存储的ROM无效",
-  "KEYBOARD\nArrows: move · Z: jump · A: run / grab\nX: SNES A · S: SNES X · C/V: L/R\nEnter: Start · Right Shift: Select\nEsc/F10: options · Backspace: rewind\nCtrl+1/2/3/4: views · +/-: pixel zoom\nF: freeze camera · I/J/K/L: pan · R: follow\nF1–F9: load · Shift+F1–F9: save · F12: screenshot\n\nGAMEPAD\nLeft stick / D-pad: move · bottom/right: B/A\nleft/top: Y/X · bumpers: L/R · Start: Start\nView/Back: options · LT: rewind · RT: Select\nLeft stick click: atlas · LB/RB: menu sections\nMenus: D-pad + bottom confirm + right back": "键盘\n方向键：移动 · Z：跳跃 · A：跑步 / 抓取\nX：SNES A · S：SNES X · C/V：L/R\nEnter：Start · 右Shift：Select\nEsc/F10：设置 · Backspace：倒带\nCtrl+1/2/3/4：切换视图 · +/-：像素缩放\nF：固定镜头 · I/J/K/L：移动镜头 · R：跟随\nF1–F9：读档 · Shift+F1–F9：存档 · F12：截图\n\n手柄\n左摇杆 / 方向键：移动 · 下/右：B/A\n左/上：Y/X · 肩键：L/R · Start：Start\nView/Back：设置 · LT：倒带 · RT：Select\n按左摇杆：地图 · LB/RB：设置页\n菜单：方向键 + 下键确认 + 右键返回",
   "Known terrain": "已知地形",
   "Language": "语言",
   "Lightweight": "轻量",
@@ -174,5 +173,9 @@
   "Soft panorama edges": "柔化全景边缘",
   "Vertical sync": "垂直同步",
   "Pixel world keeps square pixels and integer zoom. The crisp filter balances sharp detail and even pixels at other sizes.": "像素世界保持方形像素和整数缩放。在其他尺寸下，清晰滤镜兼顾细节锐度和像素均匀性。",
-  "World's atlas decodes the loaded level. Other expanded scenes accumulate observed terrain. Faded scenery is decorative; off-camera objects are not simulated. Special projections use original framing.": "World图集解码已加载的关卡。其他扩展视图累积已观察的地形。淡化景色仅作装饰；不模拟镜头外的物体。特殊投影保持原始画幅。"
+  "World's atlas decodes the loaded level. Other expanded scenes accumulate observed terrain. Faded scenery is decorative; off-camera objects are not simulated. Special projections use original framing.": "World图集解码已加载的关卡。其他扩展视图累积已观察的地形。淡化景色仅作装饰；不模拟镜头外的物体。特殊投影保持原始画幅。",
+  "Full level map": "完整地图",
+  "Show full level map": "显示完整地图",
+  "Full level map reads the entire loaded area before exploration. Doors and pipes switch to the next area's map. The original game controls which actors are active.": "探索前即可显示已加载区域的完整地图。进入门或水管后会切换至下一区域的地图。角色和物体的活动范围仍由原游戏决定。",
+  "KEYBOARD\nArrows: move · Z: jump · A: run / grab\nX: SNES A · S: SNES X · C/V: L/R\nEnter: Start · Right Shift: Select\nEsc/F10: options · Backspace: rewind\nCtrl+1/2/3/4/5: views · +/-: pixel zoom\nF: freeze camera · I/J/K/L: pan · R: follow\nF1–F9: load · Shift+F1–F9: save · F12: screenshot\n\nGAMEPAD\nLeft stick / D-pad: move · bottom/right: B/A\nleft/top: Y/X · bumpers: L/R · Start: Start\nView/Back: options · LT: rewind · RT: Select\nLeft stick click: atlas / full map / panorama · LB/RB: menu sections\nMenus: D-pad + bottom confirm + right back": "键盘\n方向键：移动 · Z：跳跃 · A：跑步 / 抓取\nX：SNES A · S：SNES X · C/V：L/R\nEnter：Start · 右Shift：Select\nEsc/F10：设置 · Backspace：倒带\nCtrl+1/2/3/4/5：切换视图 · +/-：像素缩放\nF：固定镜头 · I/J/K/L：移动镜头 · R：跟随\nF1–F9：读档 · Shift+F1–F9：存档 · F12：截图\n\n手柄\n左摇杆 / 方向键：移动 · 下/右：B/A\n左/上：Y/X · 肩键：L/R · Start：Start\nView/Back：设置 · LT：倒带 · RT：Select\n按左摇杆：图集 / 完整地图 / 全景 · LB/RB：菜单分页\n菜单：方向键 + 下键确认 + 右键返回"
 }

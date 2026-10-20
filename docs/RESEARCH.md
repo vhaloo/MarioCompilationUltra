@@ -29,3 +29,17 @@ Snes9x source is pinned at `1bcc369e89f08243e0a462882fb1f3e42e51de3a`.
 `src/observer.cpp` is a read-only bridge compiled alongside the core. Upstream
 core source is otherwise unmodified. The supplied CMake target selects the
 libretro core sources, with CPU timing and Super FX speed kept at defaults.
+
+Since 0.3.0, `src/complete_map.cpp` reads each supported game's whole loaded area:
+classic column streams, Mario 2/3 Map16 RAM, World's ROM-indexed Map16 layers,
+and Yoshi's SRAM screen directory with Super FX-produced Map16 RAM. Graphics
+definitions are resolved from the user's cartridge and current video memory.
+The two classic decoders have separate entry points and header semantics.
+
+`src/map_probe.cpp` executes those local cartridge instructions inside a
+serialized checkpoint, with instruction and column limits, then restores the
+checkpoint on both success and failure. It does not advance a video/audio frame.
+This is an additional original host-side bridge; no retail decoder instructions,
+level data or graphics are included in its source. Synthetic public fixtures
+are authored for this repository. This work adds terrain inspection rather than
+rewriting off-camera enemy or platform activation.

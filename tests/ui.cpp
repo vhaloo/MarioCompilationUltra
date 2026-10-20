@@ -102,6 +102,20 @@ int main() {
             for (int i = 0; i < 5; i++)
                 step();
             check(!a.menu && a.core.frame > before, "Controller resumes gameplay");
+            a.settings.view = 1;
+            press(SDL_CONTROLLER_BUTTON_LEFTSTICK);
+            check(a.settings.view == 3, "Left stick click selects the existing stage atlas");
+            press(SDL_CONTROLLER_BUTTON_LEFTSTICK);
+            check(a.settings.view == 4, "Second stick click selects the full level map");
+            press(SDL_CONTROLLER_BUTTON_LEFTSTICK);
+            check(a.settings.view == 1, "Third stick click returns to panorama");
+            SDL_Event shortcut{};
+            shortcut.type = SDL_KEYDOWN;
+            shortcut.key.keysym.sym = SDLK_5;
+            shortcut.key.keysym.mod = KMOD_CTRL;
+            SDL_PushEvent(&shortcut);
+            a.events();
+            check(a.settings.view == 4, "Ctrl+5 selects the full level map");
             a.settings.recommendedPicture();
             // Reproduce a retained menu focus, as seen when launching straight
             // into a game before a normal visible menu frame has retired it.
