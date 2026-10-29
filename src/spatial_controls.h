@@ -90,6 +90,7 @@ SpatialAxis spatialJoystick(float x, float y, float radius = .20f, float deadzon
 // tracking/focus disappears. Values outside [0,1] fail released.
 bool spatialPress(float value, bool previous, bool tracked);
 uint16_t questPlayButtons(bool a, bool b, bool x, bool rightTrigger, bool start);
+uint16_t questDirectionButtons(float x, float y, float deadzone);
 // The visible screen and surrounding terrain use the same pixel-to-metre map.
 struct SpatialViewport {
     float x, y, width, height;

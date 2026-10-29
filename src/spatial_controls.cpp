@@ -8,6 +8,13 @@ uint16_t questPlayButtons(bool a, bool b, bool x, bool rightTrigger, bool start)
     return uint16_t(a) | (uint16_t(b) << 1) | (uint16_t(x) << 8) | (uint16_t(rightTrigger) << 9) |
            (uint16_t(start) << 3);
 }
+uint16_t questDirectionButtons(float x, float y, float deadzone) {
+    if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(deadzone))
+        return 0;
+    deadzone = std::clamp(deadzone, .05f, .6f);
+    return (uint16_t(y > deadzone) << 4) | (uint16_t(y < -deadzone) << 5) |
+           (uint16_t(x < -deadzone) << 6) | (uint16_t(x > deadzone) << 7);
+}
 std::vector<SpatialButton> spatialButtons(int page) {
     std::vector<SpatialButton> out;
     const char *tabs[]{"remote_modes",       "remote_place",    "remote_play", "remote_picture",

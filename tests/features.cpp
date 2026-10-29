@@ -23,6 +23,12 @@ int main() {
               "Touch controls cover jump, run, action, X and Start");
         check(questPlayButtons(false, false, false, false, false) == 0,
               "Released Touch controls leave no held game button");
+        check(questDirectionButtons(.8f, .8f, .22f) == ((1 << 4) | (1 << 7)),
+              "Touch diagonals map directly to player one's SNES input");
+        check(questDirectionButtons(-.8f, -.8f, .22f) == ((1 << 5) | (1 << 6)),
+              "Touch negative axes preserve left/down directions");
+        check(!questDirectionButtons(.1f, -.1f, .22f) && !questDirectionButtons(NAN, 1, .22f),
+              "Neutral or invalid Touch axes release movement");
         settings.zoom = 1;
         for (int i = 0; i < 3; ++i)
             settings.stepZoom(-1);

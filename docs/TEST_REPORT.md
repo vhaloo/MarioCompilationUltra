@@ -7,11 +7,11 @@ of physical headset, display, controller or loudspeaker behaviour.
 
 ## Public, original test fixtures
 
-The Windows Release build passes **469 assertions in five CTest suites**:
+The Windows Release build passes **472 assertions in five CTest suites**:
 
 | Suite | Checks | Scope |
 |---|---:|---|
-| Features and spatial interaction | 307 | 90 Hz/transparent defaults, zoom through 1/8, preference bounds, stereo audio reversal, pinch hysteresis, invalid input, seven remote pages, button bounds/hit centres, full SNES controls, coplanar mapping, execution guard, placed-object formats and OAM pixels |
+| Features and spatial interaction | 310 | 90 Hz/transparent defaults, zoom through 1/8, preference bounds, stereo audio reversal, pinch hysteresis, invalid input, seven remote pages, button bounds/hit centres, full SNES controls, coplanar mapping, execution guard, placed-object formats and OAM pixels |
 | Complete maps | 45 | Area layouts, vertical pages, terrain banks, priority, bounds, room identity and transactional decoder exits |
 | Unit/runtime | 52 | Original tiny 65C816 cartridge, importer, ZIP integrity, settings, progress and core rendering |
 | Controller/UI | 51 | Ten-language menus, seven tabs, virtual SDL gamepad, quick camera chords, preserved SNES L, pause/resume, snapshots and disconnect/reconnect |

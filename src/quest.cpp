@@ -1129,8 +1129,11 @@ struct QuestPresentation::Impl {
         if (app.menu && !grabbing && std::abs(right.y) > .2f)
             wheel = right.y * float(frame.predictedDisplayPeriod) * 1e-9f * 12.f;
         bool manipulating = grabbing || singleGrabHand >= 0;
-        if (app.settings.questTouch && !app.menu && !manipulating)
+        if (app.settings.questTouch && !app.menu && !manipulating) {
             app.spatialButtons |= questPlayButtons(a, b, x, !uiConsumed[1] && rt > .55f, clicked);
+            app.spatialButtons |=
+                questDirectionButtons(left.x, left.y, app.settings.deadzone * .01f);
+        }
         if (joystick) {
             auto axis = [&](int axis, float value) {
                 SDL_JoystickSetVirtualAxis(joystick, axis,
@@ -1139,8 +1142,8 @@ struct QuestPresentation::Impl {
             auto button = [&](int button, bool down) {
                 SDL_JoystickSetVirtualButton(joystick, button, down ? 1 : 0);
             };
-            axis(SDL_CONTROLLER_AXIS_LEFTX, manipulating ? 0 : left.x);
-            axis(SDL_CONTROLLER_AXIS_LEFTY, manipulating ? 0 : -left.y);
+            axis(SDL_CONTROLLER_AXIS_LEFTX, app.menu && !manipulating ? left.x : 0);
+            axis(SDL_CONTROLLER_AXIS_LEFTY, app.menu && !manipulating ? -left.y : 0);
             axis(SDL_CONTROLLER_AXIS_RIGHTX, app.menu || manipulating ? 0 : right.x);
             axis(SDL_CONTROLLER_AXIS_RIGHTY, app.menu || manipulating ? 0 : -right.y);
             axis(SDL_CONTROLLER_AXIS_TRIGGERLEFT,
