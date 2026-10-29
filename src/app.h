@@ -7,19 +7,31 @@
 #include <functional>
 #include <memory>
 #include <imgui.h>
+#include <algorithm>
+#include "quest.h"
+#include "object_previews.h"
 namespace mcu {
 struct Options {
-    bool headless = false, software = false, menu = false, realtime = true, noResume = false;
+    bool headless = false, software = false, menu = false, realtime = true, noResume = false,
+         menuOnly = false;
+    int xrPreview = -1;
+    bool xrOptions = false;
+    std::string xrCapture, startupError;
     int width = 1280, height = 720, frames = -1;
     std::string game, importPath, script, report, capture, dump, locale;
 };
 class App {
+#ifdef MCU_QUEST
+  public:
+#endif
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
     SDL_Texture *nativeTex = nullptr, *worldTex = nullptr, *backgroundTex = nullptr;
     std::unique_ptr<Blitter> nativeBlitter, worldBlitter, insetBlitter;
     SDL_FRect nativeRect{}, insetRect{};
     int nw = 0, nh = 0, ww = 0, wh = 0, tab = 0, selected = 0, dialog = 0, dialogSlot = 0;
+    SDL_Texture *frameTarget = nullptr;
+    int frameWidth = 0, frameHeight = 0;
     std::string pendingGame, message;
     bool browser = false, pathEdit = false, releaseInput = false, focusPage = true,
          focusLibrary = true;
@@ -58,7 +70,16 @@ class App {
     void bootstrapInput();
     void updateTexture(SDL_Texture *&, int &, int &, int, int, const std::vector<uint32_t> &);
     void request(int action, int slot = 0, const std::string &game = {});
-    bool button(const char *en, const char *fr, const ImVec2 &size = {0, 0});
+    bool button(const char *en, const char *fr = nullptr, const ImVec2 &size = {0, 0});
+    void extrasUi();
+    void helpUi();
+    void hintUi();
+    void furniture();
+    std::string guideKey, guideRequested;
+    bool guideOpen = false;
+    uint64_t noticeStarted = 0, hintStarted = 0;
+    bool rewinding = false;
+    std::array<uint16_t, 2> previousQuick{};
 
   public:
     Options options;
@@ -66,7 +87,15 @@ class App {
     Library library;
     Core core;
     World world;
+    ObjectPreviews previews;
     bool menu = true, quit = false, focused = true;
+    bool dirty = true, menuVerificationOnly = false;
+    uint16_t spatialButtons = 0;
+    bool spatialRewind = false;
+    std::string xrMenuCapture;
+#ifdef MCU_QUEST
+    QuestPresentation *quest = nullptr;
+#endif
     int drawableWidth = 1280, drawableHeight = 720;
     std::function<void(int)> menuHook;
     App(Options o, fs::path data) : options(std::move(o)), core(settings) {
@@ -85,6 +114,22 @@ class App {
     void capture(const fs::path &);
     void report(const fs::path &, double elapsed) const;
     void scriptCommand(const std::string &, const std::string &);
+    void refreshControllers() { hotplug(); }
+    void showSection(int section) {
+        tab = std::clamp(section, 0, 6);
+        focusPage = true;
+        menu = true;
+        dirty = true;
+    }
+    void pushEvent(SDL_Event &e) { SDL_PushEvent(&e); }
+    void notify(const std::string &text);
+    void control(const char *key);
+    void showGuide(const std::string &key);
+    std::string guideTopic() const { return guideKey; }
+    void nextButton(const char *);
+    bool choice(const char *, int &, std::initializer_list<const char *>);
+    bool tick(const char *, bool &);
+    bool slider(const char *, int &, int, int, const char *format = "%d");
     int activeTab() const { return tab; }
     bool gameAvailable(const std::string &id) const;
     int availableGames() const;

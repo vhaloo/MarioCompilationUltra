@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- Pinned SDL utility code includes optional BLE Steam-controller and AudioRecord paths.
+         This app requests neither Bluetooth scanning/connection nor microphone permission.
+         SDL's HIDDeviceManager checks permission before Bluetooth initialization; capture is
+         never opened by this application. Keep the exception scoped to these upstream files;
+         QuestActivity and the manifest remain fully checked. -->
+    <issue id="MissingPermission">
+        <ignore path="**/org/libsdl/app/HIDDeviceBLESteamController.java"/>
+        <ignore path="**/org/libsdl/app/HIDDeviceManager.java"/>
+        <ignore path="**/org/libsdl/app/SDLAudioManager.java"/>
+    </issue>
+</lint>

@@ -6,6 +6,12 @@ struct McuLayer {
     int map = 0, tiles = 0, x = 0, y = 0, size = 0, tile16 = 0;
 };
 struct McuVideo {
+    struct Object {
+        int x = 0, y = 0, name = 0, palette = 0;
+        bool large = false, flipX = false, flipY = false;
+    };
+    std::array<Object, 128> objects{};
+    int objectBase = 0, objectSelect = 0, objectSize = 0;
     std::array<uint8_t, 65536> vram{};
     std::array<uint8_t, 131072> ram{}, sram{};
     std::array<uint16_t, 256> palette{};

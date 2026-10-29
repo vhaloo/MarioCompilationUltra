@@ -1,5 +1,29 @@
 # Releases
 
+## 0.4.0 — 2026-10-29
+
+- Bring shared presentation and input features across from the Sonic collection:
+  compact configurable controls, original/player/free camera, exact 1:1 and
+  reduced pixel scale, adjustable panorama height and CRT/arcade framing.
+- Rewind every native frame with optional reversed stereo audio and bounded
+  24/96/192 MiB history. Preserve existing on-disk save states and progress.
+- Decode placed actors for all six games. Show fixed translucent OAM images
+  learned locally, or hexadecimal-labelled outlines when their image is unknown.
+  Keep original physics and activation ranges.
+- Add a standalone ARM64 Quest AR/VR development preview: mural, wall fit, floor
+  atlas, arcade table, 3D CRT, curved gallery and spatial screen. Include optional
+  room/anchor placement, transparent AR surround and a 90 Hz refresh request.
+- Add grip movement and two-grip resize, independent native CRT, ray/poke remote,
+  hand tracking and a large virtual controller with every SNES button.
+- Expand the interface and illustrated offline documentation in all ten
+  languages, keeping English first. Add a seventh settings section and spatial
+  interaction tests. Fix desktop screenshot capture after presentation.
+
+Quest is compiled and statically checked, **physically untested**. macOS remains
+experimental for physical gameplay. Preview pictures and actor classification
+are partial; the original native viewport remains authoritative. See
+[parity](docs/PARITY.md) and [validation](docs/TEST_REPORT.md) for exact scope.
+
 ## 0.3.0 — 2026-10-20
 
 - Add a fifth view, **Full level map**, for all six games. The entire loaded

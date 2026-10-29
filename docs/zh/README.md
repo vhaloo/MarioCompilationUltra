@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.3.0
+# Mario Compilation Ultra 0.4.0
 
 本地SNES合集，提供可调整的电脑界面和实验性扩展视图。Snes9x负责模拟卡带，包括Super FX。本项目并未声称已反编译所有游戏。
 
-[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.3.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.4.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 下载与桌面启动
 
@@ -54,6 +54,10 @@ sh ./Install-Linux.sh
 | `b19ed489` | Super Mario World (US) |
 | `d138f224` | Yoshi’s Island 1.0 (US) |
 | `cf98ddaa` | Yoshi’s Island 1.1 (US) |
+
+## Quest VR / AR
+
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.4.0/MarioCompilationUltra-0.4.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 操作
 
@@ -119,9 +123,13 @@ View/Back：设置 · LT：倒带 · RT：Select<br>
 
 ![关于](screenshots/5.png)
 
-## 软件包与验证 · 0.3.0
+### Quest VR / AR
 
-公开检查涵盖四个套件的156项断言、每种语言179条消息、字体覆盖和240张真实界面截图。私密检查涵盖六款游戏、首帧地图、横向和纵向地形、105个经典区域、115个Mario 2区域、210个Mario 3房间、两个版本的1024个World关卡表项及222个Yoshi房间表项。这些是有限的加载、地形、像素及功能测试，并非完整通关。实体按钮、可听音频及实体Linux/Mac游戏运行仍未验证。详见报告。
+![Quest VR / AR](screenshots/6.png)
+
+## 软件包与验证 · 0.4.0
+
+五组自动测试检查原创测试数据、菜单、空间交互和渲染。十种语言的界面以四种尺寸截图。另行检查六款本地游戏。Quest AR/VR 和 Mac 实机游玩仍属实验性，未经实机测试。范围详见验证报告。
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

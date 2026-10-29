@@ -10,6 +10,14 @@ void mcuObserve(McuVideo &s, bool rendered) {
     std::memcpy(s.ram.data(), Memory.RAM, 131072);
     std::memcpy(s.sram.data(), Memory.SRAM, 131072);
     std::memcpy(s.palette.data(), PPU.CGDATA, 512);
+    s.objectBase = PPU.OBJNameBase;
+    s.objectSelect = PPU.OBJNameSelect;
+    s.objectSize = PPU.OBJSizeSelect;
+    for (int i = 0; i < 128; ++i) {
+        const auto &o = PPU.OBJ[i];
+        s.objects[i] = {o.HPos,      int(o.VPos),  o.Name,      o.Palette,
+                        o.Size != 0, o.HFlip != 0, o.VFlip != 0};
+    }
     for (int i = 0; i < 4; i++) {
         auto &b = PPU.BG[i];
         s.layers[i] = {b.SCBase * 2, b.NameBase * 2, b.HOffset,

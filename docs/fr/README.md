@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.3.0
+# Mario Compilation Ultra 0.4.0
 
 Une collection SNES locale avec une interface PC adaptable et des vues de monde expérimentales. Snes9x assure la simulation des cartouches, y compris le Super FX. Le projet ne revendique pas une décompilation de tous les jeux.
 
-[Téléchargement et lancement sur le bureau](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.3.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Téléchargement et lancement sur le bureau](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.4.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Téléchargement et lancement sur le bureau
 
@@ -54,6 +54,10 @@ Les profils mémoire étendus et la sélection All-Stars automatique visent les 
 | `b19ed489` | Super Mario World (US) |
 | `d138f224` | Yoshi’s Island 1.0 (US) |
 | `cf98ddaa` | Yoshi’s Island 1.1 (US) |
+
+## Quest VR / AR
+
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.4.0/MarioCompilationUltra-0.4.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Commandes
 
@@ -119,9 +123,13 @@ Choisis à nouveau la cartouche si son fichier a été déplacé ou si le disque
 
 ![À propos](screenshots/5.png)
 
-## Paquets et validation · 0.3.0
+### Quest VR / AR
 
-Les contrôles publics couvrent 156 assertions dans quatre suites, 179 messages par langue, la police et 240 captures réelles de l’interface. Les tests privés couvrent les six jeux, la carte dès la première image, les géométries horizontales et verticales, 105 zones classiques, 115 zones Mario 2, 210 salles Mario 3, 1 024 entrées de niveaux World dans deux éditions et 222 entrées de salles Yoshi. Il s’agit de tests limités des chargements, géométries, pixels et fonctions, et non de campagnes terminées. Les boutons physiques, le son audible et le jeu sur Linux/Mac physiques restent non vérifiés. Consulte le rapport détaillé.
+![Quest VR / AR](screenshots/6.png)
+
+## Paquets et validation · 0.4.0
+
+Cinq suites automatisées vérifient les données de test originales, les menus, les interactions spatiales et le rendu. L’interface en dix langues est capturée à quatre tailles. Les six jeux locaux sont vérifiés séparément. AR/VR Quest et jeu physique sur Mac restent expérimentaux et non testés. Le rapport précise la portée des essais.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

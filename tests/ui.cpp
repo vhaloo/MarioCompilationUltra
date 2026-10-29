@@ -48,14 +48,14 @@ int main() {
             for (int i = 0; i < 4; i++)
                 step();
             check(a.activeTab() == 0, "Collection page is initial focus");
-            for (int i = 1; i <= 5; i++) {
+            for (int i = 1; i <= 6; i++) {
                 press(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
                 check(a.activeTab() == i, "Shoulder reaches every options page");
             }
             press(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
             check(a.activeTab() == 0, "Options page wrap");
             press(SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
-            check(a.activeTab() == 5, "Reverse page navigation");
+            check(a.activeTab() == 6, "Reverse page navigation");
             a.settings.language = 1;
             step();
             check(ImGui::GetDrawData()->TotalVtxCount > 100, "French interface renders");
@@ -117,6 +117,7 @@ int main() {
             a.events();
             check(a.settings.view == 4, "Ctrl+5 selects the full level map");
             a.settings.recommendedPicture();
+            a.settings.hintOpacity = 0;
             // Reproduce a retained menu focus, as seen when launching straight
             // into a game before a normal visible menu frame has retired it.
             ImGui::SetWindowFocus("##menu");
@@ -146,6 +147,27 @@ int main() {
             step();
             check((a.core.buttons[0] & 1) != 0, "Bottom button maps to SNES B");
             SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_A, 0);
+            step();
+            SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_RIGHTSTICK, 1);
+            press(SDL_CONTROLLER_BUTTON_DPAD_UP);
+            check(a.settings.view == 2 && a.settings.zoom == 1 && a.settings.zoomOut == 0 &&
+                      !a.core.buttons[0],
+                  "Quick 1:1 camera chord does not leak movement into the game");
+            press(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+            check(a.settings.zoomOut == 1, "Quick zoom-out is edge triggered while held");
+            press(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+            check(a.settings.view == 4, "Quick chord reaches the entire loaded area");
+            press(SDL_CONTROLLER_BUTTON_Y);
+            check(a.settings.cameraMode == 1 && !a.settings.freeze,
+                  "Quick chord follows the player");
+            SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_RIGHTSTICK, 0);
+            step();
+            SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_LEFTSHOULDER, 1);
+            step();
+            check((a.core.buttons[0] & (1 << 10)) != 0,
+                  "Normal SNES L remains available outside quick controls");
+            SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_LEFTSHOULDER, 0);
+            a.settings.cameraMode = 0;
             step();
             check(a.core.save(1), "Save from UI runtime");
             auto video = a.core.native;

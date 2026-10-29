@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse, subprocess, shutil, zipfile, hashlib, json, plistlib, os
 from audit_public import audit_archive
 ROOT=Path(__file__).resolve().parents[1]
-VERSION='0.3.0'
+VERSION='0.4.0'
 def pack(folder,out):
     with zipfile.ZipFile(out,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
         for p in sorted(folder.rglob('*')):
@@ -39,7 +39,10 @@ def main():
     for filename in ['README.md','LICENSE','THIRD_PARTY_NOTICES.md']:shutil.copy2(ROOT/filename,folder/filename)
     shutil.copytree(ROOT/'docs',folder/'docs',dirs_exist_ok=True)
     if a.platform=='macos':shutil.copytree(ROOT/'assets',folder/'assets',dirs_exist_ok=True)
-    if a.platform=='windows':shutil.copy2(ROOT/'Install-Windows.ps1',folder/'Install-Windows.ps1')
+    if a.platform=='windows':
+        shutil.copy2(ROOT/'Install-Windows.ps1',folder/'Install-Windows.ps1')
+        redist=folder/'Redist';redist.mkdir(exist_ok=True)
+        (redist/'README.txt').write_text('Windows 10/11 x64\n\nThis build uses the static Microsoft C/C++ runtime. SDL2.dll is included.\nNo separate Visual C++ Redistributable, .NET, Python, Java or emulator installation is required.\nKeep the complete extracted folder together.\n',encoding='utf8')
     if a.platform=='linux':shutil.copy2(ROOT/'Install-Linux.sh',folder/'Install-Linux.sh');(folder/'Install-Linux.sh').chmod(0o755)
     artifacts=[];archive=a.out/(name+'.zip');pack(folder,archive);artifacts.append(archive)
     if a.source:

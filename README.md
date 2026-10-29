@@ -3,17 +3,17 @@
 
 [English](docs/en/README.md) · [Français](docs/fr/README.md) · [Español](docs/es/README.md) · [日本語](docs/ja/README.md) · [Deutsch](docs/de/README.md) · [Italiano](docs/it/README.md) · [Português](docs/pt/README.md) · [Русский](docs/ru/README.md) · [简体中文](docs/zh/README.md) · [한국어](docs/ko/README.md)
 
-# Mario Compilation Ultra 0.3.0
+# Mario Compilation Ultra 0.4.0
 
 A local SNES collection with an adaptive PC interface and experimental world views. Snes9x supplies the cartridge simulation, including Super FX. No decompilation of every game is claimed.
 
-[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.3.0) · [HTML](docs/en/guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.4.0) · [HTML](docs/en/guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download and desktop startup
 
 | Windows x64 | Linux x64 | macOS Intel x64 | macOS Apple Silicon arm64 |
 |---|---|---|---|
-| [ZIP](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.3.0/MarioCompilationUltra-0.3.0-windows-x64.zip) | [ZIP](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.3.0/MarioCompilationUltra-0.3.0-linux-x64.zip) | [ZIP — experimental](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.3.0/MarioCompilationUltra-0.3.0-macos-x64.zip) | [ZIP — experimental](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.3.0/MarioCompilationUltra-0.3.0-macos-arm64.zip) |
+| [ZIP](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.4.0/MarioCompilationUltra-0.4.0-windows-x64.zip) | [ZIP](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.4.0/MarioCompilationUltra-0.4.0-linux-x64.zip) | [ZIP — experimental](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.4.0/MarioCompilationUltra-0.4.0-macos-x64.zip) | [ZIP — experimental](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.4.0/MarioCompilationUltra-0.4.0-macos-arm64.zip) |
 
 All four packages contain all ten interface languages, illustrated guides, licences and original desktop icons.
 
@@ -60,6 +60,10 @@ Expanded memory profiles and automatic All-Stars selection target the listed US 
 | `b19ed489` | Super Mario World (US) |
 | `d138f224` | Yoshi’s Island 1.0 (US) |
 | `cf98ddaa` | Yoshi’s Island 1.1 (US) |
+
+## Quest VR / AR
+
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.4.0/MarioCompilationUltra-0.4.0-Quest-public.apk) · [Quest VR / AR](docs/en/XR.md) · [HTML](docs/en/xr.html) · [Parity](docs/PARITY.md)
 
 ## Controls
 
@@ -125,9 +129,13 @@ Choose cartridge again if its file was moved or a drive is disconnected. ZIPs mu
 
 ![About](docs/en/screenshots/5.png)
 
-## Packages and validation · 0.3.0
+### Quest VR / AR
 
-Public checks cover 156 assertions in four suites, 179 messages per language, font coverage and 240 actual interface captures. Private checks cover all six games, first-frame map preparation, horizontal and vertical geometry, 105 classic areas, 115 Mario 2 areas, 210 Mario 3 rooms, 1,024 World level-table entries in two editions, and 222 Yoshi room entries. These are bounded loader, geometry, pixel and runtime tests, not completed campaigns. Physical controller buttons, audible output and physical Linux/Mac gameplay remain unverified. See the detailed report.
+![Quest VR / AR](docs/en/screenshots/6.png)
+
+## Packages and validation · 0.4.0
+
+Five automated suites check original fixtures, menus, spatial interaction and rendering. The ten-language interface is captured at four sizes. Six locally supplied games are checked separately. Quest AR/VR and physical macOS gameplay remain experimental and untested. See the versioned validation report for scope.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](docs/TEST_REPORT.md) · [Build](docs/BUILD.md) · [Source / research](docs/RESEARCH.md)
 

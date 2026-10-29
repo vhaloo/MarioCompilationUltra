@@ -1,0 +1,46 @@
+name: Quest build and static validation
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: quest-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  compile:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - name: Native toolchain
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;29.0.14206865' 'cmake;3.31.6'
+      - name: Pinned SDL source
+        run: python tools/prepare_android.py
+      - name: Compile and lint without a headset
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon --console=plain --max-workers=2 :app:assembleRelease :app:lintRelease
+      - name: Public APK audit
+        run: |
+          python tools/audit_apk.py android/app/build/outputs/apk/release/app-release.apk --report android/apk-audit.json
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose android/app/build/outputs/apk/release/app-release.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MCU-Quest-CI-debug-signature
+          path: |
+            android/app/build/outputs/apk/release/app-release.apk
+            android/app/build/reports/lint-results-release.html
+            android/apk-audit.json
+          if-no-files-found: error

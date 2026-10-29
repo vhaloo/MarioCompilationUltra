@@ -17,6 +17,7 @@ def codepoints():
         data = json.loads(path.read_text(encoding='utf8'))
         text += json.dumps(data, ensure_ascii=False)
     text += (ROOT / 'docs/guide-texts.json').read_text(encoding='utf8')
+    text += (ROOT / 'tools/xr_guides.py').read_text(encoding='utf8')
     return set(map(ord, text)) | set(range(32, 0x250)) | set(range(0x400, 0x530)) | set(range(0x2000, 0x2070))
 def main():
     parser = argparse.ArgumentParser()
@@ -32,6 +33,7 @@ def main():
         for path in (ROOT / 'assets/locales').glob('*.json'):
             catalog_chars.update(map(ord, json.dumps(json.loads(path.read_text(encoding='utf8')), ensure_ascii=False)))
         catalog_chars.update(map(ord, (ROOT / 'docs/guide-texts.json').read_text(encoding='utf8')))
+        catalog_chars.update(map(ord, (ROOT / 'tools/xr_guides.py').read_text(encoding='utf8')))
         missing = catalog_chars - set(font.getBestCmap()) - {10, 13}
         assert not missing, f'Missing localized glyphs: {sorted(missing)}'
         print(f'Ten-language font coverage verified: {len(font.getBestCmap())} codepoints')

@@ -111,11 +111,14 @@ void Core::video(const void *data, unsigned w, unsigned h, size_t pitch) {
 size_t Core::audio(const int16_t *d, size_t n) {
     auto &a = *active;
     a.audioFrames += n;
+    if (a.recordingAudio && n)
+        a.frameAudio.insert(a.frameAudio.end(), d, d + n * 2);
     if (!a.device || a.headless || a.settings.mute || !n)
         return n;
     if (SDL_GetQueuedAudioSize(a.device) > uint32_t(a.sampleRate) * 4 / 8)
         return n;
-    std::vector<int16_t> b(n * 2);
+    auto &b = a.audioScratch;
+    b.resize(n * 2);
     for (size_t i = 0; i < n * 2; i++)
         b[i] = int16_t(int(d[i]) * a.settings.volume / 100);
     SDL_QueueAudio(a.device, b.data(), uint32_t(b.size() * 2));
@@ -143,6 +146,10 @@ Core::~Core() {
 }
 bool Core::load(const fs::path &p, const std::string &id, bool resume) {
     try {
+        if (executionBlocked) {
+            status = "Cartridge execution disabled for this preview";
+            return false;
+        }
         auto c = readRom(p);
         if (!offers(c.family, id))
             throw std::runtime_error("Cartridge does not contain this game");
@@ -158,6 +165,10 @@ bool Core::load(const fs::path &p, const std::string &id, bool resume) {
     }
 }
 bool Core::loadBytes(Cartridge c, const std::string &id) {
+    if (executionBlocked) {
+        status = "Cartridge execution disabled for this preview";
+        return false;
+    }
     unload();
     if (active && active != this) {
         status = "A SNES core is already running";
@@ -275,17 +286,36 @@ void Core::unload() {
 void Core::tick() {
     if (!loaded)
         return;
+    if (reverseDirection) {
+        clearAudio();
+        reverseDirection = false;
+    }
+    RewindFrame previous;
+    if (settings.rewind)
+        previous.state = state();
+    frameAudio.clear();
+    recordingAudio = settings.rewind;
     retro_run();
+    recordingAudio = false;
     ++frame;
     mcuObserveMemory(snapshot);
-    if (settings.rewind && frame % 8 == 0) {
-        auto b = state();
-        historyBytes += b.size();
-        history.push_back(std::move(b));
-        while (history.size() > 240 || historyBytes > 96 * 1024 * 1024) {
-            historyBytes -= history.front().size();
+    if (!previous.state.empty()) {
+        previous.pcm = frameAudio;
+        historyBytes +=
+            previous.state.size() + previous.pcm.size() * sizeof(int16_t) + sizeof(RewindFrame);
+        history.push_back(std::move(previous));
+        const size_t budgets[]{24, 96, 192};
+        size_t budget =
+            budgets[settings.quality == 0 ? 0 : std::clamp(settings.rewindMemory, 0, 2)] * 1024 *
+            1024;
+        while (!history.empty() && (history.size() > size_t(fps * 120) || historyBytes > budget)) {
+            historyBytes -= history.front().state.size() +
+                            history.front().pcm.size() * sizeof(int16_t) + sizeof(RewindFrame);
             history.pop_front();
         }
+    } else if (!settings.rewind && !history.empty()) {
+        history.clear();
+        historyBytes = 0;
     }
     if (frame % 1800 == 0) {
         try {
@@ -334,7 +364,7 @@ std::vector<uint8_t> Core::state() const {
     b.resize(32 + packedSize);
     return b;
 }
-bool Core::restore(const std::vector<uint8_t> &b) {
+bool Core::restore(const std::vector<uint8_t> &b, bool flushAudio) {
     if (!loaded || b.size() < 32 || std::memcmp(b.data(), "MCUFRM1", 8))
         return false;
     size_t engineSize = u32(b, 8), count = u32(b, 12), w = u32(b, 16), h = u32(b, 20),
@@ -351,7 +381,8 @@ bool Core::restore(const std::vector<uint8_t> &b) {
     height = unsigned(h);
     native.resize(count);
     std::memcpy(native.data(), raw.data() + engineSize, count * 4);
-    clearAudio();
+    if (flushAudio)
+        clearAudio();
     mcuObserve(snapshot);
     ++imageVersion;
     return true;
@@ -408,12 +439,36 @@ bool Core::loadState(int n) {
         return false;
     }
 }
+std::vector<int16_t> Core::reverseStereo(const std::vector<int16_t> &samples) {
+    std::vector<int16_t> out(samples.size());
+    size_t count = samples.size() / 2;
+    for (size_t i = 0; i < count; ++i) {
+        out[i * 2] = samples[(count - i - 1) * 2];
+        out[i * 2 + 1] = samples[(count - i - 1) * 2 + 1];
+    }
+    if (samples.size() & 1)
+        out.back() = samples.back();
+    return out;
+}
 bool Core::rewind() {
+    if (!reverseDirection) {
+        clearAudio();
+        reverseDirection = true;
+    }
     if (history.empty())
         return false;
-    auto b = std::move(history.back());
-    historyBytes -= b.size();
+    auto entry = std::move(history.back());
     history.pop_back();
-    return restore(b);
+    historyBytes -= entry.state.size() + entry.pcm.size() * sizeof(int16_t) + sizeof(RewindFrame);
+    if (!restore(entry.state, false))
+        return false;
+    if (device && !headless && !settings.mute && settings.rewindAudio && !entry.pcm.empty()) {
+        auto reversed = reverseStereo(entry.pcm);
+        for (auto &sample : reversed)
+            sample = int16_t(int(sample) * settings.volume / 100);
+        SDL_QueueAudio(device, reversed.data(), Uint32(reversed.size() * sizeof(int16_t)));
+    }
+    return true;
 }
+
 } // namespace mcu

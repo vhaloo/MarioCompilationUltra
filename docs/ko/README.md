@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.3.0
+# Mario Compilation Ultra 0.4.0
 
 PC에 맞게 조정할 수 있는 인터페이스와 실험적인 확장 화면을 제공하는 로컬 SNES 모음입니다. Super FX를 포함한 카트리지 동작은 Snes9x가 에뮬레이션합니다. 모든 게임을 역컴파일했다고 주장하지 않습니다.
 
-[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.3.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.4.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 다운로드와 바탕 화면에서 실행
 
@@ -54,6 +54,10 @@ sh ./Install-Linux.sh
 | `b19ed489` | Super Mario World (US) |
 | `d138f224` | Yoshi’s Island 1.0 (US) |
 | `cf98ddaa` | Yoshi’s Island 1.1 (US) |
+
+## Quest VR / AR
+
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.4.0/MarioCompilationUltra-0.4.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 조작
 
@@ -119,9 +123,13 @@ View/Back: 설정 · LT: 되감기 · RT: Select<br>
 
 ![정보](screenshots/5.png)
 
-## 패키지와 검증 · 0.3.0
+### Quest VR / AR
 
-공개 검사는 4개 모음의 156개 테스트, 언어별 179개 메시지, 글꼴과 실제 화면 240장을 확인합니다. 비공개 검사는 6개 게임, 첫 화면 지도, 가로·세로 지형, 클래식 105구역, Mario 2의 115구역, Mario 3의 210개 방, 두 버전 World의 1,024개 레벨 항목과 Yoshi 222개 방 항목을 다룹니다. 제한된 로딩·지형·픽셀·기능 검사이며 전체 캠페인 완료가 아닙니다. 실제 버튼, 들리는 소리와 실제 Linux/Mac 게임 플레이는 미확인입니다. 상세 보고서를 확인하세요.
+![Quest VR / AR](screenshots/6.png)
+
+## 패키지와 검증 · 0.4.0
+
+다섯 자동 테스트 모음이 자체 데이터, 메뉴, 공간 상호작용과 렌더링을 확인합니다. 10개 언어 화면을 네 크기로 촬영하고 여섯 로컬 게임을 별도로 검사합니다. Quest AR/VR 및 Mac 실기 플레이는 실험적이며 미검증입니다. 검증 보고서에서 범위를 확인하세요.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

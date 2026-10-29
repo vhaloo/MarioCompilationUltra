@@ -12,3 +12,12 @@
 __pycache__/
 *.tmp
 local-config*
+
+/android/.gradle/
+/android/.deps/
+/android/app/.cxx/
+/android/app/build/
+/android/build/
+/android/local.properties
+*.jks
+*.keystore

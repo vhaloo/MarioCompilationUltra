@@ -2,7 +2,7 @@
 from pathlib import Path
 import argparse, json, subprocess, zipfile, tarfile, hashlib
 
-BANNED={'.sfc','.smc','.nes','.mdrom','.srm','.mstate','.state','.sav','.spc','.rsn','.ips','.bps','.pcm','.msu','.rom','.bios'}
+BANNED={'.sfc','.smc','.nes','.mdrom','.srm','.mstate','.state','.sav','.spc','.rsn','.ips','.bps','.pcm','.msu','.rom','.bios','.jks','.keystore','.p12'}
 BAD_PARTS={'private','private_assets','user-data','saves','states','screenshots-private','research','smw-research','smas-research','yoshi-research'}
 def check_name(name):
     p=Path(name)

@@ -65,6 +65,16 @@ int run(const std::vector<std::string> &args) {
             o.capture = value();
         else if (a == "--dump")
             o.dump = value();
+        else if (a == "--menu-only")
+            o.menuOnly = true, o.menu = true;
+        else if (a == "--xr-preview")
+            o.xrPreview = std::stoi(value());
+        else if (a == "--xr-options")
+            o.xrOptions = true;
+        else if (a == "--xr-capture")
+            o.xrCapture = value();
+        else if (a == "--startup-error")
+            o.startupError = value();
         else if (a == "--menu")
             o.menu = true;
         else if (a == "--no-resume")
@@ -102,12 +112,23 @@ int run(const std::vector<std::string> &args) {
     }
     App app(o, data);
     app.init();
+#ifdef MCU_QUEST
+    QuestPresentation xr(app);
+    app.quest = &xr;
+    xr.initialise();
+#endif
     auto start = std::chrono::steady_clock::now();
     auto previous = start;
     double accumulator = 0;
     uint16_t held = 0;
     for (int i = 0; !app.quit && (o.frames < 0 || i < o.frames); i++) {
         app.events();
+#ifdef MCU_QUEST
+        if (!xr.beginFrame()) {
+            SDL_Delay(5);
+            continue;
+        }
+#endif
         app.input();
         if (!o.script.empty())
             app.core.buttons[0] = held;
@@ -117,6 +138,8 @@ int run(const std::vector<std::string> &args) {
         for (auto it = range.first; it != range.second; ++it) {
             auto &cmd = it->second.first;
             auto &v = it->second.second;
+            // Let ImGui resolve a changed tab/locale before a later scripted capture.
+            render |= cmd == "tab" || cmd == "language" || cmd == "menu" || cmd == "help";
             if (cmd == "buttons")
                 held = uint16_t(std::stoul(v, nullptr, 0));
             if (cmd == "capture") {
@@ -141,14 +164,25 @@ int run(const std::vector<std::string> &args) {
                 accumulator = 0;
         } else
             app.tick();
+#ifdef MCU_QUEST
+        if (xr.needsRedraw()) {
+            xr.prepareRender();
+            app.render();
+            xr.rendered();
+        }
+        xr.endFrame();
+#else
         if (o.realtime || i % 8 == 0 || render || i == o.frames - 1)
             app.render();
+#endif
         for (auto &p : captures)
             app.capture(fs::u8path(p));
         if (o.realtime)
             SDL_Delay(1);
     }
+#ifndef MCU_QUEST
     app.render();
+#endif
     if (!o.capture.empty())
         app.capture(fs::u8path(o.capture));
     if (!o.dump.empty())
@@ -159,7 +193,11 @@ int run(const std::vector<std::string> &args) {
                    std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count());
     return 0;
 }
+#ifdef MCU_QUEST
+extern "C" int SDL_main(int argc, char **argv) {
+#else
 int main(int argc, char **argv) {
+#endif
     std::vector<std::string> args;
     try {
 #ifdef _WIN32

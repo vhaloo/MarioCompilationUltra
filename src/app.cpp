@@ -12,12 +12,28 @@
 #include <iostream>
 #include <sstream>
 #include <zlib.h>
+#ifdef MCU_QUEST
+#include <SDL_system.h>
+#endif
 namespace mcu {
 bool App::button(const char *en, const char *fr, const ImVec2 &s) {
-    return ImGui::Button(tr(en, fr), s);
+    bool result = ImGui::Button(tr(en, fr), s);
+    control(en);
+    return result;
 }
 void App::init() {
     SDL_SetMainReady();
+    menuVerificationOnly = options.menuOnly;
+    core.executionBlocked = options.menuOnly;
+    xrMenuCapture = options.xrCapture;
+    if (!options.startupError.empty())
+        throw std::runtime_error(options.startupError);
+#ifdef MCU_QUEST
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengles2");
+#endif
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER) != 0)
         throw std::runtime_error(SDL_GetError());
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
@@ -43,7 +59,11 @@ void App::init() {
     window = SDL_CreateWindow("Mario Compilation Ultra", SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED, options.width, options.height,
                               SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI |
-                                  (options.headless ? SDL_WINDOW_HIDDEN : 0));
+                                  (options.headless ? SDL_WINDOW_HIDDEN : 0)
+#ifdef MCU_QUEST
+                                  | SDL_WINDOW_OPENGL
+#endif
+    );
     if (!window)
         throw std::runtime_error(SDL_GetError());
     SDL_GetWindowPosition(window, &windowed.x, &windowed.y);
@@ -52,7 +72,7 @@ void App::init() {
         window, -1,
         options.software
             ? SDL_RENDERER_SOFTWARE
-            : SDL_RENDERER_ACCELERATED |
+            : SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE |
                   (settings.vsync && options.realtime ? SDL_RENDERER_PRESENTVSYNC : 0));
     if (!renderer)
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
@@ -74,6 +94,9 @@ void App::init() {
     io.LogFilename = nullptr;
     char *base = SDL_GetBasePath();
     programPath = fs::u8path(base ? base : "");
+#ifdef MCU_QUEST
+    programPath = fs::u8path(SDL_AndroidGetInternalStoragePath());
+#endif
     fs::path font = programPath / "assets/Interface.otf";
     SDL_free(base);
     ImFontGlyphRangesBuilder glyphs;
@@ -126,6 +149,15 @@ void App::init() {
     hotplug();
     if (options.headless)
         settings.fullscreen = false;
+#ifdef MCU_QUEST
+    settings.fullscreen = false;
+    settings.span = false;
+    settings.vsync = false;
+#endif
+    if (options.xrPreview >= 0)
+        settings.questMode = std::clamp(options.xrPreview, 0, 6);
+    if (options.xrOptions)
+        tab = 6;
     fullscreen();
     menu = options.menu || options.game.empty();
     if (fs::is_directory(settings.dataDir))
@@ -167,6 +199,8 @@ App::~App() {
         nativeBlitter.reset();
         worldBlitter.reset();
         insetBlitter.reset();
+        if (frameTarget)
+            SDL_DestroyTexture(frameTarget);
         if (nativeTex)
             SDL_DestroyTexture(nativeTex);
         if (worldTex)
@@ -266,6 +300,9 @@ void App::events() {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
         ImGui_ImplSDL2_ProcessEvent(&e);
+        if (menu && e.type == SDL_CONTROLLERBUTTONDOWN &&
+            e.cbutton.button == SDL_CONTROLLER_BUTTON_Y)
+            showGuide(guideKey);
         if (e.type == SDL_QUIT)
             request(4);
         if (e.type == SDL_CONTROLLERDEVICEADDED || e.type == SDL_CONTROLLERDEVICEREMOVED)
@@ -332,7 +369,9 @@ void App::events() {
             settings.view = 2;
             int current =
                 settings.pixelZoom(drawableWidth, drawableHeight, core.width, core.height);
-            settings.zoom = std::clamp(current + (k == SDLK_MINUS ? -1 : 1), 1, 8);
+            if (!settings.zoom)
+                settings.zoom = current;
+            settings.stepZoom(k == SDLK_MINUS ? -1 : 1);
         }
         if ((mod & KMOD_CTRL) && k >= SDLK_1 && k <= SDLK_5) {
             settings.view = int(k - SDLK_1);
@@ -375,6 +414,50 @@ void App::input() {
         auto down = [&](SDL_GameControllerButton v) {
             return SDL_GameControllerGetButton(pad, v) != 0;
         };
+        if (settings.quickControls && !menu && down(SDL_CONTROLLER_BUTTON_RIGHTSTICK)) {
+            uint16_t held = uint16_t(down(SDL_CONTROLLER_BUTTON_DPAD_RIGHT)) |
+                            uint16_t(down(SDL_CONTROLLER_BUTTON_DPAD_LEFT)) << 1 |
+                            uint16_t(down(SDL_CONTROLLER_BUTTON_DPAD_UP)) << 2 |
+                            uint16_t(down(SDL_CONTROLLER_BUTTON_DPAD_DOWN)) << 3 |
+                            uint16_t(down(SDL_CONTROLLER_BUTTON_A)) << 4 |
+                            uint16_t(down(SDL_CONTROLLER_BUTTON_B)) << 5 |
+                            uint16_t(down(SDL_CONTROLLER_BUTTON_X)) << 6 |
+                            uint16_t(down(SDL_CONTROLLER_BUTTON_Y)) << 7;
+            uint16_t edge = held & ~previousQuick[p];
+            previousQuick[p] = held;
+            if (edge & 1) {
+                settings.view = 2;
+                settings.stepZoom(1);
+            }
+            if (edge & 2) {
+                settings.view = 2;
+                settings.stepZoom(-1);
+            }
+            if (edge & 4) {
+                settings.view = 2;
+                settings.zoom = 1;
+                settings.zoomOut = 0;
+            }
+            if (edge & 8)
+                settings.view = 4;
+            if (edge & 16)
+                settings.freeze = !settings.freeze;
+            if (edge & 32)
+                settings.view = 0;
+            if (edge & 64) {
+                auto path =
+                    settings.dataDir / "screenshots" / (std::to_string(SDL_GetTicks64()) + ".bmp");
+                capture(path);
+                notify(path.u8string());
+            }
+            if (edge & 128) {
+                settings.cameraMode = 1;
+                settings.freeze = false;
+            }
+            any = true;
+            continue;
+        }
+        previousQuick[p] = 0;
         bool m = down(SDL_CONTROLLER_BUTTON_BACK), start = down(SDL_CONTROLLER_BUTTON_START),
              left = down(SDL_CONTROLLER_BUTTON_LEFTSHOULDER),
              right = down(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER),
@@ -403,9 +486,9 @@ void App::input() {
             toggleMenu();
         if (menu && !browser && !pathEdit && !dialog) {
             if (left && !previousLeft[p])
-                tab = (tab + 5) % 6, focusPage = true;
+                tab = (tab + 6) % 7, focusPage = true;
             if (right && !previousRight[p])
-                tab = (tab + 1) % 6, focusPage = true;
+                tab = (tab + 1) % 7, focusPage = true;
         }
         if (!menu && thumb && !previousThumb[p])
             settings.view = settings.view == 3 ? 4 : settings.view == 4 ? 1 : 3;
@@ -427,16 +510,18 @@ void App::input() {
         a(down(SDL_CONTROLLER_BUTTON_DPAD_LEFT) || x < -dz, 6);
         a(down(SDL_CONTROLLER_BUTTON_DPAD_RIGHT) || x > dz, 7);
         a(start, 3);
-        a(down(SDL_CONTROLLER_BUTTON_A), 0);
-        a(down(SDL_CONTROLLER_BUTTON_B), 8);
-        a(down(SDL_CONTROLLER_BUTTON_X), 1);
-        a(down(SDL_CONTROLLER_BUTTON_Y), 9);
+        a(down(settings.padLayout == 1 ? SDL_CONTROLLER_BUTTON_B : SDL_CONTROLLER_BUTTON_A), 0);
+        a(down(settings.padLayout == 1 ? SDL_CONTROLLER_BUTTON_A : SDL_CONTROLLER_BUTTON_B), 8);
+        a(down(settings.padLayout == 2 ? SDL_CONTROLLER_BUTTON_Y : SDL_CONTROLLER_BUTTON_X), 1);
+        a(down(settings.padLayout == 2 ? SDL_CONTROLLER_BUTTON_X : SDL_CONTROLLER_BUTTON_Y), 9);
         a(left, 10);
         a(right, 11);
         a(SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 16000, 2);
         core.buttons[p] |= pb;
         any |= pb != 0;
     }
+    core.buttons[0] |= spatialButtons;
+    any |= spatialButtons != 0;
     if (releaseInput && !any)
         releaseInput = false;
     if (menu || releaseInput || !focused && settings.pauseFocus) {
@@ -470,7 +555,7 @@ bool App::play(const std::string &id, bool resume) {
     hasResume = hasResume && core.status == "State restored";
     world.reset();
     settings.lastGame = id;
-    settings.freeze = false;
+    settings.freeze = settings.cameraMode == 2;
     menu = false;
     releaseInput = true;
     message.clear();
@@ -518,11 +603,25 @@ void App::tick() {
     if (menu || !core.loaded || (!focused && settings.pauseFocus && !options.headless))
         return;
     auto *k = SDL_GetKeyboardState(nullptr);
-    bool rewindHeld = k[SDL_SCANCODE_BACKSPACE];
+    bool rewindHeld = k[SDL_SCANCODE_BACKSPACE] || spatialRewind;
+    auto rewindControl = [&](SDL_GameController *pad) {
+        if (settings.rewindButton < 2)
+            return SDL_GameControllerGetAxis(pad, settings.rewindButton == 0
+                                                      ? SDL_CONTROLLER_AXIS_TRIGGERLEFT
+                                                      : SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 16000;
+        return SDL_GameControllerGetButton(pad, settings.rewindButton == 2
+                                                    ? SDL_CONTROLLER_BUTTON_LEFTSHOULDER
+                                                    : SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) != 0;
+    };
     for (auto *p : pads)
-        if (p && SDL_GameControllerGetAxis(p, SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 16000)
+        if (p && rewindControl(p))
             rewindHeld = true;
-    if (settings.rewind && rewindHeld) {
+#ifdef MCU_QUEST
+    if (quest && quest->simulationPaused())
+        return;
+#endif
+    rewinding = settings.rewind && rewindHeld;
+    if (rewinding) {
         core.rewind();
         world.reset();
         return;
@@ -574,14 +673,20 @@ void App::drawGame() {
     if (!core.loaded)
         return;
     world.compose(core, settings, drawableWidth, drawableHeight);
-    background();
+    previews.update(core, world.scene);
+    previews.paint(world.canvas, world.scene, settings);
+    if (!settings.projectionTransparent)
+        background();
     updateTexture(nativeTex, nw, nh, core.width, core.height, core.native);
     if (world.expanded) {
         updateTexture(worldTex, ww, wh, world.canvas.width, world.canvas.height,
                       world.canvas.pixels);
         SDL_SetTextureBlendMode(worldTex, SDL_BLENDMODE_BLEND);
         worldBlitter->copy(worldTex, ww, wh, {0, 0, float(drawableWidth), float(drawableHeight)},
-                           settings.view == 2 ? 0 : settings.filter);
+                           settings.view == 2 || (settings.view >= 3 &&
+                                                  (!settings.smoothMap || settings.quality == 0))
+                               ? 0
+                               : settings.filter);
         auto &cv = world.canvas;
         nativeRect = {(world.scene.cameraX - cv.x) * drawableWidth / cv.worldWidth,
                       (world.scene.cameraY - cv.y) * drawableHeight / cv.worldHeight,
@@ -592,7 +697,7 @@ void App::drawGame() {
                               displayPixelAspect(settings.aspect, core.width, core.height));
         if (settings.view == 2) {
             float scale =
-                float(settings.pixelZoom(drawableWidth, drawableHeight, core.width, core.height));
+                float(settings.pixelScale(drawableWidth, drawableHeight, core.width, core.height));
             nativeRect = {(drawableWidth - core.width * scale) / 2,
                           (drawableHeight - core.height * scale) / 2, core.width * scale,
                           core.height * scale};
@@ -722,8 +827,13 @@ void App::libraryUi() {
                        "séparément. Toutes les données de jeu restent sur ton ordinateur."));
     ImGui::Spacing();
     if (button("Choose cartridge...", "Choisir une cartouche...")) {
+#ifdef MCU_QUEST
+        if (quest)
+            quest->chooseRom();
+#else
         browser = true;
         pathEdit = false;
+#endif
     }
     ImGui::SameLine();
     if (button("Import folder...", "Importer un dossier...")) {
@@ -785,9 +895,13 @@ void App::optionsUi() {
             }
             ImGui::EndCombo();
         }
+        control(en);
         ImGui::PopID();
     };
-    auto check = [&](const char *en, const char *fr, bool &v) { ImGui::Checkbox(tr(en, fr), &v); };
+    auto check = [&](const char *en, const char *fr, bool &v) {
+        ImGui::Checkbox(tr(en, fr), &v);
+        control(en);
+    };
     auto slider = [&](const char *en, const char *fr, int &v, int lo, int hi) {
         ImGui::PushID(en);
         ImGui::TextWrapped("%s", tr(en, fr));
@@ -987,6 +1101,7 @@ void App::optionsUi() {
         if (button("Open project on GitHub", "Ouvrir le projet GitHub"))
             SDL_OpenURL("https://github.com/vhaloo/MarioCompilationUltra");
     }
+    extrasUi();
 }
 void App::menuUi() {
     auto &io = ImGui::GetIO();
@@ -1006,15 +1121,15 @@ void App::menuUi() {
     ImGui::TextDisabled(
         "%s", tr("YOUR CARTRIDGES. A BIGGER VIEW.", "TES CARTOUCHES. UNE VUE PLUS GRANDE."));
     ImGui::Spacing();
-    const char *en[] = {"Collection",    "Screen",   "Camera & scenery",
-                        "Saves & sound", "Controls", "About"};
-    const char *fr[] = {"Collection",         "Écran",     "Caméra et paysage",
-                        "Sauvegardes et son", "Commandes", "À propos"};
+    const char *en[] = {"Collection", "Screen", "Camera & scenery", "Saves & sound",
+                        "Controls",   "About",  "XR / AR / VR"};
+    const char *fr[] = {"Collection", "Écran",    "Caméra et paysage", "Sauvegardes et son",
+                        "Commandes",  "À propos", "XR / AR / VR"};
     if (ImGui::BeginTabBar("sections", ImGuiTabBarFlags_FittingPolicyScroll)) {
         bool requestedSelection = focusPage;
         int requestedTab = focusPage ? tab : -1;
         int shownTab = tab;
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 7; i++) {
             if (ImGui::BeginTabItem(tr(en[i], fr[i]), nullptr,
                                     requestedTab == i ? ImGuiTabItemFlags_SetSelected : 0)) {
                 if (tab != i)
@@ -1272,9 +1387,40 @@ void App::render() {
     col[ImGuiCol_WindowBg] =
         settings.highContrast ? ImVec4(.015f, .02f, .03f, 1) : ImVec4(.055f, .075f, .11f, .98f);
     SDL_GetRendererOutputSize(renderer, &drawableWidth, &drawableHeight);
-    SDL_SetRenderDrawColor(renderer, 12, 19, 28, 255);
+#ifdef MCU_QUEST
+    if (quest)
+        quest->logicalSize(drawableWidth, drawableHeight);
+#endif
+#ifndef MCU_QUEST
+    if (!frameTarget || frameWidth != drawableWidth || frameHeight != drawableHeight) {
+        if (frameTarget)
+            SDL_DestroyTexture(frameTarget);
+        frameTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
+                                        SDL_TEXTUREACCESS_TARGET, drawableWidth, drawableHeight);
+        frameWidth = drawableWidth;
+        frameHeight = drawableHeight;
+        if (frameTarget)
+            SDL_SetTextureBlendMode(frameTarget, SDL_BLENDMODE_NONE);
+    }
+    if (frameTarget)
+        SDL_SetRenderTarget(renderer, frameTarget);
+#endif
+#ifdef MCU_QUEST
+    Settings persistentSettings = settings;
+    if (quest)
+        quest->configureRender(settings);
+#endif
+    bool cleanProjection = settings.projectionCleanScene;
+    SDL_SetRenderDrawColor(
+        renderer, settings.projectionTransparent ? 0 : 12, settings.projectionTransparent ? 0 : 19,
+        settings.projectionTransparent ? 0 : 28, settings.projectionTransparent ? 0 : 255);
     SDL_RenderClear(renderer);
-    drawGame();
+    if (!settings.projectionUiOnly)
+        drawGame();
+    furniture();
+#ifdef MCU_QUEST
+    settings = std::move(persistentSettings);
+#endif
     auto &io = ImGui::GetIO();
     const int navigation = ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
     if (menu || browser || dialog)
@@ -1289,8 +1435,29 @@ void App::render() {
     }
     ImGui_ImplSDLRenderer2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
+#ifdef MCU_QUEST
+    if (quest)
+        quest->prepareUi();
+#endif
+    if (menu) {
+        for (auto *pad : pads)
+            if (pad) {
+                float dz = settings.menuDeadzone / 100.f;
+                float x = SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_LEFTX) / 32767.f;
+                float y = SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_LEFTY) / 32767.f;
+                auto axis = [&](ImGuiKey key, float value) {
+                    float n = std::clamp((value - dz) / (1 - dz), 0.f, 1.f);
+                    io.AddKeyAnalogEvent(key, n > 0, n);
+                };
+                axis(ImGuiKey_GamepadLStickLeft, -x);
+                axis(ImGuiKey_GamepadLStickRight, x);
+                axis(ImGuiKey_GamepadLStickUp, -y);
+                axis(ImGuiKey_GamepadLStickDown, y);
+                break;
+            }
+    }
     ImGui::NewFrame();
-    if (!menu && world.expanded) {
+    if (!menu && world.expanded && !cleanProjection) {
         auto &sc = world.scene;
         auto &cv = world.canvas;
         auto *d = ImGui::GetForegroundDrawList();
@@ -1358,11 +1525,24 @@ void App::render() {
         browserUi();
     if (dialog)
         dialogs();
+    hintUi();
+    helpUi();
+#ifdef MCU_QUEST
+    if (quest)
+        quest->drawReticle();
+#endif
     if (menuHook)
         menuHook(tab);
     ImGui::Render();
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+#ifndef MCU_QUEST
+    if (frameTarget) {
+        SDL_SetRenderTarget(renderer, nullptr);
+        SDL_RenderCopy(renderer, frameTarget, nullptr, nullptr);
+    }
     SDL_RenderPresent(renderer);
+#endif
+    dirty = false;
     if (!menu && core.loaded) {
         uint64_t finished = SDL_GetPerformanceCounter();
         double msPerCount = 1000. / SDL_GetPerformanceFrequency();
@@ -1384,7 +1564,14 @@ void App::capture(const fs::path &p) {
                                                     SDL_PIXELFORMAT_ARGB8888);
     if (!s)
         throw std::runtime_error(SDL_GetError());
-    if (SDL_RenderReadPixels(renderer, nullptr, s->format->format, s->pixels, s->pitch) != 0) {
+    auto previousTarget = SDL_GetRenderTarget(renderer);
+    if (frameTarget)
+        SDL_SetRenderTarget(renderer, frameTarget);
+    int readResult =
+        SDL_RenderReadPixels(renderer, nullptr, s->format->format, s->pixels, s->pitch);
+    if (frameTarget)
+        SDL_SetRenderTarget(renderer, previousTarget);
+    if (readResult != 0) {
         SDL_FreeSurface(s);
         throw std::runtime_error(SDL_GetError());
     }
@@ -1478,19 +1665,33 @@ void App::report(const fs::path &p, double elapsed) const {
                       ",\n\"locale\":" + jsonString(locale(settings.language).code) +
                       ",\n\"data_dir\":" + jsonString(settings.dataDir.u8string()) +
                       ",\n\"available_games\":" + std::to_string(availableGames()) +
+                      ",\n\"rewind_bytes\":" + std::to_string(core.rewindBytes()) +
+                      ",\n\"zoom_divisor\":" + std::to_string(1 << settings.zoomOut) +
+                      ",\n\"preview_objects\":" + std::to_string(previews.objects.size()) +
+                      ",\n\"preview_sprites\":" + std::to_string(previews.spritesDrawn) +
+                      ",\n\"preview_outlines\":" + std::to_string(previews.outlinesDrawn) +
+                      ",\n\"preview_cache_bytes\":" + std::to_string(previews.cacheBytes()) +
                       ",\n\"controllers\":" + controllers.str() +
                       ",\n\"missing_localized_glyphs\":" + std::to_string(missingGlyphs));
     atomicText(p, report);
 }
 void App::scriptCommand(const std::string &cmd, const std::string &value) {
-    if (cmd == "buttons")
+    if (cmd == "guide")
+        showGuide(value);
+    else if (cmd == "zoomOut")
+        settings.zoomOut = std::stoi(value);
+    else if (cmd == "panoramaHeight")
+        settings.panoramaHeight = std::stoi(value);
+    else if (cmd == "desktopPresentation")
+        settings.desktopPresentation = std::stoi(value);
+    else if (cmd == "buttons")
         core.buttons[0] = uint16_t(std::stoul(value, nullptr, 0));
     else if (cmd == "view")
         settings.view = std::stoi(value);
     else if (cmd == "zoom")
         settings.zoom = std::stoi(value);
     else if (cmd == "tab") {
-        tab = std::clamp(std::stoi(value), 0, 5);
+        tab = std::clamp(std::stoi(value), 0, 6);
         focusPage = true;
     } else if (cmd == "menu")
         menu = std::stoi(value) != 0;
@@ -1513,6 +1714,21 @@ void App::scriptCommand(const std::string &cmd, const std::string &value) {
         settings.language = std::stoi(value);
     else if (cmd == "quality")
         settings.quality = std::stoi(value);
+    else if (cmd == "zoomOut")
+        settings.zoomOut = std::stoi(value);
+    else if (cmd == "panoramaHeight")
+        settings.panoramaHeight = std::stoi(value);
+    else if (cmd == "camera") {
+        settings.cameraMode = std::stoi(value);
+        settings.freeze = settings.cameraMode == 2;
+    } else if (cmd == "presentation")
+        settings.desktopPresentation = std::stoi(value);
+    else if (cmd == "rewindMemory")
+        settings.rewindMemory = std::stoi(value);
+    else if (cmd == "previewLabels")
+        settings.spawnLabels = std::stoi(value) != 0;
+    else if (cmd == "help")
+        showGuide(value);
     else if (cmd == "metrics" && value == "reset")
         resetMetrics();
     else if (cmd == "report")

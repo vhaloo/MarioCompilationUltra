@@ -507,11 +507,12 @@ void World::compose(const Core &c, Settings &s, int dw, int dh) {
         canvas.x = centerX - fw / 2;
         canvas.y = centerY - fh / 2;
     } else {
-        float scale =
-            s.view == 1 ? float(h) / c.height : float(s.pixelZoom(w, h, c.width, c.height));
+        float scale = s.view == 1 ? float(h) / s.panoramaHeight
+                                  : float(s.pixelScale(w, h, c.width, c.height));
         canvas.worldWidth = w / (scale * pixelAspect);
         canvas.worldHeight = h / scale;
-        float cx = sc.cameraX + c.width / 2.f, cy = sc.cameraY + c.height / 2.f;
+        float cx = s.cameraMode == 1 ? sc.playerX + 8.f : sc.cameraX + c.width / 2.f;
+        float cy = s.cameraMode == 1 ? sc.playerY + 12.f : sc.cameraY + c.height / 2.f;
         if (s.freeze) {
             cx = s.cameraX;
             cy = s.cameraY;
@@ -524,7 +525,7 @@ void World::compose(const Core &c, Settings &s, int dw, int dh) {
     }
     int divisor = s.quality == 0 ? 3 : s.quality == 1 ? 2 : 1;
     if (s.view == 2)
-        divisor = s.pixelZoom(w, h, c.width, c.height);
+        divisor = std::max(1, int(s.pixelScale(w, h, c.width, c.height)));
     // SNES art has no extra detail above one sample per world pixel. Avoid
     // rebuilding millions of identical samples on wide, high-resolution screens.
     canvas.width = std::clamp(std::min(w / divisor, int(std::ceil(canvas.worldWidth))), 1, 16384);

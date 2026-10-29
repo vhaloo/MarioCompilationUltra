@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.3.0
+# Mario Compilation Ultra 0.4.0
 
 Lokale SNES-Sammlung mit anpassbarer PC-Oberfläche und experimentellen Weltansichten. Snes9x emuliert die Module einschließlich Super FX. Eine vollständige Dekompilierung aller Spiele wird nicht behauptet.
 
-[Download und Start vom Desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.3.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download und Start vom Desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.4.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download und Start vom Desktop
 
@@ -54,6 +54,10 @@ Erweiterte Speicherprofile und die automatische All-Stars-Auswahl gelten für di
 | `b19ed489` | Super Mario World (US) |
 | `d138f224` | Yoshi’s Island 1.0 (US) |
 | `cf98ddaa` | Yoshi’s Island 1.1 (US) |
+
+## Quest VR / AR
+
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.4.0/MarioCompilationUltra-0.4.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Steuerung
 
@@ -119,9 +123,13 @@ Wähle das Modul erneut, wenn die Datei verschoben oder das Laufwerk getrennt wu
 
 ![Über das Programm](screenshots/5.png)
 
-## Pakete und Prüfung · 0.3.0
+### Quest VR / AR
 
-Öffentliche Prüfungen: 156 Tests in vier Suiten, 179 Meldungen je Sprache, Schriftabdeckung und 240 echte Aufnahmen. Private Prüfungen betreffen sechs Spiele, sofortige Karten, horizontale und vertikale Geometrie, 105 klassische Gebiete, 115 Mario-2-Gebiete, 210 Mario-3-Räume, 1.024 World-Leveleinträge in zwei Editionen und 222 Yoshi-Raumeinträge. Begrenzte Lade-, Geometrie-, Pixel- und Funktionstests, keine vollständigen Kampagnen. Physische Tasten, hörbarer Ton und echtes Linux/Mac-Spiel bleiben ungeprüft. Siehe Prüfbericht.
+![Quest VR / AR](screenshots/6.png)
+
+## Pakete und Prüfung · 0.4.0
+
+Fünf automatische Testsuiten prüfen eigene Testdaten, Menüs, räumliche Interaktion und Darstellung. Die Oberfläche in zehn Sprachen wird in vier Größen erfasst. Sechs lokale Spiele werden separat geprüft. Quest AR/VR und physisches Mac-Spiel bleiben experimentell und ungetestet. Details im Prüfbericht.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

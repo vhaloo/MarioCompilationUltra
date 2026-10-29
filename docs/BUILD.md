@@ -50,6 +50,11 @@ its simulation/presentation counts, rate and 95th-percentile frame intervals.
 These counts measure work inside that window even when cartridges change or
 save states are loaded. Reports also include the core's last operation status.
 
+Version 0.4 adds timeline commands `zoomOut 0..3`, `panoramaHeight 224..4096`,
+`camera 0|1|2` (original/player/free), `presentation 0|1|2` (plain/CRT/table),
+`rewindMemory 0|1|2`, `previewLabels 0|1` and `help SETTING_KEY` for reproducible
+regressions of the new preferences and illustrated popup.
+
 The presentation suite uses original pixel patterns with an SDL software renderer.
 The crisp filter uses texture scale modes and an optional render target, bounded
 to four million intermediate pixels. Unsupported targets fall back to nearest
@@ -87,6 +92,42 @@ such as `pt-BR` and `zh_CN` resolve to the corresponding interface catalog.
 
 To reproduce the published screenshots, run the smoke command above, then
 `python tools/guides.py --captures build/ui-smoke`. The smoke tool keeps all
-240 original PNG captures. The documentation crops only the unused surround
+280 original PNG captures. The documentation crops only the unused surround
 of the 1920×1080 images; no application pixels are fabricated or retouched.
 Window sizes of 640×360 use scrolling to retain access to every page.
+
+## Standalone Android / Quest preview
+
+Use JDK 21, Android SDK platform 36, build-tools 36.0.0, NDK 29.0.14206865 and
+CMake 3.31.6. The pinned Gradle wrapper and OpenXR Android loader dependency
+are used by the Quest workflow. No headset, cartridge or ADB command is needed.
+
+```sh
+python tools/prepare_android.py
+cd android
+./gradlew --no-daemon --console=plain --max-workers=2 :app:assembleRelease :app:lintRelease
+cd ..
+python tools/audit_apk.py android/app/build/outputs/apk/release/app-release.apk
+```
+
+Use `gradlew.bat` on Windows. Set `ANDROID_HOME` and `JAVA_HOME` to your own SDK
+and JDK. `MCU_ANDROID_BUILD_DIR` and `MCU_NATIVE_BUILD_DIR` can relocate generated
+files to another disk. CMake's `MCU_SDL_SOURCE` / Gradle's `mcuSdlDir` can select
+the extracted pinned source directory.
+
+Without signing environment variables, local/CI builds use the Android debug
+signature. The published APK is signed separately with a stable private release
+key. CI's APK is a build-check artifact and cannot update the release APK under
+a different signature. Keep your key to retain update compatibility. An optional
+`MCU_QUEST_KEYSTORE` and `MCU_QUEST_KEY_PASSWORD` select an existing keystore with
+alias `mcu-quest`; keys and passwords must never enter Git or public artifacts.
+
+Public APK assets are copied from `assets`, `docs`, `licenses` and the root
+licences. The private `mcuPrivateAssets` build option is exclusively for a local
+owner-supplied bundle; do not publish that APK. The public auditor rejects ROMs,
+progress and private keys and checks the ARM64 libraries' 16 KiB ELF alignment.
+The app requests optional scene/anchor/hand permissions, with no Internet,
+camera-image, microphone or storage-wide permission.
+
+The [Quest guide](QUEST.md) documents installation for a later user test. This
+release's development never installs or launches anything on a headset.
