@@ -305,9 +305,7 @@ void Core::tick() {
             previous.state.size() + previous.pcm.size() * sizeof(int16_t) + sizeof(RewindFrame);
         history.push_back(std::move(previous));
         const size_t budgets[]{24, 96, 192};
-        size_t budget =
-            budgets[settings.quality == 0 ? 0 : std::clamp(settings.rewindMemory, 0, 2)] * 1024 *
-            1024;
+        size_t budget = budgets[std::clamp(settings.rewindMemory, 0, 2)] * 1024 * 1024;
         while (!history.empty() && (history.size() > size_t(fps * 120) || historyBytes > budget)) {
             historyBytes -= history.front().state.size() +
                             history.front().pcm.size() * sizeof(int16_t) + sizeof(RewindFrame);

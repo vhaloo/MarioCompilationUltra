@@ -43,7 +43,7 @@ release assets. Existing player data is checkpointed before work.
 | Display matrix | 360 configurations: all six games, 640×360 / 1280×720 / 7680×1440, five views, filters, desktop furniture, reduced scale, panorama height, camera modes and labels |
 | Whole-area bounds | Entire decoded bounds remain within the fifth view's canvas in the checked configurations |
 | GPU capture | Twelve hidden-window Direct3D 11 captures: original and full-map views for all six games; retained target readback checked visually |
-| Rewind memory | 7,500 native ticks across the 24/96/192 MiB choices; all three history buffers reach their cap without exceeding it |
+| Rewind memory | 10,000 native ticks across the 24/96/192 MiB choices; all three history buffers reach their cap without exceeding it; Lightweight quality also honours an explicit 192 MiB choice |
 | Graphics cache | Observed preview images stay within the 128 × 64 × 64 × 4-byte limit (2 MiB) |
 | Preservation | Original cartridges, SRAM and settings hashes remain unchanged before installation |
 
