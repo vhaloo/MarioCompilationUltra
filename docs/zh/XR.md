@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.4.0 · Quest VR / AR
+# Mario Compilation Ultra 0.5.0 · Quest VR / AR
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -6,7 +6,7 @@
 
 关卡墙面、地面、街机桌、CRT 和曲面画廊。实验性 XR 预览，可用双侧抓握缩放。
 
-实验性预览。执行编译、lint、几何和输入自动检查。本版未连接、安装或使用任何头显；跟踪、舒适度、透视和帧间隔仍待实机测试。
+实验性 XR 预览。用户已确认安装后 Quest 3 能显示 0.4 收藏界面，并记录了帧提交。0.5 构建另行编译检查。跟踪、舒适度、透视、房间放置及持续游玩仍需实体设备测试。
 
 稍后测试时，启用开发者模式并通过 SideQuest 或 adb install -r 安装公开 ARM64 APK。在未知来源中打开 Mario Compilation Ultra XR，用系统选择器导入卡带或 ZIP 后开始游戏。All-Stars + World 和 Yoshi’s Island 须分别导入。公开 APK 不含 ROM 或进度。
 

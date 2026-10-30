@@ -1,5 +1,27 @@
 # Releases
 
+## 0.5.0 — 2026-10-29
+
+- Add a normal Android phone/tablet APK with ARM64, ARMv7 and x86_64 libraries,
+  independent of the Quest headset app. Include multi-touch SNES controls,
+  portrait/landscape and separate/overlay layouts, handedness, size, opacity,
+  optional vibration, safe insets and orientation preferences.
+- Preserve cartridges and progress across signed updates. Flush battery saves
+  and the optional resume slot when the app enters the background. Handle
+  modern Back gestures and hardware Back without repeated pause toggles.
+- Preserve the game viewport and clipping across crisp-filter texture passes;
+  keep the picture out of the separate touch controls. Retain very quick taps
+  for one native tick. Avoid treating keyboard arrows as a connected gamepad.
+- Make menus and save-slot buttons adapt to narrow and high-density windows.
+  Include ten translated mobile guides, original layout diagrams and real
+  ROM-free Android screenshots. English remains first on GitHub.
+- Refresh all desktop and Quest packages and add phone/tablet CI build, lint,
+  ABI, permission, signature and public-content checks.
+
+Phone/tablet emulator tests are distinct from physical device tests. Physical
+phones/tablets and Mac gameplay are untested; Quest AR/VR remains a preview.
+See the [validation report](docs/TEST_REPORT.md) for exact evidence and limits.
+
 ## 0.4.0 — 2026-10-29
 
 - Bring shared presentation and input features across from the Sonic collection:

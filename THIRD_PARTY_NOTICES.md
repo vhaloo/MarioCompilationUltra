@@ -25,6 +25,12 @@ FontTools is a build-time utility; it is not required by the application.
 
 The Quest package contains native Android runtime libraries and the OpenXR
 loader. The normal desktop executable does not depend on OpenXR or Android.
+The phone/tablet Android APK includes SDL2 and the NDK C++ runtime, without
+OpenXR. `tools/prepare_android.py` applies two documented Java adaptations to
+the verified SDL archive: explicit receiver export flags on Android 13+ and
+exclusion of alphabetic DPAD keyboards from gamepad discovery. Original SDL
+notices are retained. The legacy receiver overload is confined to pre-33
+Android; its method-local lint exception does not suppress modern checks.
 Android Gradle/SDK/OpenXR build dependencies are fetched as documented in the
 build guide; their binaries and private release key are not in the source ZIP.
 The stereo furniture, guide diagrams and interface artwork are original

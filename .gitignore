@@ -16,6 +16,8 @@ local-config*
 /android/.gradle/
 /android/.deps/
 /android/app/.cxx/
+/android/mobile/.cxx/
+/android/mobile/build/
 /android/app/build/
 /android/build/
 /android/local.properties

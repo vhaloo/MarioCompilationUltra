@@ -1,98 +1,113 @@
-# Validation report — 0.4.0
+# Validation report — 0.5.0
 
-2026-10-29. This release extends the six-game SNES frontend with the Sonic
-collection's presentation, rewind and spatial interaction features. Evidence is
-bounded to the cases below. These checks are not completed campaigns or proof
-of physical headset, display, controller or loudspeaker behaviour.
+2026-10-29. This release adds an ordinary Android phone/tablet app while
+retaining the desktop and standalone Quest editions. The results below are
+bounded tests, not completed campaigns or guarantees for every device.
 
-## Public, original test fixtures
+## Automated public fixtures
 
-The Windows Release build passes **472 assertions in five CTest suites**:
+The Windows Release build passes all six CTest suites. Every public cartridge,
+pixel pattern and audio fixture in these suites is original test data.
 
-| Suite | Checks | Scope |
-|---|---:|---|
-| Features and spatial interaction | 310 | 90 Hz/transparent defaults, zoom through 1/8, preference bounds, stereo audio reversal, pinch hysteresis, invalid input, seven remote pages, button bounds/hit centres, full SNES controls, coplanar mapping, execution guard, placed-object formats and OAM pixels |
-| Complete maps | 45 | Area layouts, vertical pages, terrain banks, priority, bounds, room identity and transactional decoder exits |
-| Unit/runtime | 52 | Original tiny 65C816 cartridge, importer, ZIP integrity, settings, progress and core rendering |
-| Controller/UI | 51 | Ten-language menus, seven tabs, virtual SDL gamepad, quick camera chords, preserved SNES L, pause/resume, snapshots and disconnect/reconnect |
-| Presentation | 14 | Original pixel patterns, image filters and source-pixel preservation |
+| Suite | Coverage | Observed result |
+|---|---|---|
+| Features and spatial interaction | 310 checks | Passed |
+| Complete maps | 45 checks | Passed |
+| Unit/runtime | 52 checks | Passed |
+| Controller/UI | 63 checks, including real SDL multi-touch events, very quick taps, Back repeats, pause, lifecycle saves and preference round trips | Passed |
+| Presentation | 17 checks, including crisp-filter viewport/clip preservation and pixels outside a retained target's game area | Passed |
+| Mobile geometry and multi-touch | 972 layouts across sizes, densities, insets, placements, handedness and button scales; simultaneous direction/run/jump, release and invalid input | Passed |
 
-All ten catalogs contain **432 messages**, with English first. The bundled font
-covers all catalog and guide characters. **280 actual ROM-free interface
-captures** cover seven pages, ten languages and four sizes: 640×360, 1280×720,
-1920×1080 and 7680×1440. The localized galleries crop only unused surround.
-The guide generator, local links and original SVG structure are also checked.
+The mobile geometry test performs 104,018 individual bounds, separation and
+input assertions across that matrix; these are not 104,018 distinct devices.
+The other five suites contain 487 assertions in total.
 
-CI builds and validates Windows x64, Linux x64, macOS Intel and macOS ARM64.
-Each job launches its packaged executable in a separate working directory and
-a Unicode path without a ROM. Physical macOS gameplay remains experimental and
-untested. Workflow outcomes are linked from the release and repository Actions.
+All ten catalogs contain **451 messages**, with English first. The bundled OFL
+font covers all catalog and guide characters. Desktop UI smoke captures seven
+sections in ten languages at four sizes (280 captures). The extended mobile UI
+smoke captures those sections at six sizes (420 captures): 320×568, 1080×2400,
+2400×1080, 2560×1600, 800×800 and 480×320, using the corresponding density and
+safe-area inputs. Scrolling retains the content in small windows.
 
-## Private local cartridges
+The desktop CI matrix builds Windows x64, Linux x64, macOS Intel x64 and macOS
+ARM64, runs CTest and both public UI smoke tools, and launches the packaged
+executable in an independent working directory and a Unicode installation path.
+The mobile CI smoke uses two high-density orientations (140 captures per job).
+Workflow results are available in [Actions](https://github.com/vhaloo/MarioCompilationUltra/actions).
+Physical Mac gameplay remains **experimental and untested**.
 
-The US All-Stars + World compilation supplies Mario 1, Lost Levels, Mario 2 USA,
-Mario 3 and World. A separate US Yoshi's Island 1.0 supplies the sixth game.
-Cartridges, RAM dumps, states and gameplay images remain outside public Git and
-release assets. Existing player data is checkpointed before work.
+## Android phone and tablet emulators
+
+The universal APK is compiled and linted for ARM64, ARMv7 and x86_64, with
+Android 8 as the minimum and Android 16 as the target. Static checks inspect
+the ABI/library set, signing, public content, permissions and ELF alignment.
+Both 64-bit ABIs use 16 KiB-aligned load segments. The ARMv7 runtime uses 4 KiB
+pages. This APK does not contain OpenXR or require headset hardware.
+
+Runtime tests use dedicated Android 16 x86_64 phone and tablet emulators with
+the GLES 3 SwiftShader backend. They do not use or alter unrelated emulators.
 
 | Check | Observed result |
 |---|---|
-| Six playable scenes | All load, move and produce a complete map of the loaded area |
-| Manual save/load | Exact RAM and native-framebuffer comparison in every game |
-| Frame rewind | Two individual reverse steps reproduce the earlier RAM and native framebuffer exactly in every game |
-| Display matrix | 360 configurations: all six games, 640×360 / 1280×720 / 7680×1440, five views, filters, desktop furniture, reduced scale, panorama height, camera modes and labels |
-| Whole-area bounds | Entire decoded bounds remain within the fifth view's canvas in the checked configurations |
-| GPU capture | Twelve hidden-window Direct3D 11 captures: original and full-map views for all six games; retained target readback checked visually |
-| Rewind memory | 10,000 native ticks across the 24/96/192 MiB choices; all three history buffers reach their cap without exceeding it; Lightweight quality also honours an explicit 192 MiB choice |
-| Graphics cache | Observed preview images stay within the 128 × 64 × 64 × 4-byte limit (2 MiB) |
-| Preservation | Original cartridges, SRAM and settings hashes remain unchanged before installation |
+| Public first launch | Zero supplied games, readable ROM-free collection on both form factors |
+| Personal first launch | All six games available without choosing a file or importing a directory |
+| Language rendering | Ten actual phone-emulator menu captures, correct locale and no missing glyphs; separate tablet capture |
+| Six cartridges/profiles | Each selected game loads and advances on the phone emulator; startup screens are distinguished from playable-level tests |
+| World gameplay | Enter a real level, decode the full loaded area and move with the touch D-pad |
+| Five views | Touch control cycles through all five modes during the checked World scene |
+| Pause/input | Touch Options pauses; held input is neutral; hardware Back resumes once |
+| Rotation | Phone changes between 1080×2400 and 2400×1080, retaining the loaded game and paused frame |
+| Background/resume | Android background callback saves progress; relaunch paused restores the exact native-framebuffer CRC |
+| Tablet display changes | Loaded paused cartridge stays at frame zero through 2560×1600, 1600×2560, 1280×800, 800×1280, 800×800 and 480×320, including live density changes |
+| Keyboard/gamepad distinction | Alphabetic arrow-key keyboards no longer occupy a controller slot or hide automatic touch buttons |
 
-These tests use process-local input and hidden windows, with no Computer
-Control session. Physical Xbox 360 buttons and audible reverse output were not
-verified in this run. Stereo sample ordering is checked by an original public
-audio fixture; real hardware listening remains separate.
+The tablet size changes exercise a resized emulated display, not a physical
+foldable hinge or every manufacturer's split-screen implementation. ARM phone
+runtime, physical touch latency, external Android controllers, vibration,
+speaker output and device-specific cutouts have **not** been physically tested.
+Emulator timing is not a phone-performance benchmark.
 
-## AR / VR development preview
+## Six private local games
 
-The standalone Android ARM64 project compiles with the pinned SDL source,
-OpenXR Android loader and NDK 29. Android lint, public-asset scanning, APK
-signature verification and 16 KiB ELF segment checks gate the release. CI uses
-a debug signature for its build-check artifact; the published APK uses the
-stable private release signature.
+The owner's All-Stars + World cartridge supplies SMB1, Lost Levels, SMB2 USA,
+SMB3 and World; the separate Yoshi's Island cartridge supplies the sixth game.
+Local cartridges, states, RAM dumps, SRAM and gameplay captures stay outside
+Git and public release assets.
 
-The seven spatial presentations, nine presets, ray/poke remote, hand tracking,
-grip movement, two-grip resize, independent native CRT and options, room-plane
-matching, anchors, passthrough, stereo furniture and adaptive rendering are
-implemented. Input geometry, hit testing, release hysteresis and viewport
-mapping have runtime-independent checks. Those checks cannot establish tracking
-quality, ergonomics, passthrough appearance or headset frame pacing.
+All six playable scenes are rechecked against 0.5. Save/load and two individual
+rewind steps reproduce the earlier RAM and native framebuffer exactly in every
+game. Each scene supplies its decoded complete-area terrain and responds to
+input. The 360-case rendering matrix combines six games, three display sizes
+and twenty configurations covering five views, filters, furniture, reduced
+pixel scale, panorama height, camera modes and preview labels. Complete-area
+bounds and preview/history budgets are checked within the matrix.
 
-**No headset was connected, installed, launched or physically tested for this
-release. Quest AR/VR is experimental and awaits the owner's later test.** The
-90 Hz setting requests a supported display frequency; it does not guarantee
-90 rendered frames per second or change SNES simulation speed.
+These desktop checks use process-local input and hidden/software rendering.
+They are not new physical Xbox 360 button or loudspeaker tests. The earlier
+10,000-tick history-budget sweep and twelve D3D captures are retained as 0.4
+evidence, not relabelled as new 0.5 measurements.
 
-## Coverage and presentation limits
+## Quest and packaging boundary
 
-- Full map means the entire **loaded area** at entry. Doors and pipes switch
-  areas. Disconnected rooms are not combined into invented geography. Special
-  projections and unsupported scenes retain the native image.
-- Six read-only placement formats are implemented. Boss/platform/script
-  categories cover verified identifiers; arbitrary scripted and runtime-created
-  objects are not universally decoded.
-- Distant pictures are fixed translucent OAM images learned from the owner's
-  local cartridge during the current scene. Unknown appearances use outlines;
-  optional hexadecimal identifiers are disabled by default to keep the view
-  clear. Neither preview path changes physics or actor activation.
-- The authentic native viewport remains authoritative for active sprites,
-  effects, colour math and original game behaviour. The surrounding terrain
-  is an expanded representation with the documented decoder limits.
-- Rewind history duration depends on compression, game state and the chosen
-  memory cap. Original save-state files remain compatible.
-- Physical screen pacing, headset usability and full campaigns are outside
-  this bounded validation. See the [parity matrix](PARITY.md) and
-  [Quest guide](QUEST.md).
+The 0.5 ARM64 Quest APK is compiled, linted, signed and statically inspected
+separately. Its app ID and signing key remain compatible with 0.4 updates.
+For the earlier 0.4 personal build, installation and on-device APK verification
+succeeded on a Quest 3, runtime frame submission was logged and the user
+confirmed that the collection was visible. That establishes menu startup for
+0.4, not full 0.5 AR/VR gameplay, tracking, comfort or room-placement validation.
 
-The extensive area-table sweeps and older performance observations are retained
-in the [0.3.0 report](TEST_REPORT_0.3.0.md). Their counts describe that older
-release and were not repeated or relabelled as new 0.4 measurements.
+Public packages contain software, corresponding source, original interface
+artwork, ROM-free screenshots, localized guides and third-party licences.
+They contain no commercial cartridges, extracted game assets, progress or
+private signing key. The specifically requested personal ROM bundles are
+prepared separately for the owner and are never GitHub release assets.
+
+## Limits retained from the expanded views
+
+The complete map is the currently loaded area; doors and pipes replace that
+area. The original native viewport remains authoritative for active sprites,
+effects, colour math and physics. Distant pictures use locally observed OAM
+images or labelled outlines; they do not activate actors outside the original
+game's rules. Unhandled special projections fall back to native framing.
+See [parity](PARITY.md), [mobile](en/MOBILE.md), [Quest](QUEST.md), the
+[0.4 report](TEST_REPORT_0.4.0.md) and [0.3 report](TEST_REPORT_0.3.0.md).

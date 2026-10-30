@@ -232,6 +232,99 @@ int main() {
         check(localeIndex("pt-BR") == 6 && localeIndex("zh_CN") == 8 &&
                   localeIndex("unknown") == -1,
               "System locale variants resolve correctly");
+        {
+            Options phone = o;
+            phone.mobilePreview = true;
+            phone.width = 1080;
+            phone.height = 2400;
+            phone.mobileDensity = 3;
+            phone.mobileInsets = {0, 80, 0, 70};
+            App mobile(phone, data / "mobile");
+            mobile.init();
+            mobile.settings.autoResume = true;
+            mobile.settings.touchMode = 1;
+            mobile.settings.touchPlacement = 0;
+            mobile.library.import(data / "original-fixture.sfc");
+            check(mobile.play("world", false), "Touch runtime loads the original public fixture");
+            auto step = [&] {
+                mobile.events();
+                mobile.input();
+                mobile.tick();
+                mobile.render();
+            };
+            for (int i = 0; i < 4; ++i)
+                step();
+            auto layout = mobileLayout(1080, 2400, 3, {0, 80, 0, 70}, 100, 0, false, true);
+            auto finger = [&](int64_t id, int action, Uint32 type, float position = .5f) {
+                for (int i = 0; i < layout.count; ++i)
+                    if (layout.buttons[i].action == action) {
+                        auto r = layout.buttons[i].rect;
+                        SDL_Event event{};
+                        event.type = type;
+                        event.tfinger.fingerId = id;
+                        event.tfinger.x = (r.x + r.w * position) / 1080.f;
+                        event.tfinger.y = (r.y + r.h * .5f) / 2400.f;
+                        SDL_PushEvent(&event);
+                        return;
+                    }
+            };
+            finger(1, TouchDpad, SDL_FINGERDOWN, .9f);
+            finger(2, 1, SDL_FINGERDOWN);
+            finger(3, 0, SDL_FINGERDOWN);
+            step();
+            check(mobile.core.buttons[0] == 131,
+                  "SDL multi-touch moves, runs and jumps in the real input path");
+            finger(4, TouchMenu, SDL_FINGERDOWN);
+            step();
+            auto paused = mobile.core.frame;
+            for (int i = 0; i < 3; ++i)
+                step();
+            check(mobile.menu && mobile.core.frame == paused && !mobile.core.buttons[0],
+                  "Touch pause stops the game and releases every held button");
+            mobile.toggleMenu();
+            step();
+            check(!mobile.core.buttons[0], "Resuming cannot revive stale fingers");
+            SDL_Event back{};back.type=SDL_KEYDOWN;back.key.keysym.sym=SDLK_AC_BACK;
+            SDL_PushEvent(&back);step();check(mobile.menu,"Android Back opens a paused menu");
+            back.key.repeat=1;SDL_PushEvent(&back);step();check(mobile.menu,"A held Back key cannot repeatedly toggle pause");
+            back.key.repeat=0;SDL_PushEvent(&back);step();check(!mobile.menu,"A new Back press resumes the game");
+            finger(7, 0, SDL_FINGERDOWN);
+            finger(7, 0, SDL_FINGERUP);
+            step();
+            check((mobile.core.buttons[0] & 1) != 0,
+                  "A quick down/up in one event batch reaches one native tick");
+            step();
+            check(!mobile.core.buttons[0], "A quick tap releases on the following tick");
+            finger(5, 0, SDL_FINGERDOWN);
+            step();
+            SDL_Event background{};
+            background.type = SDL_APP_WILLENTERBACKGROUND;
+            SDL_PushEvent(&background);
+            step();
+            check(!mobile.core.buttons[0] && fs::exists(mobile.core.statePath(0)),
+                  "Backgrounding releases touch input and saves the resume slot");
+            SDL_Event foreground{};
+            foreground.type = SDL_APP_DIDENTERFOREGROUND;
+            SDL_PushEvent(&foreground);
+            step();
+            check(mobile.core.loaded && mobile.focused && !mobile.core.buttons[0],
+                  "Foreground resumes with the cartridge and neutral controls");
+            mobile.settings.touchScale = 140;
+            mobile.settings.touchOpacity = 20;
+            mobile.settings.touchPlacement = 2;
+            mobile.settings.touchLeftHanded = true;
+            mobile.settings.mobileOrientation = 2;
+            mobile.settings.mobileKeepAwake = false;
+            mobile.settings.save(mobile.library);
+            Settings roundtrip;
+            roundtrip.dataDir = data / "mobile";
+            Library cartridges;
+            roundtrip.load(cartridges);
+            check(roundtrip.touchScale == 140 && roundtrip.touchOpacity == 20 &&
+                      roundtrip.touchPlacement == 2 && roundtrip.touchLeftHanded &&
+                      roundtrip.mobileOrientation == 2 && !roundtrip.mobileKeepAwake,
+                  "Mobile display and touch preferences survive a restart");
+        }
         SDL_Quit();
         std::cout << checks << " controller/UI checks passed\n";
         return 0;

@@ -28,7 +28,10 @@ int run(const std::vector<std::string> &args) {
                    "smb1|smb2|smb3|world|yoshi|lostlevels\n--data-dir FOLDER --size WIDTHxHEIGHT "
                    "--headless --software --frames COUNT\n--script FILE --capture BMP --report "
                    "JSON --dump RAMFILE --menu --no-resume --benchmark\n"
-                   "--locale en|fr|es|ja|de|it|pt|ru|zh|ko\n";
+                   "--locale en|fr|es|ja|de|it|pt|ru|zh|ko\n"
+                   "--mobile-preview --mobile-density NUMBER --mobile-insets "
+                   "LEFT,TOP,RIGHT,BOTTOM\n"
+                   "--live-report JSON (runtime diagnostics, refreshed once per second)\n";
             return 0;
         } else if (a == "--data-dir")
             data = fs::u8path(value());
@@ -75,6 +78,19 @@ int run(const std::vector<std::string> &args) {
             o.xrCapture = value();
         else if (a == "--startup-error")
             o.startupError = value();
+        else if (a == "--mobile-preview")
+            o.mobilePreview = true;
+        else if (a == "--mobile-density")
+            o.mobileDensity = std::clamp(std::stof(value()), .5f, 5.f);
+        else if (a == "--mobile-insets") {
+            auto s = value();
+            std::replace(s.begin(), s.end(), ',', ' ');
+            std::istringstream v(s);
+            if (!(v >> o.mobileInsets.left >> o.mobileInsets.top >> o.mobileInsets.right >>
+                  o.mobileInsets.bottom))
+                throw std::runtime_error("Expected four safe-area insets");
+        } else if (a == "--live-report")
+            o.liveReport = value();
         else if (a == "--menu")
             o.menu = true;
         else if (a == "--no-resume")
@@ -121,6 +137,7 @@ int run(const std::vector<std::string> &args) {
     auto previous = start;
     double accumulator = 0;
     uint16_t held = 0;
+    uint64_t liveReportAt = 0;
     for (int i = 0; !app.quit && (o.frames < 0 || i < o.frames); i++) {
         app.events();
 #ifdef MCU_QUEST
@@ -177,6 +194,12 @@ int run(const std::vector<std::string> &args) {
 #endif
         for (auto &p : captures)
             app.capture(fs::u8path(p));
+        if (!o.liveReport.empty() && SDL_GetTicks64() - liveReportAt >= 1000) {
+            liveReportAt = SDL_GetTicks64();
+            app.report(
+                fs::u8path(o.liveReport),
+                std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count());
+        }
         if (o.realtime)
             SDL_Delay(1);
     }
@@ -193,7 +216,7 @@ int run(const std::vector<std::string> &args) {
                    std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count());
     return 0;
 }
-#ifdef MCU_QUEST
+#ifdef __ANDROID__
 extern "C" int SDL_main(int argc, char **argv) {
 #else
 int main(int argc, char **argv) {

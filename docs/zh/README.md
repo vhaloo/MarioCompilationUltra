@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.4.0
+# Mario Compilation Ultra 0.5.0
 
 本地SNES合集，提供可调整的电脑界面和实验性扩展视图。Snes9x负责模拟卡带，包括Super FX。本项目并未声称已反编译所有游戏。
 
-[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.4.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.5.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 下载与桌面启动
 
@@ -55,9 +55,13 @@ sh ./Install-Linux.sh
 | `d138f224` | Yoshi’s Island 1.0 (US) |
 | `cf98ddaa` | Yoshi’s Island 1.1 (US) |
 
+## Android 手机和平板电脑
+
+[Android 手机和平板电脑](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk)
+
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.4.0/MarioCompilationUltra-0.4.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 操作
 
@@ -127,9 +131,9 @@ View/Back：设置 · LT：倒带 · RT：Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 软件包与验证 · 0.4.0
+## 软件包与验证 · 0.5.0
 
-五组自动测试检查原创测试数据、菜单、空间交互和渲染。十种语言的界面以四种尺寸截图。另行检查六款本地游戏。Quest AR/VR 和 Mac 实机游玩仍属实验性，未经实机测试。范围详见验证报告。
+六组自动测试覆盖原创数据、菜单、渲染、空间控制和多点触控。电脑与移动布局以十种语言截图，另行检查六款本地游戏。手机/平板使用 Android 模拟器测试，实体设备与 Mac 游玩未测试。用户已确认 Quest 0.4 显示收藏界面，AR/VR 游玩仍为实验性。具体范围见验证报告。
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

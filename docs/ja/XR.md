@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.4.0 · Quest VR / AR
+# Mario Compilation Ultra 0.5.0 · Quest VR / AR
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -6,7 +6,7 @@
 
 全体マップの壁、床、アーケードテーブル、CRT、曲面ギャラリー。実験的なXRプレビューです。両グリップで拡大縮小します。
 
-実験的プレビューです。コンパイル、lint、形状と入力の自動テストを行います。この版ではヘッドセットへの接続、インストール、実機テストを行っていません。追跡、快適さ、パススルー、表示間隔は実機確認が必要です。
+実験的XR版です。インストール後にQuest 3で0.4のコレクションが見えることを利用者が確認し、フレーム送信を記録しました。0.5は別途ビルド・検査します。追跡、快適さ、パススルー、室内配置、継続プレイは実機検証が必要です。
 
 後日テストする際は開発者モードを有効にし、SideQuestまたはadb install -rで公開ARM64 APKをインストールしてください。提供元不明からMario Compilation Ultra XRを開き、システム選択画面でカートリッジまたはZIPを選んでプレイします。All-Stars + WorldとYoshi’s Islandは別々に読み込みます。公開APKにROMや進行データはありません。
 

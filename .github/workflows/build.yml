@@ -44,6 +44,7 @@ jobs:
           python tools/build_font.py --check
           python tools/guides.py --check
           python tools/xr_guides.py --check
+          python tools/mobile_guides.py --check
           python tools/audit_docs.py
       - name: Linux dependencies
         if: runner.os == 'Linux'
@@ -77,10 +78,11 @@ jobs:
           exe=build/MarioCompilationUltra
           if [ "${{ runner.os }}" = "Windows" ]; then exe=build/Release/MarioCompilationUltra.exe; fi
           python tools/smoke_ui.py --exe "$exe" --out build/ui-smoke
+          python tools/smoke_mobile.py --exe "$exe" --out build/mobile-smoke
       - name: Package
         run: python tools/package.py --build build --platform ${{ matrix.platform }} --arch ${{ matrix.arch }} --out dist --source
       - name: Test installed portable executable
-        run: python tools/validate_package.py --folder dist/MarioCompilationUltra-0.4.0-${{ matrix.platform }}-${{ matrix.arch }} --platform ${{ matrix.platform }}
+        run: python tools/validate_package.py --folder dist/MarioCompilationUltra-0.5.0-${{ matrix.platform }}-${{ matrix.arch }} --platform ${{ matrix.platform }}
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
@@ -90,4 +92,5 @@ jobs:
             dist/SHA256SUMS.txt
             build/public-audit.json
             build/ui-smoke/summary.json
+            build/mobile-smoke/summary.json
           if-no-files-found: error

@@ -10,12 +10,18 @@
 #include <algorithm>
 #include "quest.h"
 #include "object_previews.h"
+#include "mobile_controls.h"
+#include "android_bridge.h"
 namespace mcu {
 struct Options {
     bool headless = false, software = false, menu = false, realtime = true, noResume = false,
          menuOnly = false;
     int xrPreview = -1;
     bool xrOptions = false;
+    bool mobilePreview = false;
+    float mobileDensity = 1;
+    MobileInsets mobileInsets;
+    std::string liveReport;
     std::string xrCapture, startupError;
     int width = 1280, height = 720, frames = -1;
     std::string game, importPath, script, report, capture, dump, locale;
@@ -80,6 +86,23 @@ class App {
     uint64_t noticeStarted = 0, hintStarted = 0;
     bool rewinding = false;
     std::array<uint16_t, 2> previousQuick{};
+    AndroidDisplay mobileDisplay;
+    MobileLayout touchLayout;
+    MobileTouches touch;
+    uint16_t pendingTouchButtons = 0;
+    float density = 1, fontDensity = 1;
+    ImGuiStyle unscaledStyle;
+    uint64_t mobileMetricsAt = 0;
+    int mobileLastOrientation = -1;
+    bool mobileLastAwake = false, mobileScroll = false, mobileSuppressMouse = false;
+    SDL_FingerID mobileScrollFinger = 0;
+    float mobileScrollY = 0;
+    SDL_Rect gameViewport{};
+    void mobileRefresh();
+    bool mobileEvent(const SDL_Event &);
+    void mobileOverlay();
+    void mobileOptions();
+    float uiUnit() const { return mobileActive() ? density : 1.f; }
 
   public:
     Options options;
@@ -134,6 +157,13 @@ class App {
     bool gameAvailable(const std::string &id) const;
     int availableGames() const;
     int missingLocalizedGlyphs() const { return missingGlyphs; }
+    bool mobileActive() const {
+#ifdef MCU_MOBILE
+        return true;
+#else
+        return options.mobilePreview;
+#endif
+    }
     const fs::path &importFolder() const { return browserPath; }
 };
 } // namespace mcu

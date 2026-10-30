@@ -21,6 +21,11 @@ void Settings::recommendedPicture() {
     inset = true;
 }
 void Settings::clamp() {
+    touchMode = std::clamp(touchMode, 0, 2);
+    touchPlacement = std::clamp(touchPlacement, 0, 2);
+    touchScale = std::clamp(touchScale, 70, 140);
+    touchOpacity = std::clamp(touchOpacity, 20, 100);
+    mobileOrientation = std::clamp(mobileOrientation, 0, 2);
     cameraMode = std::clamp(cameraMode, 0, 2);
     zoomOut = std::clamp(zoomOut, 0, 3);
     panoramaHeight = std::clamp(panoramaHeight, 224, 4096);
@@ -133,6 +138,14 @@ void Settings::load(Library &l) {
     if (key == #x)                                                                                 \
     x = n != 0
         I(zoomOut);
+        I(touchMode);
+        I(touchPlacement);
+        I(touchScale);
+        I(touchOpacity);
+        I(mobileOrientation);
+        B(touchLeftHanded);
+        B(touchHaptics);
+        B(mobileKeepAwake);
         I(panoramaHeight);
         I(rewindMemory);
         I(rewindButton);
@@ -249,6 +262,14 @@ void Settings::save(const Library &l) const {
     std::ostringstream o;
 #define S(x) o << #x << ' ' << int(x) << '\n'
     S(zoomOut);
+    S(touchMode);
+    S(touchPlacement);
+    S(touchScale);
+    S(touchOpacity);
+    S(mobileOrientation);
+    S(touchLeftHanded);
+    S(touchHaptics);
+    S(mobileKeepAwake);
     S(panoramaHeight);
     S(rewindMemory);
     S(rewindButton);

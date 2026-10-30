@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.4.0
+# Mario Compilation Ultra 0.5.0
 
 PC向けの使いやすい画面と実験的な拡張表示を備えたローカルSNESコレクションです。Super FXを含むカートリッジの動作はSnes9xが再現します。全作品を逆コンパイルしたものではありません。
 
-[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.4.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.5.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## ダウンロードとデスクトップからの起動
 
@@ -55,9 +55,13 @@ sh ./Install-Linux.sh
 | `d138f224` | Yoshi’s Island 1.0 (US) |
 | `cf98ddaa` | Yoshi’s Island 1.1 (US) |
 
+## Androidスマートフォンとタブレット
+
+[Androidスマートフォンとタブレット](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk)
+
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.4.0/MarioCompilationUltra-0.4.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 操作
 
@@ -127,9 +131,9 @@ View/Back: 設定 · LT: 巻き戻し · RT: Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 配布パッケージと検証 · 0.4.0
+## 配布パッケージと検証 · 0.5.0
 
-5つの自動テスト群で独自データ、メニュー、空間操作、描画を検証します。10言語の画面を4サイズで撮影し、ローカルの6作品も別途検証します。Quest AR/VRとMac実機でのプレイは実験的で未検証です。詳細は検証報告をご覧ください。
+6つの自動テスト群で独自データ、メニュー、描画、空間操作、マルチタッチを検証します。PC・モバイル画面を10言語で撮影し、ローカル6作品も別途検証します。スマートフォン・タブレットはAndroidエミュレーターで検証し、実機とMacでのプレイは未検証です。Quest 0.4のコレクション表示は利用者が確認しました。AR/VRでのゲーム検証は実験段階です。詳しくは検証報告をご覧ください。
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

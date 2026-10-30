@@ -29,6 +29,10 @@ class Core {
     void readSram();
 
   public:
+    void flushBattery() {
+        if (loaded)
+            saveSram();
+    }
     Settings &settings;
     Cartridge cart;
     McuVideo snapshot;

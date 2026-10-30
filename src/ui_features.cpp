@@ -19,7 +19,7 @@ void App::showGuide(const std::string &key) {
     guideRequested = key.empty() ? "Full level map" : key;
 }
 void App::nextButton(const char *) {
-    if (ImGui::GetContentRegionAvail().x > 320)
+    if (ImGui::GetContentRegionAvail().x > 320 * uiUnit())
         ImGui::SameLine();
 }
 bool App::choice(const char *key, int &value, std::initializer_list<const char *> labels) {
@@ -31,7 +31,8 @@ bool App::choice(const char *key, int &value, std::initializer_list<const char *
     if (ImGui::BeginCombo("##value", tr(*(labels.begin() + value)))) {
         int index = 0;
         for (auto label : labels) {
-            if (ImGui::Selectable(tr(label), index == value))
+            if (ImGui::Selectable(tr(label), index == value, 0,
+                                  {0, mobileActive() ? 48 * uiUnit() : 0}))
                 value = index, changed = true;
             if (index++ == value)
                 ImGui::SetItemDefaultFocus();
@@ -44,7 +45,21 @@ bool App::choice(const char *key, int &value, std::initializer_list<const char *
     return changed;
 }
 bool App::tick(const char *key, bool &value) {
-    bool changed = ImGui::Checkbox(tr(key), &value);
+    bool changed;
+    if (mobileActive()) {
+        ImGui::PushID(key);
+        ImGui::BeginGroup();
+        changed = ImGui::Checkbox("##check", &value);
+        ImGui::SameLine();
+        ImGui::TextWrapped("%s", tr(key));
+        if (ImGui::IsItemClicked()) {
+            value = !value;
+            changed = true;
+        }
+        ImGui::EndGroup();
+        ImGui::PopID();
+    } else
+        changed = ImGui::Checkbox(tr(key), &value);
     control(key);
     dirty |= changed;
     return changed;
@@ -105,6 +120,10 @@ void App::extrasUi() {
         tick("Quick camera controls", settings.quickControls);
         tick("Illustrated setting help", settings.help);
     } else if (tab == 6) {
+        if(mobileActive()) {
+            ImGui::TextWrapped("%s",tr("Quest AR/VR uses a separate APK. This phone/tablet edition uses the screen and touch or gamepad controls."));
+            return;
+        }
         ImGui::TextWrapped("%s", tr("XR preview: physical headset testing is deferred. These "
                                     "preferences also prepare the Android edition."));
 #ifdef MCU_QUEST
@@ -141,13 +160,18 @@ void App::helpUi() {
     }
     if (!guideOpen)
         return;
-    ImGui::SetNextWindowSize(
-        {std::min(680.f, drawableWidth - 16.f), std::min(560.f, drawableHeight - 16.f)},
-        ImGuiCond_Always);
+    float u = uiUnit();
+    auto safe = mobileActive() ? touchLayout.safe
+                               : MobileRect{0, 0, float(drawableWidth), float(drawableHeight)};
+    ImGui::SetNextWindowPos({safe.x + safe.w * .5f, safe.y + safe.h * .5f}, ImGuiCond_Always,
+                            {.5f, .5f});
+    ImGui::SetNextWindowSize({std::max(80.f, std::min(680.f * u, safe.w - 16 * u)),
+                              std::max(80.f, std::min(560.f * u, safe.h - 16 * u))},
+                             ImGuiCond_Always);
     if (ImGui::BeginPopupModal("##setting-guide", &guideOpen, ImGuiWindowFlags_NoSavedSettings)) {
         ImGui::TextWrapped("%s", tr(guideKey.c_str()));
-        ImGui::BeginChild("##guide-body", {0, -48}, ImGuiChildFlags_None);
-        const float width = std::min(420.f, ImGui::GetContentRegionAvail().x),
+        ImGui::BeginChild("##guide-body", {0, -60 * u}, ImGuiChildFlags_None);
+        const float width = std::min(420.f * u, ImGui::GetContentRegionAvail().x),
                     height = width * .42f;
         auto p = ImGui::GetCursorScreenPos();
         auto *d = ImGui::GetWindowDrawList();
@@ -174,6 +198,8 @@ void App::helpUi() {
     }
 }
 void App::hintUi() {
+    if (mobileActive())
+        return;
     if (menu || !core.loaded)
         return;
     uint64_t now = SDL_GetTicks64();

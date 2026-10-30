@@ -12,12 +12,18 @@
 #include <iostream>
 #include <sstream>
 #include <zlib.h>
-#ifdef MCU_QUEST
+#ifdef __ANDROID__
 #include <SDL_system.h>
 #endif
 namespace mcu {
 bool App::button(const char *en, const char *fr, const ImVec2 &s) {
-    bool result = ImGui::Button(tr(en, fr), s);
+    ImVec2 size = s;
+    if (mobileActive()) {
+        if (size.x > 0)
+            size.x *= density;
+        size.y = std::max(size.y * density, 48 * density * settings.uiScale / 100.f);
+    }
+    bool result = ImGui::Button(tr(en, fr), size);
     control(en);
     return result;
 }
@@ -32,6 +38,12 @@ void App::init() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengles2");
+#endif
+#ifdef MCU_MOBILE
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengles2");
 #endif
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER) != 0)
@@ -60,7 +72,7 @@ void App::init() {
                               SDL_WINDOWPOS_CENTERED, options.width, options.height,
                               SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI |
                                   (options.headless ? SDL_WINDOW_HIDDEN : 0)
-#ifdef MCU_QUEST
+#ifdef __ANDROID__
                                   | SDL_WINDOW_OPENGL
 #endif
     );
@@ -85,6 +97,19 @@ void App::init() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     auto &io = ImGui::GetIO();
+    if (mobileActive()) {
+        mobileDisplay = options.mobilePreview
+                            ? AndroidDisplay{options.mobileDensity, options.mobileInsets}
+                            : androidDisplay();
+        density = std::isfinite(mobileDisplay.density) ? std::clamp(mobileDisplay.density, .5f, 5.f)
+                                                       : 1.f;
+        SDL_RendererInfo info{};
+        SDL_GetRendererInfo(renderer, &info);
+        int maximum = info.max_texture_width > 0 ? std::min(4096, info.max_texture_width) : 4096;
+        fontDensity = std::min(density, maximum < 4096 ? 1.5f : 2.5f);
+        io.Fonts->TexDesiredWidth = maximum;
+        io.FontGlobalScale = density / fontDensity;
+    }
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
     // This application has one fixed options window. ImGui's window switcher
     // is not an application shortcut and must not react to game controls.
@@ -94,7 +119,7 @@ void App::init() {
     io.LogFilename = nullptr;
     char *base = SDL_GetBasePath();
     programPath = fs::u8path(base ? base : "");
-#ifdef MCU_QUEST
+#ifdef __ANDROID__
     programPath = fs::u8path(SDL_AndroidGetInternalStoragePath());
 #endif
     fs::path font = programPath / "assets/Interface.otf";
@@ -109,8 +134,8 @@ void App::init() {
     ImFontConfig fontConfig;
     fontConfig.FontDataOwnedByAtlas = false;
     if (fontBytes.empty() ||
-        !io.Fonts->AddFontFromMemoryTTF(fontBytes.data(), int(fontBytes.size()), 19, &fontConfig,
-                                        fontRanges.Data))
+        !io.Fonts->AddFontFromMemoryTTF(fontBytes.data(), int(fontBytes.size()), 19 * fontDensity,
+                                        &fontConfig, fontRanges.Data))
         throw std::runtime_error(
             "The interface font is missing. Extract the complete software package.");
     io.Fonts->Build();
@@ -144,15 +169,25 @@ void App::init() {
     style.Colors[ImGuiCol_HeaderHovered] = {.19f, .39f, .40f, 1};
     style.Colors[ImGuiCol_NavCursor] = {.9f, .88f, .5f, 1};
     style.Colors[ImGuiCol_SliderGrab] = {.58f, .83f, .69f, 1};
+    if (mobileActive()) {
+        style.WindowPadding = {12, 12};
+        style.FramePadding = {12, 14};
+        style.ScrollbarSize = 24;
+    }
+    unscaledStyle = style;
+    if (mobileActive())
+        style.ScaleAllSizes(density);
     ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer2_Init(renderer);
     hotplug();
     if (options.headless)
         settings.fullscreen = false;
-#ifdef MCU_QUEST
+#ifdef __ANDROID__
     settings.fullscreen = false;
     settings.span = false;
+#ifdef MCU_QUEST
     settings.vsync = false;
+#endif
 #endif
     if (options.xrPreview >= 0)
         settings.questMode = std::clamp(options.xrPreview, 0, 6);
@@ -221,6 +256,9 @@ App::~App() {
     SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
 }
 void App::fullscreen() {
+#ifdef __ANDROID__
+    return;
+#endif
     if (!window || options.headless)
         return;
     if (settings.fullscreen == previousFullscreen && settings.span == previousSpan &&
@@ -289,6 +327,8 @@ void App::hotplug() {
     }
 }
 void App::toggleMenu() {
+    touch.clear();
+    pendingTouchButtons = 0;
     menu = !menu || !core.loaded;
     releaseInput = true;
     focusPage = focusLibrary = true;
@@ -299,6 +339,8 @@ void App::toggleMenu() {
 void App::events() {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
+        if (mobileActive() && mobileEvent(e))
+            continue;
         ImGui_ImplSDL2_ProcessEvent(&e);
         if (menu && e.type == SDL_CONTROLLERBUTTONDOWN &&
             e.cbutton.button == SDL_CONTROLLER_BUTTON_Y)
@@ -521,7 +563,15 @@ void App::input() {
         any |= pb != 0;
     }
     core.buttons[0] |= spatialButtons;
+    if (mobileActive()) {
+        core.buttons[0] |=
+            touch.buttons(touchLayout, settings.deadzone * .01f) | pendingTouchButtons;
+        pendingTouchButtons = 0;
+        rewinding |= touch.held(TouchRewind);
+    }
     any |= spatialButtons != 0;
+    if (mobileActive())
+        any |= core.buttons[0] != 0;
     if (releaseInput && !any)
         releaseInput = false;
     if (menu || releaseInput || !focused && settings.pauseFocus) {
@@ -603,7 +653,8 @@ void App::tick() {
     if (menu || !core.loaded || (!focused && settings.pauseFocus && !options.headless))
         return;
     auto *k = SDL_GetKeyboardState(nullptr);
-    bool rewindHeld = k[SDL_SCANCODE_BACKSPACE] || spatialRewind;
+    bool rewindHeld =
+        k[SDL_SCANCODE_BACKSPACE] || spatialRewind || (mobileActive() && touch.held(TouchRewind));
     auto rewindControl = [&](SDL_GameController *pad) {
         if (settings.rewindButton < 2)
             return SDL_GameControllerGetAxis(pad, settings.rewindButton == 0
@@ -830,31 +881,42 @@ void App::libraryUi() {
 #ifdef MCU_QUEST
         if (quest)
             quest->chooseRom();
+#elif defined(MCU_MOBILE)
+        androidChooseRom();
 #else
         browser = true;
         pathEdit = false;
 #endif
     }
-    ImGui::SameLine();
-    if (button("Import folder...", "Importer un dossier...")) {
-        browser = true;
-        pathEdit = false;
-        message = "folder";
+    if (!mobileActive()) {
+        ImGui::SameLine();
+        if (button("Import folder...", "Importer un dossier...")) {
+#ifdef MCU_MOBILE
+            androidChooseRom();
+#else
+            browser = true;
+            pathEdit = false;
+            message = "folder";
+#endif
+        }
     }
     ImGui::Spacing();
     float avail = ImGui::GetContentRegionAvail().x;
-    int columns = avail > 850 ? 3 : avail > 520 ? 2 : 1;
-    float card = (avail - (columns - 1) * 12) / columns;
+    float u = uiUnit();
+    int columns = avail > 850 * u ? 3 : avail > 520 * u ? 2 : 1;
+    float card = (avail - (columns - 1) * 12 * u) / columns;
     for (int i = 0; i < 6; i++) {
         auto &g = games()[i];
         if (i % columns)
             ImGui::SameLine();
         ImGui::PushID(i);
-        ImGui::BeginChild("card", {card, 196}, ImGuiChildFlags_Borders);
+        ImGui::BeginChild("card", {card, 196 * u * settings.uiScale / 100.f},
+                          ImGuiChildFlags_Borders);
         ImU32 col = IM_COL32((g.colour >> 16) & 255, (g.colour >> 8) & 255, g.colour & 255, 255);
         auto pos = ImGui::GetCursorScreenPos();
-        ImGui::GetWindowDrawList()->AddRectFilled(pos, {pos.x + card - 24, pos.y + 4}, col, 2);
-        ImGui::Dummy({1, 9});
+        ImGui::GetWindowDrawList()->AddRectFilled(pos, {pos.x + card - 24 * u, pos.y + 4 * u}, col,
+                                                  2 * u);
+        ImGui::Dummy({1, 9 * u});
         ImGui::TextWrapped("%s", tr(g.title.c_str()));
         ImGui::TextWrapped("%s", tr(g.description.c_str()));
         bool ready = gameAvailable(g.id);
@@ -879,6 +941,7 @@ void App::libraryUi() {
                                 "contain the software and documentation."));
 }
 void App::optionsUi() {
+    mobileOptions();
     auto combo = [&](const char *en, const char *fr, int &v,
                      std::initializer_list<const char *> labels) {
         ImGui::PushID(en);
@@ -887,7 +950,8 @@ void App::optionsUi() {
         if (ImGui::BeginCombo("##value", tr(*(labels.begin() + v)))) {
             int i = 0;
             for (auto label : labels) {
-                if (ImGui::Selectable(tr(label), i == v))
+                if (ImGui::Selectable(tr(label), i == v, 0,
+                                      {0, mobileActive() ? 48 * uiUnit() : 0}))
                     v = i;
                 if (i == v)
                     ImGui::SetItemDefaultFocus();
@@ -899,6 +963,10 @@ void App::optionsUi() {
         ImGui::PopID();
     };
     auto check = [&](const char *en, const char *fr, bool &v) {
+        if (mobileActive()) {
+            tick(en, v);
+            return;
+        }
         ImGui::Checkbox(tr(en, fr), &v);
         control(en);
     };
@@ -930,20 +998,22 @@ void App::optionsUi() {
                          settings.zoom == 0 ? tr("Auto (fit window)") : "%d×");
         ImGui::PopID();
         combo("Quality", "Qualité", settings.quality, {"Lightweight", "Balanced", "Ultra"});
-        check("Borderless fullscreen", "Plein écran sans bordure", settings.fullscreen);
-        check("Span all displays", "Étendre sur tous les écrans", settings.span);
-        if (ImGui::BeginCombo(tr("Display", "Écran"), settings.display < 0
-                                                          ? tr("Current display", "Écran actuel")
-                                                          : SDL_GetDisplayName(settings.display))) {
-            if (ImGui::Selectable(tr("Current display", "Écran actuel"), settings.display < 0))
-                settings.display = -1;
-            for (int i = 0; i < SDL_GetNumVideoDisplays(); i++) {
-                ImGui::PushID(i);
-                if (ImGui::Selectable(SDL_GetDisplayName(i), settings.display == i))
-                    settings.display = i;
-                ImGui::PopID();
+        if (!mobileActive()) {
+            check("Borderless fullscreen", "Plein écran sans bordure", settings.fullscreen);
+            check("Span all displays", "Étendre sur tous les écrans", settings.span);
+            if (ImGui::BeginCombo(tr("Display", "Écran"),
+                                  settings.display < 0 ? tr("Current display", "Écran actuel")
+                                                       : SDL_GetDisplayName(settings.display))) {
+                if (ImGui::Selectable(tr("Current display", "Écran actuel"), settings.display < 0))
+                    settings.display = -1;
+                for (int i = 0; i < SDL_GetNumVideoDisplays(); i++) {
+                    ImGui::PushID(i);
+                    if (ImGui::Selectable(SDL_GetDisplayName(i), settings.display == i))
+                        settings.display = i;
+                    ImGui::PopID();
+                }
+                ImGui::EndCombo();
             }
-            ImGui::EndCombo();
         }
         check("Vertical sync", "Synchronisation verticale", settings.vsync);
         slider("Scanlines", "Lignes de balayage", settings.scanlines, 0, 80);
@@ -999,12 +1069,18 @@ void App::optionsUi() {
             bool occupied = core.loaded && fs::exists(core.statePath(i));
             ImGui::Text("%s %d · %s", tr("Slot", "Emplacement"), i,
                         occupied ? tr("Saved", "Enregistré") : tr("Empty", "Vide"));
-            ImGui::SameLine(290);
-            if (button("Save", "Enregistrer"))
+            if (!mobileActive())
+                ImGui::SameLine(290);
+            float saveWidth =
+                mobileActive()
+                    ? (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x) /
+                          (2 * uiUnit())
+                    : 0;
+            if (button("Save", "Enregistrer", {saveWidth, 0}))
                 request(1, i);
             ImGui::SameLine();
             ImGui::BeginDisabled(!occupied);
-            if (button("Load", "Charger"))
+            if (button("Load", "Charger", {saveWidth, 0}))
                 request(2, i);
             ImGui::EndDisabled();
             ImGui::PopID();
@@ -1086,6 +1162,9 @@ void App::optionsUi() {
                         core.sampleRate);
         }
         if (button("Open guide", "Ouvrir le guide")) {
+#ifdef MCU_MOBILE
+            androidOpenGuide(locale(settings.language).code, true);
+#else
             auto guide =
                 fs::absolute(programPath / "docs" / locale(settings.language).code / "guide.html");
             auto url = std::string("file://") + guide.generic_u8string();
@@ -1096,8 +1175,10 @@ void App::optionsUi() {
             for (char c : url)
                 encoded += c == ' ' ? "%20" : std::string(1, c);
             SDL_OpenURL(encoded.c_str());
+#endif
         }
-        ImGui::SameLine();
+        if (!mobileActive())
+            ImGui::SameLine();
         if (button("Open project on GitHub", "Ouvrir le projet GitHub"))
             SDL_OpenURL("https://github.com/vhaloo/MarioCompilationUltra");
     }
@@ -1105,27 +1186,44 @@ void App::optionsUi() {
 }
 void App::menuUi() {
     auto &io = ImGui::GetIO();
+    float u = uiUnit();
     float scale = settings.uiScale / 100.f;
-    float panelW = std::min(io.DisplaySize.x - 24, 1220.f * scale),
-          panelH = std::min(io.DisplaySize.y - 24, 900.f * scale);
-    ImGui::SetNextWindowPos({(io.DisplaySize.x - panelW) / 2, (io.DisplaySize.y - panelH) / 2},
-                            ImGuiCond_Always);
+    MobileRect bounds =
+        mobileActive() ? touchLayout.safe : MobileRect{0, 0, io.DisplaySize.x, io.DisplaySize.y};
+    float panelW = std::max(80.f, std::min(bounds.w - 24 * u, 1220.f * scale * u)),
+          panelH = std::max(80.f, std::min(bounds.h - 24 * u, 900.f * scale * u));
+    ImGui::SetNextWindowPos(
+        {bounds.x + (bounds.w - panelW) / 2, bounds.y + (bounds.h - panelH) / 2}, ImGuiCond_Always);
     ImGui::SetNextWindowSize({panelW, panelH}, ImGuiCond_Always);
     ImGui::Begin("##menu", nullptr,
                  ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
                      ImGuiWindowFlags_NoSavedSettings);
     ImGui::SetWindowFontScale(scale);
-    ImGui::TextColored({.64f, .86f, .73f, 1}, "MARIO  /  COMPILATION ULTRA");
-    ImGui::SameLine();
-    ImGui::TextDisabled("   %s", MCU_VERSION);
-    ImGui::TextDisabled(
-        "%s", tr("YOUR CARTRIDGES. A BIGGER VIEW.", "TES CARTOUCHES. UNE VUE PLUS GRANDE."));
-    ImGui::Spacing();
+    bool compact = mobileActive() && bounds.w / density < 850;
+    if (!compact || bounds.h / density >= 400) {
+        ImGui::TextColored({.64f, .86f, .73f, 1},
+                           compact ? "MARIO ULTRA" : "MARIO  /  COMPILATION ULTRA");
+        ImGui::SameLine();
+        ImGui::TextDisabled("   %s", MCU_VERSION);
+        ImGui::TextDisabled(
+            "%s", tr("YOUR CARTRIDGES. A BIGGER VIEW.", "TES CARTOUCHES. UNE VUE PLUS GRANDE."));
+        ImGui::Spacing();
+    }
     const char *en[] = {"Collection", "Screen", "Camera & scenery", "Saves & sound",
                         "Controls",   "About",  "XR / AR / VR"};
     const char *fr[] = {"Collection", "Écran",    "Caméra et paysage", "Sauvegardes et son",
                         "Commandes",  "À propos", "XR / AR / VR"};
-    if (ImGui::BeginTabBar("sections", ImGuiTabBarFlags_FittingPolicyScroll)) {
+    if (compact) {
+        ImGui::SetNextItemWidth(-1);
+        if (ImGui::BeginCombo("##mobile-sections", tr(en[tab]))) {
+            for (int i = 0; i < 7; ++i)
+                if (ImGui::Selectable(tr(en[i]), i == tab, 0, {0, 48 * u})) {
+                    tab = i;
+                    focusPage = true;
+                }
+            ImGui::EndCombo();
+        }
+    } else if (ImGui::BeginTabBar("sections", ImGuiTabBarFlags_FittingPolicyScroll)) {
         bool requestedSelection = focusPage;
         int requestedTab = focusPage ? tab : -1;
         int shownTab = tab;
@@ -1143,7 +1241,7 @@ void App::menuUi() {
             tab = shownTab;
     }
     ImGui::Separator();
-    float footer = core.loaded ? 126.f : 102.f;
+    float footer = mobileActive() ? 70 * u : (core.loaded ? 126.f : 102.f);
     ImGui::BeginChild("page", {0, -footer}, ImGuiChildFlags_None);
     if (focusPage) {
         ImGui::SetScrollY(0);
@@ -1165,15 +1263,21 @@ void App::menuUi() {
     ImGui::EndChild();
     ImGui::Separator();
     if (core.loaded) {
-        if (button("Resume", "Reprendre", {180, 0}))
+        float width =
+            mobileActive()
+                ? (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x) / (2 * u)
+                : 180;
+        if (button("Resume", "Reprendre", {width, 0}))
             toggleMenu();
         ImGui::SameLine();
     }
-    if (button("Quit", "Quitter"))
+    if (button("Quit", "Quitter", {mobileActive() && core.loaded ? -1.f : 0.f, 0}))
         request(4);
-    ImGui::SameLine();
-    ImGui::TextWrapped("%s", tr("D-pad / arrows · Confirm / Back · LB/RB sections",
-                                "Croix / flèches · Confirmer / Retour · LB/RB pages"));
+    if (!mobileActive()) {
+        ImGui::SameLine();
+        ImGui::TextWrapped("%s", tr("D-pad / arrows · Confirm / Back · LB/RB sections",
+                                    "Croix / flèches · Confirmer / Retour · LB/RB pages"));
+    }
     if (!message.empty() && message != "folder")
         ImGui::TextWrapped("%s", tr(message.c_str()));
     else if (core.loaded)
@@ -1321,8 +1425,9 @@ void App::browserUi() {
 void App::dialogs() {
     ImGui::OpenPopup("##confirm");
     ImGui::SetNextWindowPos(ImGui::GetIO().DisplaySize * .5f, ImGuiCond_Always, {.5f, .5f});
-    ImGui::SetNextWindowSize({std::min(520.f, ImGui::GetIO().DisplaySize.x - 20), 0},
-                             ImGuiCond_Always);
+    ImGui::SetNextWindowSize(
+        {std::min(520.f * uiUnit(), ImGui::GetIO().DisplaySize.x - 20 * uiUnit()), 0},
+        ImGuiCond_Always);
     if (ImGui::BeginPopupModal("##confirm", nullptr,
                                ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize)) {
         const char *en[] = {
@@ -1340,14 +1445,18 @@ void App::dialogs() {
                             "Quitter la collection ?",
                             "Redémarrer la cartouche ?"};
         ImGui::TextWrapped("%s", tr(en[dialog], fr[dialog]));
-        if (button("Cancel", "Annuler", {180, 0})) {
+        float confirmWidth = mobileActive() ? std::min(180.f, (ImGui::GetContentRegionAvail().x -
+                                                               ImGui::GetStyle().ItemSpacing.x) /
+                                                                  (2 * density))
+                                            : 180;
+        if (button("Cancel", "Annuler", {confirmWidth, 0})) {
             dialog = 0;
             ImGui::CloseCurrentPopup();
         }
         if (ImGui::IsWindowAppearing())
             ImGui::SetItemDefaultFocus();
         ImGui::SameLine();
-        if (button("Confirm", "Confirmer", {180, 0})) {
+        if (button("Confirm", "Confirmer", {confirmWidth, 0})) {
             int action = dialog;
             dialog = 0;
             ImGui::CloseCurrentPopup();
@@ -1387,6 +1496,8 @@ void App::render() {
     col[ImGuiCol_WindowBg] =
         settings.highContrast ? ImVec4(.015f, .02f, .03f, 1) : ImVec4(.055f, .075f, .11f, .98f);
     SDL_GetRendererOutputSize(renderer, &drawableWidth, &drawableHeight);
+    if (mobileActive())
+        mobileRefresh();
 #ifdef MCU_QUEST
     if (quest)
         quest->logicalSize(drawableWidth, drawableHeight);
@@ -1415,9 +1526,27 @@ void App::render() {
         renderer, settings.projectionTransparent ? 0 : 12, settings.projectionTransparent ? 0 : 19,
         settings.projectionTransparent ? 0 : 28, settings.projectionTransparent ? 0 : 255);
     SDL_RenderClear(renderer);
+    int fullWidth = drawableWidth, fullHeight = drawableHeight;
+    gameViewport = {0, 0, drawableWidth, drawableHeight};
+    if (mobileActive() && !menu && core.loaded) {
+        auto r = touchLayout.game;
+        gameViewport = {int(r.x), int(r.y), std::max(1, int(r.w)), std::max(1, int(r.h))};
+        SDL_RenderSetViewport(renderer, &gameViewport);
+        drawableWidth = gameViewport.w;
+        drawableHeight = gameViewport.h;
+    }
     if (!settings.projectionUiOnly)
         drawGame();
     furniture();
+    if (mobileActive()) {
+        SDL_RenderSetViewport(renderer, nullptr);
+        drawableWidth = fullWidth;
+        drawableHeight = fullHeight;
+        nativeRect.x += gameViewport.x;
+        nativeRect.y += gameViewport.y;
+        insetRect.x += gameViewport.x;
+        insetRect.y += gameViewport.y;
+    }
 #ifdef MCU_QUEST
     settings = std::move(persistentSettings);
 #endif
@@ -1461,10 +1590,10 @@ void App::render() {
         auto &sc = world.scene;
         auto &cv = world.canvas;
         auto *d = ImGui::GetForegroundDrawList();
-        ImVec2 size = ImGui::GetIO().DisplaySize;
+        ImVec2 size{float(gameViewport.w), float(gameViewport.h)};
         auto xy = [&](float x, float y) {
-            return ImVec2((x - cv.x) * size.x / cv.worldWidth,
-                          (y - cv.y) * size.y / cv.worldHeight);
+            return ImVec2(gameViewport.x + (x - cv.x) * size.x / cv.worldWidth,
+                          gameViewport.y + (y - cv.y) * size.y / cv.worldHeight);
         };
         if (settings.guide)
             d->AddRect(xy(float(sc.cameraX), float(sc.cameraY)),
@@ -1490,7 +1619,7 @@ void App::render() {
             int height = full ? world.complete.height : sc.height;
             float mw = std::min(280.f, size.x * .3f),
                   mh = std::clamp(mw * height / width, 28.f, 90.f);
-            ImVec2 p{size.x - mw - 16, 16};
+            ImVec2 p{gameViewport.x + size.x - mw - 16 * uiUnit(), gameViewport.y + 16 * uiUnit()};
             d->AddRectFilled(p, {p.x + mw, p.y + mh}, IM_COL32(9, 18, 27, 215), 5);
             auto map = [&](float x, float y) {
                 return ImVec2(p.x + (x - left) * mw / width, p.y + (y - top) * mh / height);
@@ -1505,14 +1634,18 @@ void App::render() {
             std::string text = sc.id + " · " +
                                tr(sc.fullMap ? "Loaded stage" : "Observed terrain",
                                   sc.fullMap ? "niveau chargé" : "terrain observé");
-            d->AddRectFilled({12, 12}, {std::min(size.x - 12, 440.f), 44}, IM_COL32(7, 16, 24, 210),
-                             5);
-            d->AddText({22, 20}, IM_COL32(224, 237, 229, 255), text.c_str());
+            float u = uiUnit(), x = float(gameViewport.x), y = float(gameViewport.y);
+            d->PushClipRect({x, y}, {x + size.x, y + size.y}, true);
+            d->AddRectFilled({x + 12 * u, y + 12 * u},
+                             {x + std::min(size.x - 12 * u, 440.f * u), y + 44 * u},
+                             IM_COL32(7, 16, 24, 210), 5 * u);
+            d->AddText({x + 22 * u, y + 20 * u}, IM_COL32(224, 237, 229, 255), text.c_str());
+            d->PopClipRect();
         }
     }
     if (settings.showStats && !menu) {
         ImGui::SetNextWindowBgAlpha(.75f);
-        ImGui::SetNextWindowPos({12, 56});
+        ImGui::SetNextWindowPos({gameViewport.x + 12 * uiUnit(), gameViewport.y + 56 * uiUnit()});
         ImGui::Begin("##stats", nullptr,
                      ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::Text("SNES %.2f Hz · %d × %d · %.1f fps", core.fps, drawableWidth, drawableHeight,
@@ -1526,6 +1659,8 @@ void App::render() {
     if (dialog)
         dialogs();
     hintUi();
+    if (mobileActive())
+        mobileOverlay();
     helpUi();
 #ifdef MCU_QUEST
     if (quest)
@@ -1609,6 +1744,16 @@ void App::report(const fs::path &p, double elapsed) const {
                     << ",\"product\":" << SDL_GameControllerGetProduct(pad) << '}';
     }
     controllers << ']';
+    std::ostringstream mobileButtons;
+    mobileButtons << '[';
+    for (int i = 0; mobileActive() && i < touchLayout.count; ++i) {
+        if (i)
+            mobileButtons << ',';
+        const auto &b = touchLayout.buttons[i];
+        mobileButtons << "{\"action\":" << b.action << ",\"rect\":[" << b.rect.x << ',' << b.rect.y
+                      << ',' << b.rect.w << ',' << b.rect.h << "]}";
+    }
+    mobileButtons << ']';
     o << std::setprecision(12) << "{\n\"version\":\"" << MCU_VERSION
       << "\",\n\"game\":" << jsonString(core.currentId)
       << ",\n\"loaded\":" << (core.loaded ? "true" : "false") << ",\n\"frames\":" << core.frame
@@ -1658,21 +1803,29 @@ void App::report(const fs::path &p, double elapsed) const {
              (uint32_t)crc32(0, (const Bytef *)core.native.data(), (uInt)(core.native.size() * 4))))
       << "\n}\n";
     std::string report = o.str();
-    report.insert(report.size() - 3,
-                  std::string(",\n\"menu_tab\":") + std::to_string(tab) +
-                      ",\n\"cartridge_crc32\":" + jsonString(hex32(core.cart.checksum)) +
-                      ",\n\"profile_supported\":" + (core.cart.supported ? "true" : "false") +
-                      ",\n\"locale\":" + jsonString(locale(settings.language).code) +
-                      ",\n\"data_dir\":" + jsonString(settings.dataDir.u8string()) +
-                      ",\n\"available_games\":" + std::to_string(availableGames()) +
-                      ",\n\"rewind_bytes\":" + std::to_string(core.rewindBytes()) +
-                      ",\n\"zoom_divisor\":" + std::to_string(1 << settings.zoomOut) +
-                      ",\n\"preview_objects\":" + std::to_string(previews.objects.size()) +
-                      ",\n\"preview_sprites\":" + std::to_string(previews.spritesDrawn) +
-                      ",\n\"preview_outlines\":" + std::to_string(previews.outlinesDrawn) +
-                      ",\n\"preview_cache_bytes\":" + std::to_string(previews.cacheBytes()) +
-                      ",\n\"controllers\":" + controllers.str() +
-                      ",\n\"missing_localized_glyphs\":" + std::to_string(missingGlyphs));
+    report.insert(
+        report.size() - 3,
+        std::string(",\n\"menu_tab\":") + std::to_string(tab) +
+            ",\n\"cartridge_crc32\":" + jsonString(hex32(core.cart.checksum)) +
+            ",\n\"profile_supported\":" + (core.cart.supported ? "true" : "false") +
+            ",\n\"locale\":" + jsonString(locale(settings.language).code) +
+            ",\n\"data_dir\":" + jsonString(settings.dataDir.u8string()) +
+            ",\n\"available_games\":" + std::to_string(availableGames()) +
+            ",\n\"rewind_bytes\":" + std::to_string(core.rewindBytes()) +
+            ",\n\"zoom_divisor\":" + std::to_string(1 << settings.zoomOut) +
+            ",\n\"preview_objects\":" + std::to_string(previews.objects.size()) +
+            ",\n\"preview_sprites\":" + std::to_string(previews.spritesDrawn) +
+            ",\n\"preview_outlines\":" + std::to_string(previews.outlinesDrawn) +
+            ",\n\"preview_cache_bytes\":" + std::to_string(previews.cacheBytes()) +
+            ",\n\"controllers\":" + controllers.str() + ",\n\"missing_localized_glyphs\":" +
+            std::to_string(missingGlyphs) + ",\n\"mobile\":" + (mobileActive() ? "true" : "false") +
+            ",\n\"mobile_density\":" + std::to_string(density) + ",\n\"mobile_game_rect\":[" +
+            std::to_string(gameViewport.x) + "," + std::to_string(gameViewport.y) + "," +
+            std::to_string(gameViewport.w) + "," + std::to_string(gameViewport.h) + "]" +
+            ",\n\"mobile_separate_controls\":" + (touchLayout.separate ? "true" : "false") +
+            ",\n\"mobile_touch_count\":" + std::to_string(touch.count()) +
+            ",\n\"mobile_buttons\":" + mobileButtons.str() + ",\n\"input_buttons\":" +
+            std::to_string(core.buttons[0]) + ",\n\"menu_open\":" + (menu ? "true" : "false"));
     atomicText(p, report);
 }
 void App::scriptCommand(const std::string &cmd, const std::string &value) {

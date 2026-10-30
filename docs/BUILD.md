@@ -130,4 +130,40 @@ The app requests optional scene/anchor/hand permissions, with no Internet,
 camera-image, microphone or storage-wide permission.
 
 The [Quest guide](QUEST.md) documents installation for a later user test. This
-release's development never installs or launches anything on a headset.
+build workflow does not install or launch on a headset. A prior 0.4 build was
+installed on the owner's Quest 3 and the user confirmed that the collection
+was visible. This does not establish full 0.5 headset gameplay validation.
+
+## Android phones and tablets
+
+The `mobile` Gradle module is a normal launcher app, with a separate package
+ID and no headset/OpenXR requirement. It targets Android 16 (API 36), supports
+Android 8 (API 26) or newer and GLES 3.0, and bundles `arm64-v8a`, `armeabi-v7a`
+and `x86_64`. Use the same toolchain and prepared SDL source as the Quest build:
+
+```sh
+cd android
+./gradlew --no-daemon --console=plain --max-workers=2 :mobile:assembleRelease :mobile:lintRelease
+cd ..
+python tools/audit_apk.py android/mobile/build/outputs/apk/release/mobile-release.apk --edition mobile
+```
+
+`MCU_MOBILE_BUILD_DIR` and `MCU_MOBILE_NATIVE_DIR` relocate generated mobile files.
+The same stable signing environment variables are supported. Never publish an
+APK built with `mcuPrivateAssets`. The public audit checks every ABI, excludes
+OpenXR, inspects permissions and checks 16 KiB ELF alignment for 64-bit libraries.
+The older ARMv7 runtime uses 4 KiB pages. Libraries are extracted at installation.
+
+`python tools/smoke_mobile.py --exe PATH --out FOLDER --extended` captures
+seven menu sections in ten languages across phone, tablet, landscape, square
+and small-window sizes without a ROM. A desktop build can preview the layout
+with `--mobile-preview --mobile-density 2.625 --size 1080x2400` and
+`--mobile-insets LEFT,TOP,RIGHT,BOTTOM`. `--live-report FILE` writes runtime
+diagnostics once per second. Android's diagnostic launch extras are limited to
+known games/languages, menu-only, start-paused, no-resume and a fixed app-owned
+report path; they do not accept executable scripts or arbitrary file paths.
+
+Android 13+ uses an `OnBackInvokedCallback`; the legacy Back method and hardware
+key dispatch send the same native menu action. Method-local lint exceptions
+document those legacy paths. Android 13+ USB receiver flags and alphabetic
+keyboard filtering are reproducible Java adaptations in `prepare_android.py`.

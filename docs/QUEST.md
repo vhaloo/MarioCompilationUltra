@@ -2,7 +2,7 @@
 
 [English illustrated guide](en/XR.md) · [Offline HTML](en/xr.html) · [Feature parity](PARITY.md)
 
-Experimental preview. Compilation, lint and automated geometry/input checks are performed. No headset has been connected, installed or used for this version; tracking, comfort, passthrough and frame pacing await your physical test.
+Experimental XR preview. The user confirmed that the 0.4 collection is visible on a Quest 3 after installation; runtime frame submission was logged. The 0.5 build is compiled and checked separately. Tracking, comfort, passthrough, room placement and sustained gameplay still need physical testing.
 
 For a later test, enable developer mode and install the public ARM64 APK with SideQuest or adb install -r. Open Mario Compilation Ultra XR in Unknown Sources, choose a cartridge or ZIP using the system picker, then Play. Import All-Stars + World and Yoshi’s Island separately. Public APKs contain no ROMs or progress.
 

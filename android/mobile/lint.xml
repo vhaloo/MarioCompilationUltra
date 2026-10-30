@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- Optional SDL microphone/BLE helpers are never invoked without permission. -->
+    <issue id="MissingPermission">
+        <ignore path="**/org/libsdl/app/HIDDeviceBLESteamController.java"/>
+        <ignore path="**/org/libsdl/app/HIDDeviceManager.java"/>
+        <ignore path="**/org/libsdl/app/SDLAudioManager.java"/>
+    </issue>
+    <!-- HandheldActivity overrides this legacy base method AND installs the API 33+
+         OnBackInvokedCallback. The upstream base implementation is not used. -->
+    <issue id="GestureBackNavigation">
+        <ignore path="**/org/libsdl/app/SDLActivity.java"/>
+    </issue>
+</lint>

@@ -33,6 +33,9 @@ struct Settings {
     bool questHandTracking = true, questInsetCrt = true, questCrtCoplanar = true,
          questMoveRotate = true;
     bool questControlHints = true, help = true;
+    int touchMode = 0, touchPlacement = 0, touchScale = 100, touchOpacity = 65,
+        mobileOrientation = 0;
+    bool touchLeftHanded = false, touchHaptics = false, mobileKeepAwake = true;
     // Render-pass controls are ephemeral and are never written to disk.
     bool projectionUiOnly = false, projectionCleanScene = false, projectionTransparent = false;
     double pixelScale(int w, int h, int nw, int nh) const;

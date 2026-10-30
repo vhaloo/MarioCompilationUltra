@@ -1,0 +1,49 @@
+name: Android phone and tablet build
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: mobile-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  compile:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Native toolchain
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;29.0.14206865' 'cmake;3.31.6'
+      - name: Pinned SDL source and Android receiver patch
+        run: python tools/prepare_android.py
+      - name: Compile and lint all three ABIs
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon --console=plain --max-workers=2 :mobile:assembleRelease :mobile:lintRelease
+      - name: Public APK audit
+        run: |
+          python tools/audit_apk.py android/mobile/build/outputs/apk/release/mobile-release.apk --edition mobile --report android/mobile-apk-audit.json
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose android/mobile/build/outputs/apk/release/mobile-release.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MCU-Android-phone-tablet-CI-debug-signature
+          path: |
+            android/mobile/build/outputs/apk/release/mobile-release.apk
+            android/mobile/build/reports/lint-results-release.html
+            android/mobile-apk-audit.json
+          if-no-files-found: error

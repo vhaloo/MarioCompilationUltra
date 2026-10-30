@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.4.0
+# Mario Compilation Ultra 0.5.0
 
 PC에 맞게 조정할 수 있는 인터페이스와 실험적인 확장 화면을 제공하는 로컬 SNES 모음입니다. Super FX를 포함한 카트리지 동작은 Snes9x가 에뮬레이션합니다. 모든 게임을 역컴파일했다고 주장하지 않습니다.
 
-[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.4.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.5.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 다운로드와 바탕 화면에서 실행
 
@@ -55,9 +55,13 @@ sh ./Install-Linux.sh
 | `d138f224` | Yoshi’s Island 1.0 (US) |
 | `cf98ddaa` | Yoshi’s Island 1.1 (US) |
 
+## Android 휴대전화와 태블릿
+
+[Android 휴대전화와 태블릿](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk)
+
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.4.0/MarioCompilationUltra-0.4.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 조작
 
@@ -127,9 +131,9 @@ View/Back: 설정 · LT: 되감기 · RT: Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 패키지와 검증 · 0.4.0
+## 패키지와 검증 · 0.5.0
 
-다섯 자동 테스트 모음이 자체 데이터, 메뉴, 공간 상호작용과 렌더링을 확인합니다. 10개 언어 화면을 네 크기로 촬영하고 여섯 로컬 게임을 별도로 검사합니다. Quest AR/VR 및 Mac 실기 플레이는 실험적이며 미검증입니다. 검증 보고서에서 범위를 확인하세요.
+여섯 자동 테스트 모음이 자체 데이터, 메뉴, 렌더링, 공간 조작, 멀티터치를 검증합니다. PC와 모바일 화면을 10개 언어로 촬영하고 여섯 로컬 게임을 별도로 검사합니다. 휴대전화/태블릿은 Android 에뮬레이터로 검사했으며 실물 기기와 Mac 플레이는 미검증입니다. 사용자가 Quest 0.4 모음을 확인했지만 AR/VR 플레이는 실험 단계입니다. 자세한 범위는 검증 보고서를 보세요.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

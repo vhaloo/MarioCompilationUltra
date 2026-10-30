@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.4.0
+# Mario Compilation Ultra 0.5.0
 
 A local SNES collection with an adaptive PC interface and experimental world views. Snes9x supplies the cartridge simulation, including Super FX. No decompilation of every game is claimed.
 
-[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.4.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.5.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download and desktop startup
 
@@ -55,9 +55,13 @@ Expanded memory profiles and automatic All-Stars selection target the listed US 
 | `d138f224` | Yoshi’s Island 1.0 (US) |
 | `cf98ddaa` | Yoshi’s Island 1.1 (US) |
 
+## Android phones and tablets
+
+[Android phones and tablets](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk)
+
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.4.0/MarioCompilationUltra-0.4.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Controls
 
@@ -127,9 +131,9 @@ Choose cartridge again if its file was moved or a drive is disconnected. ZIPs mu
 
 ![Quest VR / AR](screenshots/6.png)
 
-## Packages and validation · 0.4.0
+## Packages and validation · 0.5.0
 
-Five automated suites check original fixtures, menus, spatial interaction and rendering. The ten-language interface is captured at four sizes. Six locally supplied games are checked separately. Quest AR/VR and physical macOS gameplay remain experimental and untested. See the versioned validation report for scope.
+Six automated suites cover original fixtures, menus, rendering, spatial controls and multi-touch. Desktop and mobile layouts are captured in ten languages. Six local games are checked separately. Phone/tablet tests use Android emulators; physical devices and Mac gameplay remain untested. Quest 0.4 collection startup was confirmed by its user; full AR/VR gameplay remains experimental. See the validation report for exact scope.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

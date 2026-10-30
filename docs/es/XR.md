@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.4.0 · Quest VR / RA
+# Mario Compilation Ultra 0.5.0 · Quest VR / RA
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -6,7 +6,7 @@
 
 Muros del nivel, suelo, mesas arcade, CRT y galerías curvas. Vista XR experimental; usa ambas empuñaduras para cambiar tamaño.
 
-Vista experimental. Se comprueban compilación, lint, geometría y entrada. No se ha conectado, instalado ni usado un visor para esta versión; seguimiento, comodidad, passthrough y fluidez esperan tu prueba física.
+Vista XR experimental. El usuario confirmó la colección 0.4 visible en Quest 3 tras instalarla; se registró el envío de fotogramas. La versión 0.5 se compila y verifica aparte. Seguimiento, comodidad, passthrough, colocación y juego prolongado necesitan pruebas físicas.
 
 Para probar más tarde, activa el modo desarrollador e instala el APK ARM64 público con SideQuest o adb install -r. Abre Mario Compilation Ultra XR en Fuentes desconocidas, elige un cartucho o ZIP con el selector y pulsa Jugar. Importa All-Stars + World y Yoshi’s Island por separado. El APK público no contiene ROMs ni progreso.
 

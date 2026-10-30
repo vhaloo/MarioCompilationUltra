@@ -112,6 +112,34 @@ int main() {
             SDL_RenderFlush(renderer);
             check(sample(15, 15) == 0xffffffff && sample(16, 15) == 0xffb400a0,
                   "Partly off-screen native images clip without stretching their source");
+            auto *target = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
+                                             SDL_TEXTUREACCESS_TARGET, 96, 96);
+            check(target && SDL_SetRenderTarget(renderer, target) == 0,
+                  "A retained frame target is available");
+            SDL_RenderClear(renderer);
+            SDL_Rect viewport{21, 30, 50, 50}, clip{3, 4, 18, 17};
+            SDL_RenderSetViewport(renderer, &viewport);
+            SDL_RenderSetClipRect(renderer, &clip);
+            std::fill(std::begin(source), std::end(source), 0xffffffff);
+            SDL_UpdateTexture(texture, nullptr, source, 16);
+            blitter.copy(texture, 4, 4, {0, 0, 22, 22}, 1);
+            SDL_Rect after{}, afterClip{};
+            SDL_RenderGetViewport(renderer, &after);
+            SDL_RenderGetClipRect(renderer, &afterClip);
+            check(after.x == viewport.x && after.y == viewport.y && after.w == viewport.w &&
+                      after.h == viewport.h && SDL_RenderIsClipEnabled(renderer) &&
+                      afterClip.x == clip.x && afterClip.y == clip.y && afterClip.w == clip.w &&
+                      afterClip.h == clip.h,
+                  "Crisp intermediate filtering preserves a retained target's viewport and clip");
+            SDL_RenderSetViewport(renderer, nullptr);
+            SDL_RenderSetClipRect(renderer, nullptr);
+            uint32_t pixels[96 * 96];
+            SDL_RenderReadPixels(renderer, nullptr, SDL_PIXELFORMAT_ARGB8888, pixels, 96 * 4);
+            check(pixels[34 * 96 + 24] == 0xffffffff && pixels[34 * 96 + 23] == 0xffb400a0 &&
+                      pixels[30 * 96 + 21] == 0xffb400a0 && pixels[51 * 96 + 24] == 0xffb400a0,
+                  "Fractional filtering cannot draw above the game safe area or beneath controls");
+            SDL_SetRenderTarget(renderer, nullptr);
+            SDL_DestroyTexture(target);
         }
         SDL_DestroyTexture(texture);
         SDL_DestroyRenderer(renderer);

@@ -14,12 +14,12 @@ android {
         applicationId 'com.vhaloo.mariocompilationultra.quest'
         minSdk 29
         targetSdk 32
-        versionCode 400
-        versionName '0.4.0-xr-preview'
+        versionCode 500
+        versionName '0.5.0-xr-preview'
         ndk { abiFilters 'arm64-v8a' }
         externalNativeBuild {
             cmake {
-                arguments '-DBUILD_TESTING=OFF', '-DANDROID_STL=c++_shared',
+                arguments '-DBUILD_TESTING=OFF', '-DANDROID_STL=c++_shared', '-DMCU_BUILD_QUEST=ON',
                     "-DMCU_SDL_SOURCE=${sdl.absolutePath.replace('\\','/')}", '-DMCU_FETCH_SDL=OFF'
                 targets 'MarioCompilationUltra', 'SDL2'
                 cppFlags '-std=c++17'

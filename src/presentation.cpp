@@ -100,6 +100,12 @@ void Blitter::copy(SDL_Texture *source, int w, int h, const SDL_FRect &dest, int
                     height = th;
                 }
                 SDL_Texture *previous = SDL_GetRenderTarget(renderer);
+                SDL_Rect viewport{}, clip{};
+                SDL_RenderGetViewport(renderer, &viewport);
+                SDL_RenderGetClipRect(renderer, &clip);
+                bool clipped = SDL_RenderIsClipEnabled(renderer) == SDL_TRUE;
+                float scaleX = 1, scaleY = 1;
+                SDL_RenderGetScale(renderer, &scaleX, &scaleY);
                 if (intermediate && SDL_SetRenderTarget(renderer, intermediate) == 0) {
                     SDL_BlendMode blend;
                     SDL_GetTextureBlendMode(source, &blend);
@@ -107,6 +113,11 @@ void Blitter::copy(SDL_Texture *source, int w, int h, const SDL_FRect &dest, int
                     int copied = SDL_RenderCopy(renderer, source, nullptr, nullptr);
                     SDL_SetTextureBlendMode(source, blend);
                     SDL_SetRenderTarget(renderer, previous);
+                    // Switching between texture targets resets the viewport. Preserve the
+                    // caller's safe-area viewport, scale and clipping for mobile/XR panels.
+                    SDL_RenderSetScale(renderer, scaleX, scaleY);
+                    SDL_RenderSetViewport(renderer, &viewport);
+                    SDL_RenderSetClipRect(renderer, clipped ? &clip : nullptr);
                     if (copied == 0) {
                         SDL_SetTextureBlendMode(intermediate, blend);
                         SDL_SetTextureScaleMode(intermediate, SDL_ScaleModeLinear);
