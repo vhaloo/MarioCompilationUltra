@@ -20,7 +20,10 @@ int main() {
         check(device >= 0, "Attach virtual gamepad");
         SDL_Joystick *joy = SDL_JoystickOpen(device);
         check(joy != nullptr, "Open virtual gamepad");
-        fs::path data = fs::temp_directory_path() / ("mcu-ui-" + std::to_string(SDL_GetTicks64()));
+        // SDL ticks start near zero in every process. Repeated CI runs must not
+        // reopen an earlier run's persisted handedness/scale preferences.
+        fs::path data =
+            fs::temp_directory_path() / ("mcu-ui-" + std::to_string(SDL_GetPerformanceCounter()));
         Options o;
         o.headless = true;
         o.software = true;
@@ -284,10 +287,20 @@ int main() {
             mobile.toggleMenu();
             step();
             check(!mobile.core.buttons[0], "Resuming cannot revive stale fingers");
-            SDL_Event back{};back.type=SDL_KEYDOWN;back.key.keysym.sym=SDLK_AC_BACK;
-            SDL_PushEvent(&back);step();check(mobile.menu,"Android Back opens a paused menu");
-            back.key.repeat=1;SDL_PushEvent(&back);step();check(mobile.menu,"A held Back key cannot repeatedly toggle pause");
-            back.key.repeat=0;SDL_PushEvent(&back);step();check(!mobile.menu,"A new Back press resumes the game");
+            SDL_Event back{};
+            back.type = SDL_KEYDOWN;
+            back.key.keysym.sym = SDLK_AC_BACK;
+            SDL_PushEvent(&back);
+            step();
+            check(mobile.menu, "Android Back opens a paused menu");
+            back.key.repeat = 1;
+            SDL_PushEvent(&back);
+            step();
+            check(mobile.menu, "A held Back key cannot repeatedly toggle pause");
+            back.key.repeat = 0;
+            SDL_PushEvent(&back);
+            step();
+            check(!mobile.menu, "A new Back press resumes the game");
             finger(7, 0, SDL_FINGERDOWN);
             finger(7, 0, SDL_FINGERUP);
             step();
