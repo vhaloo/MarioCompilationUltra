@@ -91,6 +91,7 @@ void App::init() {
     if (!renderer)
         throw std::runtime_error(SDL_GetError());
     previousVsync = settings.vsync;
+    vsyncActive = settings.vsync && options.realtime && SDL_RenderSetVSync(renderer, 1) == 0;
     nativeBlitter = std::make_unique<Blitter>(renderer);
     worldBlitter = std::make_unique<Blitter>(renderer);
     insetBlitter = std::make_unique<Blitter>(renderer);
@@ -219,6 +220,11 @@ void App::resetMetrics() {
     metricsStarted = SDL_GetPerformanceCounter();
     renderTimes.clear();
     presentationIntervals.clear();
+    workTimes.clear();
+    composeTimes.clear();
+    simulationTimes.clear();
+    presentTimes.clear();
+    sceneRebuilds = sceneReuses = textureUploads = 0;
 }
 App::~App() {
     try {
@@ -231,11 +237,14 @@ App::~App() {
         if (p)
             SDL_GameControllerClose(p);
     if (renderer) {
+        gpuTimer.release();
         nativeBlitter.reset();
         worldBlitter.reset();
         insetBlitter.reset();
         if (frameTarget)
             SDL_DestroyTexture(frameTarget);
+        if (sceneTarget)
+            SDL_DestroyTexture(sceneTarget);
         if (nativeTex)
             SDL_DestroyTexture(nativeTex);
         if (worldTex)
@@ -336,12 +345,33 @@ void App::toggleMenu() {
     core.buttons[0] = core.buttons[1] = 0;
     settings.save(library);
 }
+void App::invalidateGraphics(bool deviceReset) {
+    lastCompose = nativeVersion = backdropVersion = ~uint64_t(0);
+    previousPresentation = 0;
+    dirty = true;
+    nativeBlitter->invalidate(deviceReset);
+    worldBlitter->invalidate(deviceReset);
+    insetBlitter->invalidate(deviceReset);
+    if (deviceReset) {
+        SDL_SetRenderTarget(renderer, nullptr);
+        for (auto texture : {nativeTex, worldTex, backgroundTex, frameTarget, sceneTarget})
+            if (texture)
+                SDL_DestroyTexture(texture);
+        nativeTex = worldTex = backgroundTex = frameTarget = sceneTarget = nullptr;
+        nw = nh = ww = wh = frameWidth = frameHeight = sceneWidth = sceneHeight = 0;
+        ImGui_ImplSDLRenderer2_DestroyDeviceObjects();
+        gpuTimer.release();
+    }
+    presentationDeadline.reset();
+}
 void App::events() {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
         if (mobileActive() && mobileEvent(e))
             continue;
         ImGui_ImplSDL2_ProcessEvent(&e);
+        if (e.type == SDL_RENDER_TARGETS_RESET || e.type == SDL_RENDER_DEVICE_RESET)
+            invalidateGraphics(e.type == SDL_RENDER_DEVICE_RESET);
         if (menu && e.type == SDL_CONTROLLERBUTTONDOWN &&
             e.cbutton.button == SDL_CONTROLLER_BUTTON_Y)
             showGuide(guideKey);
@@ -672,14 +702,19 @@ void App::tick() {
         return;
 #endif
     rewinding = settings.rewind && rewindHeld;
+    uint64_t began = SDL_GetPerformanceCounter();
     if (rewinding) {
         core.rewind();
         world.reset();
+        simulationWorkMs +=
+            1000. * (SDL_GetPerformanceCounter() - began) / SDL_GetPerformanceFrequency();
         return;
     }
     bootstrapInput();
     core.tick();
     ++simulationTicks;
+    simulationWorkMs +=
+        1000. * (SDL_GetPerformanceCounter() - began) / SDL_GetPerformanceFrequency();
 }
 void App::updateTexture(SDL_Texture *&t, int &ow, int &oh, int w, int h,
                         const std::vector<uint32_t> &b) {
@@ -697,6 +732,7 @@ void App::updateTexture(SDL_Texture *&t, int &ow, int &oh, int w, int h,
         oh = h;
     }
     SDL_UpdateTexture(t, nullptr, b.data(), w * 4);
+    ++textureUploads;
 }
 void App::background() {
     if (settings.background == 3)
@@ -707,37 +743,88 @@ void App::background() {
     if (!core.loaded || settings.background >= 2)
         return;
     int w = 64, h = 56;
-    auto pixels =
-        softenBackdrop(world.backdropPixels, w, h, settings.background == 0 ? settings.blur / 4 : 0,
-                       settings.brightness);
-    if (pixels.empty())
-        return;
     if (!backgroundTex) {
         backgroundTex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
                                           SDL_TEXTUREACCESS_STREAMING, w, h);
         SDL_SetTextureScaleMode(backgroundTex, SDL_ScaleModeLinear);
     }
-    SDL_UpdateTexture(backgroundTex, nullptr, pixels.data(), w * 4);
+    std::array<int, 3> key{{settings.background, settings.blur, settings.brightness}};
+    if (backdropVersion != core.imageVersion || backdropKey != key) {
+        auto pixels =
+            softenBackdrop(world.backdropPixels, w, h,
+                           settings.background == 0 ? settings.blur / 4 : 0, settings.brightness);
+        if (pixels.empty())
+            return;
+        SDL_UpdateTexture(backgroundTex, nullptr, pixels.data(), w * 4);
+        backdropKey = key;
+        backdropVersion = core.imageVersion;
+        ++textureUploads;
+    }
     SDL_RenderCopy(renderer, backgroundTex, nullptr, nullptr);
 }
 void App::drawGame() {
     if (!core.loaded)
         return;
-    world.compose(core, settings, drawableWidth, drawableHeight);
-    previews.update(core, world.scene);
-    previews.paint(world.canvas, world.scene, settings);
+    uint64_t began = SDL_GetPerformanceCounter();
+    std::array<double, 20> key{{double(drawableWidth),
+                                double(drawableHeight),
+                                double(settings.view),
+                                double(settings.zoom),
+                                double(settings.zoomOut),
+                                double(settings.panoramaHeight),
+                                double(settings.cameraMode),
+                                settings.freeze ? settings.cameraX : 0.,
+                                settings.freeze ? settings.cameraY : 0.,
+                                double(settings.aspect),
+                                double(settings.quality),
+                                double(settings.background),
+                                double(settings.softEdges),
+                                double(settings.freeze),
+                                resolutionScale(),
+                                double(settings.enemyOpacity),
+                                double(settings.enemyPreview),
+                                double(settings.bossPreview),
+                                double(settings.objectPreview),
+                                double(settings.spawnLabels)}};
+    bool rebuild = lastCompose != core.imageVersion || compositionKey != key;
+    if (rebuild) {
+        world.compose(core, settings, drawableWidth, drawableHeight,
+#ifdef MCU_QUEST
+                      1.f
+#else
+                      resolutionScale()
+#endif
+        );
+        previews.update(core, world.scene);
+        previews.paint(world.canvas, world.scene, settings);
+        lastCompose = core.imageVersion;
+        compositionKey = key;
+        ++sceneRebuilds;
+        ++canvasVersion;
+    } else
+        ++sceneReuses;
+    if (!menu)
+        composeTimes.push_back(1000. * (SDL_GetPerformanceCounter() - began) /
+                               SDL_GetPerformanceFrequency());
+    if (composeTimes.size() > 600)
+        composeTimes.erase(composeTimes.begin());
     if (!settings.projectionTransparent)
         background();
-    updateTexture(nativeTex, nw, nh, core.width, core.height, core.native);
+    if (!nativeTex || nativeVersion != core.imageVersion) {
+        updateTexture(nativeTex, nw, nh, core.width, core.height, core.native);
+        nativeVersion = core.imageVersion;
+    }
     if (world.expanded) {
-        updateTexture(worldTex, ww, wh, world.canvas.width, world.canvas.height,
-                      world.canvas.pixels);
+        if (rebuild || !worldTex)
+            updateTexture(worldTex, ww, wh, world.canvas.width, world.canvas.height,
+                          world.canvas.pixels);
         SDL_SetTextureBlendMode(worldTex, SDL_BLENDMODE_BLEND);
         worldBlitter->copy(worldTex, ww, wh, {0, 0, float(drawableWidth), float(drawableHeight)},
                            settings.view == 2 || (settings.view >= 3 &&
                                                   (!settings.smoothMap || settings.quality == 0))
                                ? 0
-                               : settings.filter);
+                               : settings.filter,
+                           canvasVersion);
         auto &cv = world.canvas;
         nativeRect = {(world.scene.cameraX - cv.x) * drawableWidth / cv.worldWidth,
                       (world.scene.cameraY - cv.y) * drawableHeight / cv.worldHeight,
@@ -757,7 +844,7 @@ void App::drawGame() {
     // Draw the authoritative framebuffer again at full source resolution. Atlas
     // quality budgets and panorama sampling must never downsample the live game.
     nativeBlitter->copy(nativeTex, core.width, core.height, nativeRect,
-                        settings.view == 2 ? 0 : settings.filter);
+                        settings.view == 2 ? 0 : settings.filter, core.imageVersion);
     float rowHeight = nativeRect.h / core.height;
     if (settings.scanlines && rowHeight >= 2.f) {
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -832,7 +919,8 @@ void App::drawGame() {
         SDL_FRect border{insetRect.x - 2, insetRect.y - 2, w + 4, h + 4};
         SDL_SetRenderDrawColor(renderer, 154, 203, 179, 255);
         SDL_RenderFillRectF(renderer, &border);
-        insetBlitter->copy(nativeTex, core.width, core.height, insetRect, settings.filter);
+        insetBlitter->copy(nativeTex, core.width, core.height, insetRect, settings.filter,
+                           core.imageVersion);
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
     }
 }
@@ -998,6 +1086,10 @@ void App::optionsUi() {
                          settings.zoom == 0 ? tr("Auto (fit window)") : "%d×");
         ImGui::PopID();
         combo("Quality", "Qualité", settings.quality, {"Lightweight", "Balanced", "Ultra"});
+        check("Automatic resolution", nullptr, settings.adaptiveResolution);
+        ImGui::TextWrapped(
+            "%s",
+            tr("Targets 60 fps by adapting scenery detail. Game pixels and menus stay sharp."));
         if (!mobileActive()) {
             check("Borderless fullscreen", "Plein écran sans bordure", settings.fullscreen);
             check("Span all displays", "Étendre sur tous les écrans", settings.span);
@@ -1485,8 +1577,12 @@ void App::dialogs() {
 }
 void App::render() {
     uint64_t began = SDL_GetPerformanceCounter();
+#ifndef MCU_QUEST
+    gpuTimer.begin();
+#endif
     if (settings.vsync != previousVsync) {
-        SDL_RenderSetVSync(renderer, settings.vsync && options.realtime);
+        bool requested = settings.vsync && options.realtime;
+        vsyncActive = SDL_RenderSetVSync(renderer, requested) == 0 && requested;
         previousVsync = settings.vsync;
     }
     auto &col = ImGui::GetStyle().Colors;
@@ -1535,8 +1631,55 @@ void App::render() {
         drawableWidth = gameViewport.w;
         drawableHeight = gameViewport.h;
     }
-    if (!settings.projectionUiOnly)
+    if (!settings.projectionUiOnly) {
+#ifndef MCU_QUEST
+        SDL_Texture *previousTarget = SDL_GetRenderTarget(renderer);
+        bool reduced = false;
+        if (!menu && core.loaded && resolutionScale() < 1.f) {
+            // Keep logical geometry, input, HUD and UI at display resolution.
+            // Only the game layer uses the smaller physical target.
+            float scale = std::min(
+                1.f, std::max({resolutionScale(), float(core.width) / std::max(1, drawableWidth),
+                               float(core.height) / std::max(1, drawableHeight)}));
+            int w = std::max(1, int(drawableWidth * scale)),
+                h = std::max(1, int(drawableHeight * scale));
+            if (!sceneTarget || sceneWidth != w || sceneHeight != h) {
+                if (sceneTarget)
+                    SDL_DestroyTexture(sceneTarget);
+                sceneTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
+                                                SDL_TEXTUREACCESS_TARGET, w, h);
+                sceneWidth = w;
+                sceneHeight = h;
+                if (sceneTarget) {
+                    SDL_SetTextureBlendMode(sceneTarget, SDL_BLENDMODE_NONE);
+                    SDL_SetTextureScaleMode(sceneTarget, settings.view == 2 ? SDL_ScaleModeNearest
+                                                                            : SDL_ScaleModeLinear);
+                }
+            }
+            if (sceneTarget && SDL_SetRenderTarget(renderer, sceneTarget) == 0) {
+                SDL_RenderSetScale(renderer, float(w) / drawableWidth, float(h) / drawableHeight);
+                SDL_Rect logical{0, 0, drawableWidth, drawableHeight};
+                SDL_RenderSetViewport(renderer, &logical);
+                reduced = true;
+            }
+        }
+#endif
         drawGame();
+#ifndef MCU_QUEST
+        if (reduced) {
+            SDL_SetRenderTarget(renderer, previousTarget);
+            SDL_RenderSetScale(renderer, 1, 1);
+            SDL_RenderSetViewport(renderer, &gameViewport);
+            SDL_FRect dest{0, 0, float(drawableWidth), float(drawableHeight)};
+            SDL_SetTextureScaleMode(sceneTarget, settings.view == 2 ? SDL_ScaleModeNearest
+                                                                    : SDL_ScaleModeLinear);
+            SDL_RenderCopyF(renderer, sceneTarget, nullptr, &dest);
+        } else {
+            sceneWidth = drawableWidth;
+            sceneHeight = drawableHeight;
+        }
+#endif
+    }
     furniture();
     if (mobileActive()) {
         SDL_RenderSetViewport(renderer, nullptr);
@@ -1675,7 +1818,37 @@ void App::render() {
         SDL_SetRenderTarget(renderer, nullptr);
         SDL_RenderCopy(renderer, frameTarget, nullptr, nullptr);
     }
+    SDL_RenderFlush(renderer);
+    gpuTimer.end();
+    uint64_t submitted = SDL_GetPerformanceCounter();
+    // Align presentation rather than CPU-frame start when compose costs vary.
+    if (options.realtime && !vsyncActive) {
+        double now = double(submitted) / SDL_GetPerformanceFrequency();
+        presentationWaiter.wait(presentationDeadline.remaining(now, 60.));
+    } else
+        presentationDeadline.reset();
+    uint64_t beforePresent = SDL_GetPerformanceCounter();
     SDL_RenderPresent(renderer);
+    double msPerCount = 1000. / SDL_GetPerformanceFrequency();
+    if (!menu && core.loaded) {
+        framePressureMs = 0;
+        if (options.realtime && !gpuTimer.available() && previousPresentation) {
+            SDL_DisplayMode mode{};
+            double period = 1000. / 60.;
+            if (vsyncActive &&
+                SDL_GetCurrentDisplayMode(SDL_GetWindowDisplayIndex(window), &mode) == 0 &&
+                mode.refresh_rate > 0)
+                period = std::max(period, 1000. / mode.refresh_rate);
+            framePressureMs = missedFramePressure(
+                (SDL_GetPerformanceCounter() - previousPresentation) * msPerCount, period);
+        }
+        presentTimes.push_back((SDL_GetPerformanceCounter() - beforePresent) * msPerCount);
+        if (presentTimes.size() > 600)
+            presentTimes.erase(presentTimes.begin());
+        finishFrame(simulationWorkMs + (submitted - began) * msPerCount, gpuTimer.ms(),
+                    1000. / 60.);
+    }
+    simulationWorkMs = 0;
 #endif
     dirty = false;
     if (!menu && core.loaded) {
@@ -1692,6 +1865,24 @@ void App::render() {
             presentationIntervals.erase(presentationIntervals.begin());
     } else
         previousPresentation = 0;
+}
+void App::finishFrame(double workMs, double gpuMs, double budgetMs) {
+    if (menu || !core.loaded || (!focused && !options.headless)) {
+        simulationWorkMs = 0;
+        return;
+    }
+    workTimes.push_back(workMs);
+    simulationTimes.push_back(simulationWorkMs);
+    if (workTimes.size() > 600)
+        workTimes.erase(workTimes.begin());
+    if (simulationTimes.size() > 600)
+        simulationTimes.erase(simulationTimes.begin());
+    resolution.observe(workMs, std::max(gpuMs, framePressureMs), budgetMs,
+                       settings.adaptiveResolution
+#ifdef MCU_QUEST
+                           && settings.questAdaptive
+#endif
+    );
 }
 void App::capture(const fs::path &p) {
     fs::create_directories(p.parent_path());
@@ -1764,6 +1955,16 @@ void App::report(const fs::path &p, double elapsed) const {
       << ",\n\"presentation_frames\":" << presentationFrames
       << ",\n\"presentation_fps\":" << (measured > 0 ? presentationFrames / measured : 0)
       << ",\n\"render_ms_p95\":" << percentile(renderTimes, .95)
+      << ",\n\"work_ms_p95\":" << percentile(workTimes, .95)
+      << ",\n\"compose_ms_p95\":" << percentile(composeTimes, .95)
+      << ",\n\"simulation_ms_p95\":" << percentile(simulationTimes, .95)
+      << ",\n\"present_ms_p95\":" << percentile(presentTimes, .95)
+      << ",\n\"gpu_ms\":" << gpuTimer.ms() << ",\n\"frame_pressure_ms\":" << framePressureMs
+      << ",\n\"gpu_timer_available\":" << (gpuTimer.available() ? "true" : "false")
+      << ",\n\"resolution_scale\":" << resolutionScale() << ",\n\"scene_render_size\":["
+      << sceneWidth << ',' << sceneHeight << ']' << ",\n\"adaptive_level\":" << resolution.level()
+      << ",\n\"scene_rebuilds\":" << sceneRebuilds << ",\n\"scene_reuses\":" << sceneReuses
+      << ",\n\"texture_uploads\":" << textureUploads
       << ",\n\"frame_interval_ms_p95\":" << percentile(presentationIntervals, .95)
       << ",\n\"audio_frames\":" << core.audioFrames << ",\n\"native_width\":" << core.width
       << ",\n\"native_height\":" << core.height << ",\n\"drawable_width\":" << drawableWidth
@@ -1867,6 +2068,8 @@ void App::scriptCommand(const std::string &cmd, const std::string &value) {
         settings.language = std::stoi(value);
     else if (cmd == "quality")
         settings.quality = std::stoi(value);
+    else if (cmd == "adaptive")
+        settings.adaptiveResolution = std::stoi(value) != 0;
     else if (cmd == "zoomOut")
         settings.zoomOut = std::stoi(value);
     else if (cmd == "panoramaHeight")

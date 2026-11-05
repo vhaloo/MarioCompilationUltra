@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.5.0 · Android 휴대전화와 태블릿
+# Mario Compilation Ultra 0.6.0 · Android 휴대전화와 태블릿
 
 [English](../en/MOBILE.md) · [Français](../fr/MOBILE.md) · [Español](../es/MOBILE.md) · [日本語](../ja/MOBILE.md) · [Deutsch](../de/MOBILE.md) · [Italiano](../it/MOBILE.md) · [Português](../pt/MOBILE.md) · [Русский](../ru/MOBILE.md) · [简体中文](../zh/MOBILE.md) · [한국어](../ko/MOBILE.md)
 
@@ -23,10 +23,12 @@ Android 휴대전화/태블릿 APK를 설치하고 앱 목록에서 Mario Compil
 
 저장 슬롯, 되감기, 배터리 저장은 앱 전용 저장소를 사용합니다. 백그라운드로 가면 배터리 저장과 활성화된 경우 재개 슬롯 0을 저장합니다. 같은 서명의 APK로 업데이트하면 진행이 유지됩니다. 앱 삭제나 데이터 지우기는 로컬 카트리지와 저장을 삭제합니다. 저장 슬롯은 저장 및 소리 항목에 있습니다.
 
+배경의 세부 수준을 조절하여 60fps를 목표로 합니다. 게임 픽셀과 메뉴는 선명하게 유지됩니다.
+
 휴대전화 및 태블릿 에뮬레이터 검증은 실물 하드웨어와 구분합니다. 성능, 게임패드, 화면 홈, 제조사 창 동작은 기기에 따라 다를 수 있습니다. macOS 빌드는 실제 Mac에서 테스트하지 않은 실험판입니다. 정확한 범위는 검증 보고서를 보세요.
 
 ![모음](screenshots/android-phone.png)
 
-[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
+[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
 
 [Adaptive Android apps](https://developer.android.com/develop/adaptive-apps/guides/support-different-display-sizes) · [16 KiB page sizes](https://developer.android.com/guide/practices/page-sizes)

@@ -33,10 +33,15 @@ class World {
     mutable std::vector<std::array<uint32_t, 256>> completeBlocks;
     int sceneryW = 0, sceneryH = 0;
     uint64_t graphicsVersion = ~uint64_t(0);
+    std::vector<uint8_t> graphicsVram;
+    std::array<bool, 544> blockValid{};
+    std::array<uint16_t, 256> graphicsPalette{};
+    std::array<int, 10> graphicsKey{};
+    bool graphicsCached = false;
     int lastStage = -1, lastKind = -1, minX = 0, maxX = 256, minY = 0, maxY = 224,
         previousCameraX = 0, previousCameraY = 0;
     uint64_t lastFrame = ~uint64_t(0);
-    bool wholeLevel = false;
+    bool wholeLevel = false, needScenery = false;
     uint32_t tilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
     uint32_t preparedTilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
     uint32_t bgPixel(const McuVideo &, int bg, int x, int y, bool prepared = false) const;
@@ -59,10 +64,12 @@ class World {
         lastFrame = ~uint64_t(0);
         cache.clear();
         graphicsVersion = ~uint64_t(0);
+        graphicsCached = false;
         complete.reset();
     }
     Scene inspect(const Core &, bool completeView = false) const;
-    void compose(const Core &, Settings &, int drawableWidth, int drawableHeight);
+    void compose(const Core &, Settings &, int drawableWidth, int drawableHeight,
+                 float resolutionScale = 1.f);
     uint32_t decodeTileForTest(const McuVideo &s, int bg, uint16_t a, int x, int y) const {
         return tilePixel(s, bg, a, x, y);
     }

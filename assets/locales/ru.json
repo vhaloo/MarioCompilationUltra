@@ -449,5 +449,10 @@
   "Use several fingers to move, run and jump together. A connected gamepad hides automatic touch controls. Android Back opens the menu.": "Несколькими пальцами можно двигаться, бежать и прыгать одновременно. При подключённом геймпаде автоматические кнопки скрываются. Назад Android открывает меню.",
   "Android phones and tablets": "Телефоны и планшеты Android",
   "Rewind": "Назад",
-  "Quest AR/VR uses a separate APK. This phone/tablet edition uses the screen and touch or gamepad controls.": "Quest AR/VR использует отдельный APK. Версия для телефона/планшета работает с экраном, сенсорным управлением или геймпадом."
+  "Quest AR/VR uses a separate APK. This phone/tablet edition uses the screen and touch or gamepad controls.": "Quest AR/VR использует отдельный APK. Версия для телефона/планшета работает с экраном, сенсорным управлением или геймпадом.",
+  "Automatic resolution": "Автоматическое разрешение",
+  "Targets 60 fps by adapting scenery detail. Game pixels and menus stay sharp.": "Цель — 60 кадров/с за счёт детализации окружения. Пиксели игры и меню остаются чёткими.",
+  "VR shader": "Шейдер VR",
+  "Efficient CRT": "Экономичный ЭЛТ",
+  "Reference CRT": "Эталонный ЭЛТ"
 }

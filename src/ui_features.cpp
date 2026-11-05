@@ -120,8 +120,9 @@ void App::extrasUi() {
         tick("Quick camera controls", settings.quickControls);
         tick("Illustrated setting help", settings.help);
     } else if (tab == 6) {
-        if(mobileActive()) {
-            ImGui::TextWrapped("%s",tr("Quest AR/VR uses a separate APK. This phone/tablet edition uses the screen and touch or gamepad controls."));
+        if (mobileActive()) {
+            ImGui::TextWrapped("%s", tr("Quest AR/VR uses a separate APK. This phone/tablet "
+                                        "edition uses the screen and touch or gamepad controls."));
             return;
         }
         ImGui::TextWrapped("%s", tr("XR preview: physical headset testing is deferred. These "
@@ -145,6 +146,7 @@ void App::extrasUi() {
         tick("questhandtracking", settings.questHandTracking);
         tick("questinsetcrt", settings.questInsetCrt);
         tick("questcoplanar", settings.questCrtCoplanar);
+        choice("VR shader", settings.questShader, {"Efficient CRT", "Reference CRT"});
     }
 }
 void App::helpUi() {

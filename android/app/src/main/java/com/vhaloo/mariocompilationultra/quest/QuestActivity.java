@@ -1,6 +1,7 @@
 package com.vhaloo.mariocompilationultra.quest;
 
 import org.libsdl.app.SDLActivity;
+import com.vhaloo.mariocompilationultra.AssetPreparation;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -29,7 +30,7 @@ public final class QuestActivity extends SDLActivity {
                 copyExisting(new File(old, "ROMs"), new File(root, "ROMs"));
                 try (Writer marker = new FileWriter(migration)) { marker.write("Existing readable external data preserved.\n"); }
             }
-            copyTree("mcu", root);
+            AssetPreparation.prepare(this, root);
             File data = new File(root, "UserData");
             ensureDirectory(data);
             ensureDirectory(new File(root, "ROMs"));
@@ -40,7 +41,7 @@ public final class QuestActivity extends SDLActivity {
                     int language = 0;
                     String system = java.util.Locale.getDefault().getLanguage();
                     for (int i=0;i<languages.length;i++) if (languages[i].equals(system)) language=i;
-                    out.write("language " + language + "\nview 4\nquality 0\nbackground 0\nblur 12\n"
+                    out.write("language " + language + "\nview 4\nquality 1\nadaptiveResolution 1\nbackground 0\nblur 12\n"
                         + "fullscreen 0\nvsync 0\nrewind 1\nrewindMemory 0\n"
                         + "questResolution 1\nquestMode 2\nquestPassthrough 1\nquestTransparent 1\n"
                         + "questWallHeight 200\nquestScale 100\nquestRefresh 90\n"
@@ -74,25 +75,6 @@ public final class QuestActivity extends SDLActivity {
     }
     private static void ensureDirectory(File path) throws IOException {
         if (!path.isDirectory() && !path.mkdirs()) throw new IOException("Cannot create " + path.getName());
-    }
-    private void copyTree(String source, File destination) throws IOException {
-        String[] children = getAssets().list(source);
-        if (children == null) return;
-        ensureDirectory(destination);
-        for (String child : children) {
-            String asset = source + "/" + child;
-            File target = new File(destination, child);
-            if (!target.getCanonicalPath().startsWith(root.getCanonicalPath() + File.separator))
-                throw new IOException("Invalid bundled path");
-            String[] nested = getAssets().list(asset);
-            if (nested != null && nested.length > 0) copyTree(asset, target);
-            else if (!target.exists() || asset.startsWith("mcu/assets/") || asset.startsWith("mcu/licences/") || asset.startsWith("mcu/docs/")) {
-                try (InputStream in = getAssets().open(asset); OutputStream out = new FileOutputStream(target)) {
-                    byte[] buffer = new byte[65536]; int count;
-                    while ((count = in.read(buffer)) != -1) out.write(buffer, 0, count);
-                }
-            }
-        }
     }
     @Override protected String[] getLibraries() { return new String[]{"c++_shared", "openxr_loader", "SDL2", "main"}; }
     @Override protected String[] getArguments() {

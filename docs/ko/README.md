@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.5.0
+# Mario Compilation Ultra 0.6.0
 
 PC에 맞게 조정할 수 있는 인터페이스와 실험적인 확장 화면을 제공하는 로컬 SNES 모음입니다. Super FX를 포함한 카트리지 동작은 Snes9x가 에뮬레이션합니다. 모든 게임을 역컴파일했다고 주장하지 않습니다.
 
-[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.5.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.6.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 다운로드와 바탕 화면에서 실행
 
@@ -47,6 +47,12 @@ sh ./Install-Linux.sh
 
 확장 메모리 프로필과 All-Stars 자동 선택은 목록의 미국판을 대상으로 합니다. 인식되지만 검증된 프로필이 없는 판은 원본 화면을 사용합니다. 인터페이스 번역은 상용 카트리지의 이야기나 그래픽을 번역하지 않습니다. 다섯 게임 전체를 새로 네이티브 역컴파일했다고 주장하지 않습니다.
 
+## 자동 해상도
+
+0.6 버전은 게임과 배경 해상도를 자동으로 조절하여 60fps를 목표로 합니다. 메뉴와 조작은 화면 해상도를 유지합니다. SNES 속도와 저장은 유지되며, 빠른 무손실 되감기는 CPU 부담을 줄입니다. Quest는 선택한 주사율에 맞춰 입체 해상도를 조절하고 효율적인 CRT와 기준 CRT를 제공합니다. 속도는 기기에 따라 다릅니다. 실제 휴대폰, Mac 및 Quest 성능은 아직 검증하지 않았습니다.
+
+[Performance / GPU](../PERFORMANCE.md)
+
 | CRC32 | SNES |
 |---|---|
 | `f84305b1` | All-Stars + World (US) |
@@ -57,11 +63,11 @@ sh ./Install-Linux.sh
 
 ## Android 휴대전화와 태블릿
 
-[Android 휴대전화와 태블릿](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk)
+[Android 휴대전화와 태블릿](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 조작
 
@@ -131,9 +137,9 @@ View/Back: 설정 · LT: 되감기 · RT: Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 패키지와 검증 · 0.5.0
+## 패키지와 검증 · 0.6.0
 
-여섯 자동 테스트 모음이 자체 데이터, 메뉴, 렌더링, 공간 조작, 멀티터치를 검증합니다. PC와 모바일 화면을 10개 언어로 촬영하고 여섯 로컬 게임을 별도로 검사합니다. 휴대전화/태블릿은 Android 에뮬레이터로 검사했으며 실물 기기와 Mac 플레이는 미검증입니다. 사용자가 Quest 0.4 모음을 확인했지만 AR/VR 플레이는 실험 단계입니다. 자세한 범위는 검증 보고서를 보세요.
+0.6 검증은 공개 테스트 7개 모음, 10개 언어의 메뉴, 로컬 게임 6개와 PC 성능을 다룹니다. 휴대폰과 태블릿은 에뮬레이터로 확인했습니다. 실제 Android, Mac 및 Quest 프레임 속도는 아직 검증하지 않았습니다. 자세한 내용은 검증 보고서를 확인하세요.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

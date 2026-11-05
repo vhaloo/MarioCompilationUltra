@@ -449,5 +449,10 @@
   "Use several fingers to move, run and jump together. A connected gamepad hides automatic touch controls. Android Back opens the menu.": "Use several fingers to move, run and jump together. A connected gamepad hides automatic touch controls. Android Back opens the menu.",
   "Android phones and tablets": "Android phones and tablets",
   "Rewind": "Rewind",
-  "Quest AR/VR uses a separate APK. This phone/tablet edition uses the screen and touch or gamepad controls.": "Quest AR/VR uses a separate APK. This phone/tablet edition uses the screen and touch or gamepad controls."
+  "Quest AR/VR uses a separate APK. This phone/tablet edition uses the screen and touch or gamepad controls.": "Quest AR/VR uses a separate APK. This phone/tablet edition uses the screen and touch or gamepad controls.",
+  "Automatic resolution": "Automatic resolution",
+  "Targets 60 fps by adapting scenery detail. Game pixels and menus stay sharp.": "Targets 60 fps by adapting scenery detail. Game pixels and menus stay sharp.",
+  "VR shader": "VR shader",
+  "Efficient CRT": "Efficient CRT",
+  "Reference CRT": "Reference CRT"
 }

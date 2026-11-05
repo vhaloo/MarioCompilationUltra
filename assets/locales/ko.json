@@ -449,5 +449,10 @@
   "Use several fingers to move, run and jump together. A connected gamepad hides automatic touch controls. Android Back opens the menu.": "여러 손가락으로 이동, 달리기, 점프를 함께 조작하세요. 게임패드 연결 시 자동 터치 버튼이 숨겨집니다. Android 뒤로 가기로 메뉴를 엽니다.",
   "Android phones and tablets": "Android 휴대전화와 태블릿",
   "Rewind": "되감기",
-  "Quest AR/VR uses a separate APK. This phone/tablet edition uses the screen and touch or gamepad controls.": "Quest AR/VR은 별도의 APK를 사용합니다. 이 휴대전화/태블릿판은 화면과 터치 또는 게임패드 조작을 사용합니다."
+  "Quest AR/VR uses a separate APK. This phone/tablet edition uses the screen and touch or gamepad controls.": "Quest AR/VR은 별도의 APK를 사용합니다. 이 휴대전화/태블릿판은 화면과 터치 또는 게임패드 조작을 사용합니다.",
+  "Automatic resolution": "자동 해상도",
+  "Targets 60 fps by adapting scenery detail. Game pixels and menus stay sharp.": "배경의 세부 수준을 조절하여 60fps를 목표로 합니다. 게임 픽셀과 메뉴는 선명하게 유지됩니다.",
+  "VR shader": "VR 셰이더",
+  "Efficient CRT": "효율적인 CRT",
+  "Reference CRT": "기준 CRT"
 }

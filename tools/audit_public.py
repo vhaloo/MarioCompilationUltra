@@ -24,7 +24,7 @@ def audit_archive(path):
                     b=t.extractfile(m).read();check_bytes(m.name,b);files.append(m.name)
     return files
 def check_bytes(name,b):
-    if b.startswith((b'MCU-SNES-STATE',b'MCUFRM1')):raise ValueError(f'Save-state payload: {name}')
+    if b.startswith((b'MCU-SNES-STATE',b'MCUFRM1',b'MCUFRM2')):raise ValueError(f'Save-state payload: {name}')
     if Path(name).suffix.lower() not in {'.cpp','.c','.h','.md','.py','.svg','.yml','.txt'}:
         for p in (0x7fc0,0xffc0,0x7fc0+512,0xffc0+512):
             if len(b)>p+21 and b[p:p+21].rstrip(b' ') in {b'ALL_STARS + WORLD',b'SUPER MARIO ALL_STARS',b'SUPER MARIOWORLD',b"YOSHI'S ISLAND"}:

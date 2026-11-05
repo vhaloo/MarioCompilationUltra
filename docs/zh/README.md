@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.5.0
+# Mario Compilation Ultra 0.6.0
 
 本地SNES合集，提供可调整的电脑界面和实验性扩展视图。Snes9x负责模拟卡带，包括Super FX。本项目并未声称已反编译所有游戏。
 
-[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.5.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.6.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 下载与桌面启动
 
@@ -47,6 +47,12 @@ sh ./Install-Linux.sh
 
 扩展内存配置与All-Stars自动选择针对所列美版。已识别但没有已验证配置的版本使用原始画面。界面翻译不会翻译商业卡带的剧情或图像。项目并不声称实现了全部五款游戏的新原生反编译版本。
 
+## 自动分辨率
+
+0.6版通过自动调整游戏和场景分辨率，以60帧/秒为目标；菜单和操作保持屏幕分辨率。保留SNES时钟和存档，无损快速倒带降低CPU负担。Quest根据所选刷新率调整立体分辨率，并提供高效CRT和参考CRT。持续速度取决于设备。尚未在实体手机、Mac和Quest上测量性能。
+
+[Performance / GPU](../PERFORMANCE.md)
+
 | CRC32 | SNES |
 |---|---|
 | `f84305b1` | All-Stars + World (US) |
@@ -57,11 +63,11 @@ sh ./Install-Linux.sh
 
 ## Android 手机和平板电脑
 
-[Android 手机和平板电脑](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk)
+[Android 手机和平板电脑](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 操作
 
@@ -131,9 +137,9 @@ View/Back：设置 · LT：倒带 · RT：Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 软件包与验证 · 0.5.0
+## 软件包与验证 · 0.6.0
 
-六组自动测试覆盖原创数据、菜单、渲染、空间控制和多点触控。电脑与移动布局以十种语言截图，另行检查六款本地游戏。手机/平板使用 Android 模拟器测试，实体设备与 Mac 游玩未测试。用户已确认 Quest 0.4 显示收藏界面，AR/VR 游玩仍为实验性。具体范围见验证报告。
+0.6验证包括七组公开测试、十种语言的菜单、六款本地游戏及桌面性能。手机和平板电脑使用模拟器测试。实体Android、Mac和Quest的帧率仍待验证；详情请见报告。
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

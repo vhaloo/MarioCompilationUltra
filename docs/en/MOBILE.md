@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.5.0 · Android phones and tablets
+# Mario Compilation Ultra 0.6.0 · Android phones and tablets
 
 [English](../en/MOBILE.md) · [Français](../fr/MOBILE.md) · [Español](../es/MOBILE.md) · [日本語](../ja/MOBILE.md) · [Deutsch](../de/MOBILE.md) · [Italiano](../it/MOBILE.md) · [Português](../pt/MOBILE.md) · [Русский](../ru/MOBILE.md) · [简体中文](../zh/MOBILE.md) · [한국어](../ko/MOBILE.md)
 
@@ -23,10 +23,12 @@ The labels match SNES buttons: use B to jump and Y to run in most Mario games. L
 
 Save slots, rewind and battery saves use app-private storage. Going to the background flushes battery saves and, when enabled, saves resume slot 0. Updating the same signed APK preserves progress. Uninstalling the app or clearing its data removes local cartridges and saves. Settings and save slots are under Saves & sound.
 
+Targets 60 fps by adapting scenery detail. Game pixels and menus stay sharp.
+
 Phone and tablet emulator testing is reported separately from physical hardware. Performance, controller mappings, cutouts and manufacturer window behavior can differ on your device. macOS builds remain experimental and have not been tested on a physical Mac. See the release validation report for exact coverage.
 
 ![Collection](screenshots/android-phone.png)
 
-[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
+[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
 
 [Adaptive Android apps](https://developer.android.com/develop/adaptive-apps/guides/support-different-display-sizes) · [16 KiB page sizes](https://developer.android.com/guide/practices/page-sizes)

@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.5.0 · Android 手机和平板电脑
+# Mario Compilation Ultra 0.6.0 · Android 手机和平板电脑
 
 [English](../en/MOBILE.md) · [Français](../fr/MOBILE.md) · [Español](../es/MOBILE.md) · [日本語](../ja/MOBILE.md) · [Deutsch](../de/MOBILE.md) · [Italiano](../it/MOBILE.md) · [Português](../pt/MOBILE.md) · [Русский](../ru/MOBILE.md) · [简体中文](../zh/MOBILE.md) · [한국어](../ko/MOBILE.md)
 
@@ -23,10 +23,12 @@
 
 存档位、回退和卡带存档使用应用私有存储。进入后台会写入卡带存档，并在启用时保存恢复位 0。使用同一签名 APK 更新可保留进度。卸载或清除应用数据会删除本地卡带与存档。存档操作位于存档与声音页面。
 
+通过调整场景细节以达到60帧/秒。游戏像素和菜单保持清晰。
+
 手机和平板模拟器测试与实体设备测试分开记录。性能、手柄映射、屏幕缺口和厂商窗口行为可能因设备而异。macOS 构建仍为实验版，未在实体 Mac 上测试。具体覆盖范围见验证报告。
 
 ![合集](screenshots/android-phone.png)
 
-[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
+[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
 
 [Adaptive Android apps](https://developer.android.com/develop/adaptive-apps/guides/support-different-display-sizes) · [16 KiB page sizes](https://developer.android.com/guide/practices/page-sizes)

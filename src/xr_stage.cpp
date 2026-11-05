@@ -243,10 +243,10 @@ uniform vec4 nativeHole;
 uniform bool clipNative;
 uniform float intensity,glassStrength,surroundBrightness;
 uniform bool flipImage,srgbTarget;
+uniform bool efficientShader;
 out vec4 result;
 vec3 displayColor(vec2 uv){return texture(image,vec2(uv.x,flipImage?1.0-uv.y:uv.y)).rgb;}
 void main(){
- vec3 n=normalize(worldNormal);vec3 v=normalize(eye-worldPosition);float facing=max(dot(n,v),0.0);
  vec3 c=tint.rgb;float a=tint.a;
  if(kind==1||kind==2||kind==3){
   vec2 uv=texcoord;
@@ -256,15 +256,19 @@ void main(){
   if(a<.002)discard;
   c=(kind==1||kind==3)?sampleColor.rgb/max(a,.001):sampleColor.rgb;
   if(kind==2&&crt>0){
-   float scan=.5+.5*cos(uv.y*raster.y*6.2831853);
+   vec3 n=normalize(worldNormal);vec3 v=normalize(eye-worldPosition);float facing=max(dot(n,v),0.0);
+   float phase=fract(uv.y*raster.y+.75)*2.0-1.0;
+   float wave=4.0*phase*(1.0-abs(phase));
+   wave=.225*(wave*abs(wave)-wave)+wave;
+   float scan=.5+.5*(efficientShader?wave:cos(uv.y*raster.y*6.2831853));
    float scanAA=1.0-smoothstep(.5,1.25,fwidth(uv.y*raster.y));
    float strength=intensity*(crt==1?.19:crt==2?.32:.43);
    c*=1.0-strength*scan*scanAA;
    if(maskMode>0){float lane=mod(floor(uv.x*raster.x*3.0),3.0);vec3 mask=lane<1.0?vec3(1,.68,.68):lane<2.0?vec3(.68,1,.68):vec3(.68,.68,1);
     float aa=1.0-smoothstep(.45,1.5,fwidth(uv.x*raster.x*3.0));c*=mix(vec3(1),mask,aa*intensity*(maskMode==1?.38:.65));}
    vec2 edge=uv*(1.0-uv);float vignette=pow(clamp(edge.x*edge.y*16.0,0.0,1.0),.12);
-   c*=mix(1.0,vignette,intensity);c+=pow(max(c-vec3(.65),vec3(0)),vec3(1.5))*.12*intensity;
-   c+=vec3(.015,.025,.04)*pow(1.0-facing,3.0)*glassStrength;
+   c*=mix(1.0,vignette,intensity);vec3 glow=max(c-vec3(.65),vec3(0));c+=glow*sqrt(glow)*.12*intensity;
+   float rim=1.0-facing;c+=vec3(.015,.025,.04)*rim*rim*rim*glassStrength;
   }
   if(kind==3)c*=surroundBrightness;
  }else if(kind==6){
@@ -272,15 +276,17 @@ void main(){
   float fade=smoothstep(0.0,.28,uv.y)*smoothstep(0.0,.28,1.0-uv.y);
   c=mix(vec3(.008,.013,.025),displayColor(uv)*surroundBrightness,fade);
  }else if(kind==4){
-  float fresnel=pow(1.0-facing,4.0);c=vec3(.2,.47,.65);a=glassStrength*(.015+.14*fresnel);
+  vec3 n=normalize(worldNormal);vec3 v=normalize(eye-worldPosition);float rim=1.0-max(dot(n,v),0.0);
+  float square=rim*rim;float fresnel=square*square;c=vec3(.2,.47,.65);a=glassStrength*(.015+.14*fresnel);
  }else if(kind==5){
   vec2 cell=worldPosition.xz*.8;vec2 grid=abs(fract(cell-.5)-.5)/max(fwidth(cell),vec2(.001));
   float line=1.0-min(min(grid.x,grid.y),1.0);float fade=exp(-length(worldPosition.xz-eye.xz)*.055);
   c=vec3(.014,.022,.036)+vec3(.025,.095,.12)*line*fade;
  }else{
+  vec3 n=normalize(worldNormal);vec3 v=normalize(eye-worldPosition);float facing=max(dot(n,v),0.0);
   vec3 l=normalize(vec3(-.45,.85,.65));float diffuse=max(dot(n,l),0.0);
   float spec=pow(max(dot(reflect(-l,n),v),0.0),mix(100.0,12.0,roughness));
-  float rim=pow(1.0-facing,4.0);
+  float edge=1.0-facing;float square=edge*edge;float rim=square*square;
   c*=.3+.7*diffuse;c+=vec3(.7,.84,1)*spec*(1.0-roughness)*.7;
   c+=vec3(.035,.10,.14)*rim;
   if(roughness<0.0)c=tint.rgb*1.2;
@@ -352,7 +358,7 @@ struct XrStageRenderer::Impl {
     Mesh remoteMesh, insetFurniture, insetScreen, cube;
     int imageUniform = -1, crtUniform = -1, maskUniform = -1, rasterUniform = -1,
         intensityUniform = -1, glassUniform = -1, brightnessUniform = -1, srgbUniform = -1,
-        flipUniform = -1, holeUniform = -1, clipUniform = -1;
+        flipUniform = -1, holeUniform = -1, clipUniform = -1, efficientUniform = -1;
     uint64_t nativeVersion = ~uint64_t(0), backdropVersion = ~uint64_t(0), frameCount = 0,
              meshHash = 0;
     bool srgb = false;
@@ -392,6 +398,7 @@ struct XrStageRenderer::Impl {
         flipUniform = glGetUniformLocation(program, "flipImage");
         holeUniform = glGetUniformLocation(program, "nativeHole");
         clipUniform = glGetUniformLocation(program, "clipNative");
+        efficientUniform = glGetUniformLocation(program, "efficientShader");
         glGenFramebuffers(1, &framebuffer);
         uint32_t count = 0;
         xrCheck(xrEnumerateViewConfigurationViews(instance, system,
@@ -781,7 +788,7 @@ struct XrStageRenderer::Impl {
                                                const Settings &s, int mode,
                                                const XrStageContent &content,
                                                const XrSpatialControls &controls, bool ar,
-                                               const std::string &capture) {
+                                               const std::string &capture, float resolutionScale) {
         std::array<XrView, 2> views{{{XR_TYPE_VIEW}, {XR_TYPE_VIEW}}};
         XrViewLocateInfo locate{XR_TYPE_VIEW_LOCATE_INFO};
         locate.viewConfigurationType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
@@ -819,6 +826,7 @@ struct XrStageRenderer::Impl {
         glUniform1f(brightnessUniform, s.questSurroundBrightness * .01f);
         glUniform1i(srgbUniform, srgb);
         glUniform1i(flipUniform, s.questFlip);
+        glUniform1i(efficientUniform, s.questShader == 0);
         GLuint nativeImage = native(content), expanded = demoTexture;
         GLuint backdropImage =
             !ar && mode == 5 && s.questWorldBackdrop ? backdrop(content) : demoTexture;
@@ -871,7 +879,11 @@ struct XrStageRenderer::Impl {
                                       e.depth);
             if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
                 throw std::runtime_error("Incomplete XR stereo framebuffer");
-            glViewport(0, 0, e.width, e.height);
+            float scale =
+                std::isfinite(resolutionScale) ? std::clamp(resolutionScale, .375f, 1.f) : 1.f;
+            int renderWidth = std::max(1, int(e.width * scale));
+            int renderHeight = std::max(1, int(e.height * scale));
+            glViewport(0, 0, renderWidth, renderHeight);
             glClearColor(ar ? 0 : .008f, ar ? 0 : .013f, ar ? 0 : .025f, ar ? 0 : 1);
             glDepthMask(GL_TRUE);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -980,24 +992,24 @@ struct XrStageRenderer::Impl {
                 }
             }
             if (!capture.empty() && i == 0) {
-                auto surface = SDL_CreateRGBSurfaceWithFormat(0, e.width, e.height, 32,
+                auto surface = SDL_CreateRGBSurfaceWithFormat(0, renderWidth, renderHeight, 32,
                                                               SDL_PIXELFORMAT_RGBA32);
                 if (surface) {
                     glPixelStorei(GL_PACK_ALIGNMENT, 4);
-                    glReadPixels(0, 0, e.width, e.height, GL_RGBA, GL_UNSIGNED_BYTE,
+                    glReadPixels(0, 0, renderWidth, renderHeight, GL_RGBA, GL_UNSIGNED_BYTE,
                                  surface->pixels);
                     auto *pixels = static_cast<uint8_t *>(surface->pixels);
                     std::vector<uint8_t> row(surface->pitch);
-                    for (int y = 0; y < e.height / 2; ++y) {
+                    for (int y = 0; y < renderHeight / 2; ++y) {
                         auto *a = pixels + y * surface->pitch,
-                             *b = pixels + (e.height - y - 1) * surface->pitch;
+                             *b = pixels + (renderHeight - y - 1) * surface->pitch;
                         std::memcpy(row.data(), a, row.size());
                         std::memcpy(a, b, row.size());
                         std::memcpy(b, row.data(), row.size());
                     }
                     if (SDL_SaveBMP(surface, capture.c_str()) == 0)
-                        SDL_Log("MCU XR menu scene captured: %dx%d; ROM loaded=%d", e.width,
-                                e.height, content.loaded);
+                        SDL_Log("MCU XR menu scene captured: %dx%d; ROM loaded=%d", renderWidth,
+                                renderHeight, content.loaded);
                     SDL_FreeSurface(surface);
                 }
             }
@@ -1011,7 +1023,7 @@ struct XrStageRenderer::Impl {
             p.pose = views[i].pose;
             p.fov = views[i].fov;
             p.subImage.swapchain = e.chain;
-            p.subImage.imageRect = {{0, 0}, {e.width, e.height}};
+            p.subImage.imageRect = {{0, 0}, {renderWidth, renderHeight}};
         }
         if (labelsImage)
             SDL_GL_UnbindTexture(controls.labels);
@@ -1057,12 +1069,11 @@ XrStageRenderer::~XrStageRenderer() = default;
 void XrStageRenderer::initialise(XrInstance i, XrSystemId s, XrSession session, int detail) {
     impl->initialise(i, s, session, detail);
 }
-const XrCompositionLayerProjection *XrStageRenderer::render(XrSpace space, XrTime time,
-                                                            XrPosef origin, const Settings &s,
-                                                            int mode, const XrStageContent &c,
-                                                            const XrSpatialControls &controls,
-                                                            bool ar, const std::string &capture) {
-    return impl->render(space, time, origin, s, mode, c, controls, ar, capture);
+const XrCompositionLayerProjection *
+XrStageRenderer::render(XrSpace space, XrTime time, XrPosef origin, const Settings &s, int mode,
+                        const XrStageContent &c, const XrSpatialControls &controls, bool ar,
+                        const std::string &capture, float resolutionScale) {
+    return impl->render(space, time, origin, s, mode, c, controls, ar, capture, resolutionScale);
 }
 uint64_t XrStageRenderer::frames() const { return impl->frameCount; }
 } // namespace mcu

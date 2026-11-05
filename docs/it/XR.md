@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.5.0 · Quest VR / AR
+# Mario Compilation Ultra 0.6.0 · Quest VR / AR
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -23,6 +23,8 @@ Le immagini fantasma sono informative, senza simulare oggetti lontani. Le posizi
 Il tavolo arcade mostra l’area caricata. Fisica e attivazione degli oggetti restano originali.
 
 Comandi rapidi PC: tieni premuto lo stick destro; croce sinistra/destra zoom, su 1:1, giù mappa intera, A blocca, B camera originale, X schermata, Y segue il giocatore. Rilascia per tornare ai comandi SNES. F1 o aiuto Y nel menu apre la spiegazione illustrata.
+
+La versione 0.6 punta a 60 fps adattando la risoluzione di gioco e scenario; menu e comandi mantengono la risoluzione dello schermo. Il ritmo SNES e i salvataggi sono preservati; il riavvolgimento rapido senza perdita riduce il lavoro della CPU. Quest adatta la risoluzione stereo alla frequenza scelta e offre CRT efficiente o di riferimento. Le prestazioni dipendono dal dispositivo. Telefoni, Mac e Quest fisici restano da misurare.
 
 SNES: D-pad · A · B · X · Y · L · R · Start · Select
 

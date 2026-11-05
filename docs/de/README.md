@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.5.0
+# Mario Compilation Ultra 0.6.0
 
 Lokale SNES-Sammlung mit anpassbarer PC-Oberfläche und experimentellen Weltansichten. Snes9x emuliert die Module einschließlich Super FX. Eine vollständige Dekompilierung aller Spiele wird nicht behauptet.
 
-[Download und Start vom Desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.5.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download und Start vom Desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.6.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download und Start vom Desktop
 
@@ -47,6 +47,12 @@ Gesamte Karte (Strg+5) zeigt in allen sechs Spielen das vollständige Gelände d
 
 Erweiterte Speicherprofile und die automatische All-Stars-Auswahl gelten für die aufgeführten US-Ausgaben. Erkannte Ausgaben ohne geprüftes Profil verwenden den Originalausschnitt. Die Oberfläche übersetzt weder Geschichte noch Grafiken des kommerziellen Moduls. Eine neue native Dekompilierung aller fünf Spiele wird nicht behauptet.
 
+## Automatische Auflösung
+
+Version 0.6 zielt mit automatischer Spiel- und Landschaftsauflösung auf 60 fps; Menüs und Eingaben behalten die Bildschirmauflösung. SNES-Takt und Spielstände bleiben erhalten, schnelles verlustfreies Zurückspulen entlastet die CPU. Quest passt die Stereoauflösung an die gewählte Bildrate an und bietet effizienten sowie Referenz-CRT. Die Leistung hängt vom Gerät ab. Physische Telefone, Macs und Quest müssen noch gemessen werden.
+
+[Performance / GPU](../PERFORMANCE.md)
+
 | CRC32 | SNES |
 |---|---|
 | `f84305b1` | All-Stars + World (US) |
@@ -57,11 +63,11 @@ Erweiterte Speicherprofile und die automatische All-Stars-Auswahl gelten für di
 
 ## Android-Smartphones und -Tablets
 
-[Android-Smartphones und -Tablets](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk)
+[Android-Smartphones und -Tablets](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Steuerung
 
@@ -131,9 +137,9 @@ Wähle das Modul erneut, wenn die Datei verschoben oder das Laufwerk getrennt wu
 
 ![Quest VR / AR](screenshots/6.png)
 
-## Pakete und Prüfung · 0.5.0
+## Pakete und Prüfung · 0.6.0
 
-Sechs automatische Testsuiten prüfen eigene Daten, Menüs, Darstellung, räumliche Steuerung und Multitouch. PC- und mobile Layouts werden in zehn Sprachen erfasst; sechs lokale Spiele separat geprüft. Smartphone/Tablet wurden auf Android-Emulatoren getestet, echte Geräte und Mac-Spiel nicht. Der Nutzer bestätigte die Quest-0.4-Sammlung; AR/VR-Spiel bleibt experimentell. Details im Prüfbericht.
+Die Prüfung von 0.6 umfasst sieben öffentliche Testsuiten, Menüs in zehn Sprachen, sechs lokale Spiele und Desktop-Leistung. Telefon und Tablet werden emuliert. Die Bildrate auf echten Android-Geräten, Macs und Quest ist noch nicht bestätigt; siehe Prüfbericht.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.5.0 · Телефоны и планшеты Android
+# Mario Compilation Ultra 0.6.0 · Телефоны и планшеты Android
 
 [English](../en/MOBILE.md) · [Français](../fr/MOBILE.md) · [Español](../es/MOBILE.md) · [日本語](../ja/MOBILE.md) · [Deutsch](../de/MOBILE.md) · [Italiano](../it/MOBILE.md) · [Português](../pt/MOBILE.md) · [Русский](../ru/MOBILE.md) · [简体中文](../zh/MOBILE.md) · [한국어](../ko/MOBILE.md)
 
@@ -23,10 +23,12 @@
 
 Состояния, перемотка и сохранения картриджа находятся в закрытом хранилище приложения. В фоне записывается батарейное сохранение и, если включено, слот продолжения 0. Обновление с той же подписью сохраняет прогресс. Удаление приложения или очистка данных удаляет локальные картриджи и сохранения. Слоты находятся в разделе сохранений и звука.
 
+Цель — 60 кадров/с за счёт детализации окружения. Пиксели игры и меню остаются чёткими.
+
 Проверки эмуляторов телефона и планшета отделены от испытаний на реальном устройстве. Производительность, геймпады, вырезы и окна зависят от модели. Версии macOS остаются экспериментальными и не проверены на реальном Mac. Точный охват приведён в отчёте.
 
 ![Коллекция](screenshots/android-phone.png)
 
-[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
+[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
 
 [Adaptive Android apps](https://developer.android.com/develop/adaptive-apps/guides/support-different-display-sizes) · [16 KiB page sizes](https://developer.android.com/guide/practices/page-sizes)

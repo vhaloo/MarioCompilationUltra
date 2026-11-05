@@ -161,6 +161,25 @@ int main() {
                 core.tick();
             check(core.restore(b), "SNES state restore");
             check(core.snapshot.ram[0] == ramBefore, "Restored WRAM identity");
+            auto fast = core.state(true);
+            check(fast.capacity() <= fast.size() * 2,
+                  "Rewind entries keep compact allocations instead of worst-case staging buffers");
+            auto nativeBefore = core.native;
+            auto ramSnapshot = core.snapshot.ram;
+            for (int i = 0; i < 8; ++i)
+                core.tick();
+            check(fast.size() > 32 && fast[6] == '2' && core.restore(fast) &&
+                      core.native == nativeBefore && core.snapshot.ram == ramSnapshot,
+                  "Fast rewind restores the exact native image and all WRAM bytes");
+            for (size_t offset : {size_t(28), size_t(32), fast.size() - 1}) {
+                auto corrupt = fast;
+                corrupt[offset] ^= 0x7f;
+                check(!core.restore(corrupt),
+                      "Corrupt fast rewind is rejected before engine restore");
+            }
+            auto shortFrame = fast;
+            shortFrame.resize(35);
+            check(!core.restore(shortFrame), "Truncated fast rewind is safely rejected");
             check(core.save(1) && core.loadState(1), "Save slot round trip");
             auto path = core.statePath(1);
             auto file = readFile(path);

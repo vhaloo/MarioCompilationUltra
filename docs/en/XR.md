@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.5.0 · Quest VR / AR
+# Mario Compilation Ultra 0.6.0 · Quest VR / AR
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -23,6 +23,8 @@ Ghost images are informative and do not simulate distant objects. Verified place
 The arcade table shows the loaded area. Original cartridge physics and object activation remain unchanged.
 
 Desktop quick controls: hold right-stick click, then D-pad left/right for zoom, up for 1:1, down for the whole map, A to freeze, B for the original camera, X for a screenshot, Y to follow the player. Releasing the modifier restores normal SNES controls. F1 or the menu’s Y help opens an illustrated setting explanation.
+
+Version 0.6 targets 60 fps with automatic game-layer and scenery resolution, while menus and input stay at display resolution. The original SNES clock and save slots are preserved; fast lossless rewind reduces CPU work. Quest follows the selected headset refresh rate with adaptive stereo resolution and an efficient CRT shader; the reference shader remains selectable. Sustained speed depends on the device. Physical phone, Mac and Quest performance still requires testing.
 
 SNES: D-pad · A · B · X · Y · L · R · Start · Select
 

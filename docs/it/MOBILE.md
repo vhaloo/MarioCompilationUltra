@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.5.0 · Telefoni e tablet Android
+# Mario Compilation Ultra 0.6.0 · Telefoni e tablet Android
 
 [English](../en/MOBILE.md) · [Français](../fr/MOBILE.md) · [Español](../es/MOBILE.md) · [日本語](../ja/MOBILE.md) · [Deutsch](../de/MOBILE.md) · [Italiano](../it/MOBILE.md) · [Português](../pt/MOBILE.md) · [Русский](../ru/MOBILE.md) · [简体中文](../zh/MOBILE.md) · [한국어](../ko/MOBILE.md)
 
@@ -23,10 +23,12 @@ Le lettere corrispondono al SNES: B salta e Y corre nella maggior parte dei Mari
 
 Stati, riavvolgimento e salvataggi usano l’archivio privato dell’app. In background vengono scritti i salvataggi della cartuccia e, se attivo, lo stato di ripresa 0. Gli aggiornamenti con la stessa firma conservano i progressi. Disinstallare o cancellare i dati elimina cartucce e salvataggi locali. Gli stati sono in Salvataggi e audio.
 
+Punta a 60 fps adattando il dettaglio dello scenario. I pixel del gioco e i menu restano nitidi.
+
 I test su emulatori di telefono e tablet sono distinti dall’hardware fisico. Prestazioni, gamepad, ritagli e finestre possono variare per dispositivo. macOS resta sperimentale e non è stato testato su un Mac fisico. Il rapporto indica la copertura esatta.
 
 ![Raccolta](screenshots/android-phone.png)
 
-[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
+[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
 
 [Adaptive Android apps](https://developer.android.com/develop/adaptive-apps/guides/support-different-display-sizes) · [16 KiB page sizes](https://developer.android.com/guide/practices/page-sizes)

@@ -12,6 +12,8 @@
 #include "object_previews.h"
 #include "mobile_controls.h"
 #include "android_bridge.h"
+#include "performance.h"
+#include "gpu_timer.h"
 namespace mcu {
 struct Options {
     bool headless = false, software = false, menu = false, realtime = true, noResume = false,
@@ -37,6 +39,8 @@ class App {
     SDL_FRect nativeRect{}, insetRect{};
     int nw = 0, nh = 0, ww = 0, wh = 0, tab = 0, selected = 0, dialog = 0, dialogSlot = 0;
     SDL_Texture *frameTarget = nullptr;
+    SDL_Texture *sceneTarget = nullptr;
+    int sceneWidth = 0, sceneHeight = 0;
     int frameWidth = 0, frameHeight = 0;
     std::string pendingGame, message;
     bool browser = false, pathEdit = false, releaseInput = false, focusPage = true,
@@ -60,7 +64,20 @@ class App {
     uint64_t simulationTicks = 0, presentationFrames = 0, metricsStarted = 0,
              previousPresentation = 0;
     std::vector<double> renderTimes, presentationIntervals;
+    std::vector<double> workTimes, composeTimes, simulationTimes, presentTimes;
+    AdaptiveResolution resolution;
+    GpuTimer gpuTimer;
+    FrameDeadline presentationDeadline;
+    FrameWaiter presentationWaiter;
+    double simulationWorkMs = 0;
+    double framePressureMs = 0;
+    uint64_t sceneRebuilds = 0, sceneReuses = 0, textureUploads = 0;
+    uint64_t canvasVersion = 0;
+    uint64_t nativeVersion = ~uint64_t(0), backdropVersion = ~uint64_t(0);
+    std::array<double, 20> compositionKey{};
+    std::array<int, 3> backdropKey{};
     void resetMetrics();
+    void invalidateGraphics(bool deviceReset);
     const char *tr(const char *en, const char * = nullptr) const {
         return translate(settings.language, en);
     }
@@ -113,6 +130,7 @@ class App {
     ObjectPreviews previews;
     bool menu = true, quit = false, focused = true;
     bool dirty = true, menuVerificationOnly = false;
+    bool vsyncActive = false;
     uint16_t spatialButtons = 0;
     bool spatialRewind = false;
     std::string xrMenuCapture;
@@ -132,6 +150,15 @@ class App {
     void input();
     void tick();
     void render();
+    void finishFrame(double workMs, double gpuMs, double budgetMs);
+    float resolutionScale() const {
+        return settings.adaptiveResolution
+#ifdef MCU_QUEST
+                       && settings.questAdaptive
+#endif
+                   ? resolution.scale()
+                   : 1.f;
+    }
     void toggleMenu();
     bool play(const std::string &, bool resume = true);
     void capture(const fs::path &);

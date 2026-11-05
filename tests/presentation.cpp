@@ -138,6 +138,25 @@ int main() {
             check(pixels[34 * 96 + 24] == 0xffffffff && pixels[34 * 96 + 23] == 0xffb400a0 &&
                       pixels[30 * 96 + 21] == 0xffb400a0 && pixels[51 * 96 + 24] == 0xffb400a0,
                   "Fractional filtering cannot draw above the game safe area or beneath controls");
+            SDL_RenderSetScale(renderer, .5f, .5f);
+            SDL_Rect logical{0, 0, 96, 96};
+            SDL_RenderSetViewport(renderer, &logical);
+            SDL_RenderClear(renderer);
+            blitter.copy(texture, 4, 4, {8, 11, 22, 22}, 1, 1);
+            blitter.copy(texture, 4, 4, {8, 11, 22, 22}, 1, 1);
+            float sx = 0, sy = 0;
+            SDL_RenderGetScale(renderer, &sx, &sy);
+            SDL_RenderReadPixels(renderer, nullptr, SDL_PIXELFORMAT_ARGB8888, pixels, 96 * 4);
+            check(sx == .5f && sy == .5f && pixels[8 * 96 + 6] == 0xffffffff &&
+                      pixels[8 * 96 + 3] == 0xffb400a0,
+                  "Scaled and cached crisp passes preserve resolution and pixel bounds");
+            std::fill(std::begin(source), std::end(source), 0xff0077aa);
+            SDL_UpdateTexture(texture, nullptr, source, 16);
+            blitter.copy(texture, 4, 4, {8, 11, 22, 22}, 1, 2);
+            SDL_RenderReadPixels(renderer, nullptr, SDL_PIXELFORMAT_ARGB8888, pixels, 96 * 4);
+            check(pixels[8 * 96 + 6] == 0xff0077aa,
+                  "A new source version invalidates cached crisp pixels");
+            SDL_RenderSetScale(renderer, 1, 1);
             SDL_SetRenderTarget(renderer, nullptr);
             SDL_DestroyTexture(target);
         }

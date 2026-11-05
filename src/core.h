@@ -24,6 +24,7 @@ class Core {
     std::deque<RewindFrame> history;
     size_t historyBytes = 0;
     std::vector<int16_t> frameAudio, audioScratch;
+    mutable std::vector<uint8_t> stateScratch, packedScratch;
     bool recordingAudio = false, reverseDirection = false;
     void saveSram();
     void readSram();
@@ -52,7 +53,7 @@ class Core {
     void tick();
     void reset();
     void clearAudio();
-    std::vector<uint8_t> state() const;
+    std::vector<uint8_t> state(bool fastRewind = false) const;
     bool restore(const std::vector<uint8_t> &, bool flushAudio = true);
     bool save(int);
     bool loadState(int);

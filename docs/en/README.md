@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.5.0
+# Mario Compilation Ultra 0.6.0
 
 A local SNES collection with an adaptive PC interface and experimental world views. Snes9x supplies the cartridge simulation, including Super FX. No decompilation of every game is claimed.
 
-[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.5.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.6.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download and desktop startup
 
@@ -47,6 +47,12 @@ Full level map (Ctrl+5) shows all decoded terrain in the loaded area from its fi
 
 Expanded memory profiles and automatic All-Stars selection target the listed US editions. A recognized edition without a verified profile uses original framing. Interface translation does not translate the commercial cartridge’s story or graphics. No new native decompilation of all five games is claimed.
 
+## Automatic resolution
+
+Version 0.6 targets 60 fps with automatic game-layer and scenery resolution, while menus and input stay at display resolution. The original SNES clock and save slots are preserved; fast lossless rewind reduces CPU work. Quest follows the selected headset refresh rate with adaptive stereo resolution and an efficient CRT shader; the reference shader remains selectable. Sustained speed depends on the device. Physical phone, Mac and Quest performance still requires testing.
+
+[Performance / GPU](../PERFORMANCE.md)
+
 | CRC32 | SNES |
 |---|---|
 | `f84305b1` | All-Stars + World (US) |
@@ -57,11 +63,11 @@ Expanded memory profiles and automatic All-Stars selection target the listed US 
 
 ## Android phones and tablets
 
-[Android phones and tablets](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk)
+[Android phones and tablets](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Controls
 
@@ -131,9 +137,9 @@ Choose cartridge again if its file was moved or a drive is disconnected. ZIPs mu
 
 ![Quest VR / AR](screenshots/6.png)
 
-## Packages and validation · 0.5.0
+## Packages and validation · 0.6.0
 
-Six automated suites cover original fixtures, menus, rendering, spatial controls and multi-touch. Desktop and mobile layouts are captured in ten languages. Six local games are checked separately. Phone/tablet tests use Android emulators; physical devices and Mac gameplay remain untested. Quest 0.4 collection startup was confirmed by its user; full AR/VR gameplay remains experimental. See the validation report for exact scope.
+0.6 validation covers seven public test suites, menus in ten languages, local six-game regressions and desktop performance. Phone/tablet checks use emulators. Physical Android, Mac and Quest framerate remains unverified; see the detailed report.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

@@ -1,6 +1,7 @@
 package com.vhaloo.mariocompilationultra.android;
 
 import org.libsdl.app.SDLActivity;
+import com.vhaloo.mariocompilationultra.AssetPreparation;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -31,14 +32,14 @@ public final class HandheldActivity extends SDLActivity {
     @Override protected void onCreate(Bundle state) {
         root=getFilesDir();
         try {
-            copyTree("mcu",root);
+            AssetPreparation.prepare(this,root);
             File data=new File(root,"UserData");ensureDirectory(data);ensureDirectory(new File(root,"ROMs"));
             File settings=new File(data,"settings.ini");
             if(!settings.exists()) {
                 int language=0;String system=java.util.Locale.getDefault().getLanguage();
                 for(int i=0;i<LANGUAGES.length;i++)if(LANGUAGES[i].equals(system))language=i;
                 try(Writer out=new OutputStreamWriter(new FileOutputStream(settings),"UTF-8")) {
-                    out.write("language "+language+"\nview 4\ninset 1\nlocator 1\nminimap 0\nquality 0\nrewindMemory 0\n"
+                    out.write("language "+language+"\nview 4\ninset 1\nlocator 1\nminimap 0\nquality 1\nrewindMemory 0\nadaptiveResolution 1\n"
                         +"fullscreen 0\nspan 0\nvsync 1\nautoResume 1\ntouchMode 0\ntouchPlacement 0\n");
                 }
             }
@@ -67,21 +68,6 @@ public final class HandheldActivity extends SDLActivity {
     }
     private static void ensureDirectory(File path)throws IOException {
         if(!path.isDirectory()&&!path.mkdirs())throw new IOException("Cannot create "+path.getName());
-    }
-    private void copyTree(String source,File destination)throws IOException {
-        String[] children=getAssets().list(source);if(children==null)return;
-        ensureDirectory(destination);
-        for(String child:children) {
-            String asset=source+"/"+child;File target=new File(destination,child);
-            if(!target.getCanonicalPath().startsWith(root.getCanonicalPath()+File.separator))throw new IOException("Invalid bundled path");
-            String[] nested=getAssets().list(asset);
-            if(nested!=null&&nested.length>0)copyTree(asset,target);
-            else if(!target.exists()||asset.startsWith("mcu/assets/")||asset.startsWith("mcu/docs/")||asset.startsWith("mcu/licences/")) {
-                try(InputStream in=getAssets().open(asset);OutputStream out=new FileOutputStream(target)) {
-                    byte[] buffer=new byte[65536];int count;while((count=in.read(buffer))!=-1)out.write(buffer,0,count);
-                }
-            }
-        }
     }
     private void readInsets(WindowInsets insets) {
         int l,t,r,b;

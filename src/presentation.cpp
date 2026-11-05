@@ -34,20 +34,26 @@ std::vector<uint32_t> softenBackdrop(const std::vector<uint32_t> &source, int w,
         std::vector<uint32_t> temp(pixels.size());
         for (int pass = 0; pass < 3; ++pass) {
             for (int direction = 0; direction < 2; ++direction) {
-                for (int y = 0; y < h; ++y)
-                    for (int x = 0; x < w; ++x) {
-                        int r = 0, g = 0, b = 0;
-                        for (int d = -radius; d <= radius; ++d) {
-                            int sx = direction ? x : std::clamp(x + d, 0, w - 1);
-                            int sy = direction ? std::clamp(y + d, 0, h - 1) : y;
-                            auto p = pixels[sy * w + sx];
-                            r += (p >> 16) & 255;
-                            g += (p >> 8) & 255;
-                            b += p & 255;
-                        }
-                        int n = 2 * radius + 1;
-                        temp[y * w + x] = 0xff000000 | ((r / n) << 16) | ((g / n) << 8) | b / n;
+                int length = direction ? h : w, lines = direction ? w : h;
+                int stride = direction ? w : 1;
+                for (int line = 0; line < lines; ++line) {
+                    int start = direction ? line : line * w;
+                    int r = 0, g = 0, b = 0;
+                    auto add = [&](uint32_t p, int sign) {
+                        r += int((p >> 16) & 255) * sign;
+                        g += int((p >> 8) & 255) * sign;
+                        b += int(p & 255) * sign;
+                    };
+                    for (int d = -radius; d <= radius; ++d)
+                        add(pixels[start + std::clamp(d, 0, length - 1) * stride], 1);
+                    int n = 2 * radius + 1;
+                    for (int p = 0; p < length; ++p) {
+                        temp[start + p * stride] =
+                            0xff000000 | ((r / n) << 16) | ((g / n) << 8) | b / n;
+                        add(pixels[start + std::clamp(p - radius, 0, length - 1) * stride], -1);
+                        add(pixels[start + std::clamp(p + radius + 1, 0, length - 1) * stride], 1);
                     }
+                }
                 pixels.swap(temp);
             }
         }
@@ -62,12 +68,24 @@ Blitter::~Blitter() {
     if (intermediate)
         SDL_DestroyTexture(intermediate);
 }
-void Blitter::copy(SDL_Texture *source, int w, int h, const SDL_FRect &dest, int filter) {
+void Blitter::invalidate(bool recreate) {
+    lastSource = nullptr;
+    lastVersion = ~uint64_t(0);
+    if (recreate && intermediate) {
+        SDL_DestroyTexture(intermediate);
+        intermediate = nullptr;
+        width = height = 0;
+    }
+}
+void Blitter::copy(SDL_Texture *source, int w, int h, const SDL_FRect &dest, int filter,
+                   uint64_t version) {
     if (!source || w < 1 || h < 1 || dest.w <= 0 || dest.h <= 0)
         return;
     SDL_SetTextureScaleMode(source, filter == 2 ? SDL_ScaleModeLinear : SDL_ScaleModeNearest);
     if (filter == 1) {
-        float sx = dest.w / w, sy = dest.h / h;
+        float renderScaleX = 1, renderScaleY = 1;
+        SDL_RenderGetScale(renderer, &renderScaleX, &renderScaleY);
+        float sx = dest.w * renderScaleX / w, sy = dest.h * renderScaleY / h;
         // Downsampling uses linear; integer output needs no additional pass.
         if (sx < 1.f || sy < 1.f)
             SDL_SetTextureScaleMode(source, SDL_ScaleModeLinear);
@@ -98,6 +116,17 @@ void Blitter::copy(SDL_Texture *source, int w, int h, const SDL_FRect &dest, int
                                                      SDL_TEXTUREACCESS_TARGET, tw, th);
                     width = tw;
                     height = th;
+                    lastSource = nullptr;
+                    lastVersion = ~uint64_t(0);
+                }
+                if (intermediate && version != ~uint64_t(0) && lastSource == source &&
+                    lastVersion == version) {
+                    SDL_BlendMode blend;
+                    SDL_GetTextureBlendMode(source, &blend);
+                    SDL_SetTextureBlendMode(intermediate, blend);
+                    SDL_SetTextureScaleMode(intermediate, SDL_ScaleModeLinear);
+                    SDL_RenderCopyF(renderer, intermediate, nullptr, &dest);
+                    return;
                 }
                 SDL_Texture *previous = SDL_GetRenderTarget(renderer);
                 SDL_Rect viewport{}, clip{};
@@ -119,6 +148,8 @@ void Blitter::copy(SDL_Texture *source, int w, int h, const SDL_FRect &dest, int
                     SDL_RenderSetViewport(renderer, &viewport);
                     SDL_RenderSetClipRect(renderer, clipped ? &clip : nullptr);
                     if (copied == 0) {
+                        lastSource = source;
+                        lastVersion = version;
                         SDL_SetTextureBlendMode(intermediate, blend);
                         SDL_SetTextureScaleMode(intermediate, SDL_ScaleModeLinear);
                         SDL_RenderCopyF(renderer, intermediate, nullptr, &dest);

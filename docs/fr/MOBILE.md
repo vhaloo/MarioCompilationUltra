@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.5.0 · Téléphones et tablettes Android
+# Mario Compilation Ultra 0.6.0 · Téléphones et tablettes Android
 
 [English](../en/MOBILE.md) · [Français](../fr/MOBILE.md) · [Español](../es/MOBILE.md) · [日本語](../ja/MOBILE.md) · [Deutsch](../de/MOBILE.md) · [Italiano](../it/MOBILE.md) · [Português](../pt/MOBILE.md) · [Русский](../ru/MOBILE.md) · [简体中文](../zh/MOBILE.md) · [한국어](../ko/MOBILE.md)
 
@@ -23,10 +23,12 @@ Les lettres correspondent à la SNES : B pour sauter et Y pour courir dans la pl
 
 Les états, le retour arrière et les sauvegardes de cartouche utilisent le stockage privé de l’application. Le passage en arrière-plan écrit la sauvegarde de cartouche et, si activé, l’état de reprise 0. Une mise à jour avec le même APK signé conserve la progression. Désinstaller ou effacer les données supprime les cartouches et sauvegardes locales. Les emplacements sont dans Sauvegardes et son.
 
+Vise 60 images/s en adaptant le détail du décor. Les pixels du jeu et les menus restent nets.
+
 Les essais sur émulateur téléphone et tablette sont distingués du matériel physique. Performances, manettes, encoches et fenêtres peuvent varier selon l’appareil. Les versions macOS restent expérimentales, sans essai sur Mac physique. Le rapport de validation précise la couverture réelle.
 
 ![Collection](screenshots/android-phone.png)
 
-[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
+[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
 
 [Adaptive Android apps](https://developer.android.com/develop/adaptive-apps/guides/support-different-display-sizes) · [16 KiB page sizes](https://developer.android.com/guide/practices/page-sizes)

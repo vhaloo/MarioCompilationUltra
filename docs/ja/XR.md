@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.5.0 · Quest VR / AR
+# Mario Compilation Ultra 0.6.0 · Quest VR / AR
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -23,6 +23,8 @@
 アーケードテーブルは読み込まれたエリアを表示します。物理挙動やオブジェクトの起動条件は元のままです。
 
 PCのクイック操作：右スティック押し込み中、十字左右でズーム、上で1:1、下で全体マップ、Aで固定、Bで元カメラ、Xで撮影、Yでプレイヤー追従。離すと通常のSNES操作に戻ります。F1またはメニューのYヘルプで図解を開きます。
+
+バージョン0.6はゲームと背景の解像度を自動調整し、60 fpsを目指します。メニューと操作は画面解像度を維持します。SNESの動作速度とセーブは保持され、可逆圧縮による巻き戻しでCPU負荷を減らします。Questは選択した更新頻度に合わせて立体描画の解像度を調整し、省電力CRTと基準CRTを選べます。速度は機器によって異なります。実機の電話、Mac、Questでの性能検証は未実施です。
 
 SNES: D-pad · A · B · X · Y · L · R · Start · Select
 

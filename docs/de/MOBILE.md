@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.5.0 · Android-Smartphones und -Tablets
+# Mario Compilation Ultra 0.6.0 · Android-Smartphones und -Tablets
 
 [English](../en/MOBILE.md) · [Français](../fr/MOBILE.md) · [Español](../es/MOBILE.md) · [日本語](../ja/MOBILE.md) · [Deutsch](../de/MOBILE.md) · [Italiano](../it/MOBILE.md) · [Português](../pt/MOBILE.md) · [Русский](../ru/MOBILE.md) · [简体中文](../zh/MOBILE.md) · [한국어](../ko/MOBILE.md)
 
@@ -23,10 +23,12 @@ Die Tasten entsprechen dem SNES: meist B zum Springen und Y zum Rennen. L, R, St
 
 Spielstände, Rückspulen und Batteriespeicher liegen im privaten App-Speicher. Beim Wechsel in den Hintergrund werden Batteriespeicher und, falls aktiviert, Fortsetzungsslot 0 geschrieben. Updates mit gleicher Signatur erhalten den Fortschritt. Deinstallation oder Datenlöschung entfernt lokale Module und Spielstände. Speicherplätze stehen unter Spielstände & Ton.
 
+Zielt durch angepasste Landschaftsdetails auf 60 fps. Spielpixel und Menüs bleiben scharf.
+
 Tests auf Smartphone-/Tablet-Emulatoren werden von echter Hardware getrennt ausgewiesen. Leistung, Controller, Aussparungen und Fensterverhalten können je nach Gerät abweichen. macOS bleibt experimentell und wurde nicht auf einem echten Mac getestet. Der Prüfbericht nennt den genauen Umfang.
 
 ![Sammlung](screenshots/android-phone.png)
 
-[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
+[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
 
 [Adaptive Android apps](https://developer.android.com/develop/adaptive-apps/guides/support-different-display-sizes) · [16 KiB page sizes](https://developer.android.com/guide/practices/page-sizes)

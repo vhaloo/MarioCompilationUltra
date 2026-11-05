@@ -1,9 +1,11 @@
 #include "core.h"
+#include "performance.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <iostream>
 #include <zlib.h>
+#include <lz4.h>
 namespace mcu {
 Core *Core::active = nullptr;
 bool Core::environment(unsigned cmd, void *d) {
@@ -78,6 +80,7 @@ void Core::video(const void *data, unsigned w, unsigned h, size_t pitch) {
     a.width = w;
     a.height = h;
     a.native.resize(size_t(w) * h);
+    const auto &colors = nativeColorTable(a.pixelFormat == RETRO_PIXEL_FORMAT_RGB565);
     for (unsigned y = 0; y < h; y++) {
         auto *p = (const uint8_t *)data + y * pitch;
         for (unsigned x = 0; x < w; x++) {
@@ -85,22 +88,7 @@ void Core::video(const void *data, unsigned w, unsigned h, size_t pitch) {
             if (a.pixelFormat == RETRO_PIXEL_FORMAT_XRGB8888)
                 c = ((const uint32_t *)p)[x] | 0xff000000;
             else {
-                uint16_t q = ((const uint16_t *)p)[x];
-                int r, g, b;
-                if (a.pixelFormat == RETRO_PIXEL_FORMAT_RGB565) {
-                    r = (q >> 11) & 31;
-                    g = (q >> 5) & 63;
-                    b = q & 31;
-                    g = (g * 255 + 31) / 63;
-                } else {
-                    r = (q >> 10) & 31;
-                    g = (q >> 5) & 31;
-                    b = q & 31;
-                    g = (g * 255 + 15) / 31;
-                }
-                r = (r * 255 + 15) / 31;
-                b = (b * 255 + 15) / 31;
-                c = 0xff000000 | (r << 16) | (g << 8) | b;
+                c = colors[((const uint16_t *)p)[x]];
             }
             a.native[y * w + x] = c;
         }
@@ -208,7 +196,8 @@ bool Core::loadBytes(Cartridge c, const std::string &id) {
     }
     loaded = true;
     frame = 0;
-    imageVersion = 0;
+    // Texture/scene caches use this version across cartridge changes too.
+    ++imageVersion;
     audioFrames = 0;
     width = 256;
     height = 224;
@@ -292,7 +281,7 @@ void Core::tick() {
     }
     RewindFrame previous;
     if (settings.rewind)
-        previous.state = state();
+        previous.state = state(true);
     frameAudio.clear();
     recordingAudio = settings.rewind;
     retro_run();
@@ -301,14 +290,14 @@ void Core::tick() {
     mcuObserveMemory(snapshot);
     if (!previous.state.empty()) {
         previous.pcm = frameAudio;
-        historyBytes +=
-            previous.state.size() + previous.pcm.size() * sizeof(int16_t) + sizeof(RewindFrame);
+        historyBytes += previous.state.capacity() + previous.pcm.capacity() * sizeof(int16_t) +
+                        sizeof(RewindFrame);
         history.push_back(std::move(previous));
         const size_t budgets[]{24, 96, 192};
         size_t budget = budgets[std::clamp(settings.rewindMemory, 0, 2)] * 1024 * 1024;
         while (!history.empty() && (history.size() > size_t(fps * 120) || historyBytes > budget)) {
-            historyBytes -= history.front().state.size() +
-                            history.front().pcm.size() * sizeof(int16_t) + sizeof(RewindFrame);
+            historyBytes -= history.front().state.capacity() +
+                            history.front().pcm.capacity() * sizeof(int16_t) + sizeof(RewindFrame);
             history.pop_front();
         }
     } else if (!settings.rewind && !history.empty()) {
@@ -336,17 +325,20 @@ void Core::clearAudio() {
     if (device)
         SDL_ClearQueuedAudio(device);
 }
-std::vector<uint8_t> Core::state() const {
+std::vector<uint8_t> Core::state(bool fastRewind) const {
     if (!loaded)
         return {};
     size_t engineSize = retro_serialize_size();
-    std::vector<uint8_t> raw(engineSize + native.size() * sizeof(uint32_t));
+    auto &raw = stateScratch;
+    raw.resize(engineSize + native.size() * sizeof(uint32_t));
     if (!retro_serialize(raw.data(), engineSize))
         return {};
     std::memcpy(raw.data() + engineSize, native.data(), native.size() * sizeof(uint32_t));
-    uLongf packedSize = compressBound(uLong(raw.size()));
-    std::vector<uint8_t> b(32 + packedSize);
-    std::memcpy(b.data(), "MCUFRM1", 8);
+    uLongf packedSize =
+        fastRewind ? LZ4_compressBound(int(raw.size())) : compressBound(uLong(raw.size()));
+    auto &b = packedScratch;
+    b.resize(32 + packedSize);
+    std::memcpy(b.data(), fastRewind ? "MCUFRM2" : "MCUFRM1", 8);
     auto put = [&](size_t p, uint32_t v) {
         for (int i = 0; i < 4; i++)
             b[p + i] = uint8_t(v >> (i * 8));
@@ -357,13 +349,26 @@ std::vector<uint8_t> Core::state() const {
     put(20, height);
     put(24, uint32_t(raw.size()));
     put(28, crc(raw));
-    if (compress2(b.data() + 32, &packedSize, raw.data(), uLong(raw.size()), Z_BEST_SPEED) != Z_OK)
+    if (fastRewind) {
+        int size = LZ4_compress_default(reinterpret_cast<const char *>(raw.data()),
+                                        reinterpret_cast<char *>(b.data() + 32), int(raw.size()),
+                                        int(packedSize));
+        if (size <= 0)
+            return {};
+        packedSize = size;
+    } else if (compress2(b.data() + 32, &packedSize, raw.data(), uLong(raw.size()), Z_BEST_SPEED) !=
+               Z_OK)
         return {};
-    b.resize(32 + packedSize);
-    return b;
+    // A resized vector keeps its worst-case capacity. Retaining that allocation
+    // in every history entry would turn a nominal 24 MiB budget into hundreds
+    // of MiB. Reuse the large staging area, then store only the packed bytes.
+    return std::vector<uint8_t>(b.begin(), b.begin() + 32 + packedSize);
 }
 bool Core::restore(const std::vector<uint8_t> &b, bool flushAudio) {
-    if (!loaded || b.size() < 32 || std::memcmp(b.data(), "MCUFRM1", 8))
+    if (!loaded || b.size() < 32 || b.size() > 4 * 1024 * 1024)
+        return false;
+    bool fastRewind = std::memcmp(b.data(), "MCUFRM2", 8) == 0;
+    if (!fastRewind && std::memcmp(b.data(), "MCUFRM1", 8))
         return false;
     size_t engineSize = u32(b, 8), count = u32(b, 12), w = u32(b, 16), h = u32(b, 20),
            bytes = u32(b, 24);
@@ -372,8 +377,16 @@ bool Core::restore(const std::vector<uint8_t> &b, bool flushAudio) {
         return false;
     std::vector<uint8_t> raw(bytes);
     uLongf size = uLongf(bytes);
-    if (uncompress(raw.data(), &size, b.data() + 32, uLong(b.size() - 32)) != Z_OK ||
-        size != bytes || crc(raw) != u32(b, 28) || !retro_unserialize(raw.data(), engineSize))
+    if (fastRewind) {
+        int decoded = LZ4_decompress_safe(reinterpret_cast<const char *>(b.data() + 32),
+                                          reinterpret_cast<char *>(raw.data()), int(b.size() - 32),
+                                          int(bytes));
+        if (decoded != int(bytes))
+            return false;
+    } else if (uncompress(raw.data(), &size, b.data() + 32, uLong(b.size() - 32)) != Z_OK ||
+               size != bytes)
+        return false;
+    if (crc(raw) != u32(b, 28) || !retro_unserialize(raw.data(), engineSize))
         return false;
     width = unsigned(w);
     height = unsigned(h);
@@ -457,7 +470,8 @@ bool Core::rewind() {
         return false;
     auto entry = std::move(history.back());
     history.pop_back();
-    historyBytes -= entry.state.size() + entry.pcm.size() * sizeof(int16_t) + sizeof(RewindFrame);
+    historyBytes -=
+        entry.state.capacity() + entry.pcm.capacity() * sizeof(int16_t) + sizeof(RewindFrame);
     if (!restore(entry.state, false))
         return false;
     if (device && !headless && !settings.mute && settings.rewindAudio && !entry.pcm.empty()) {

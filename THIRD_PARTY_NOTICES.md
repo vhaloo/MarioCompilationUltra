@@ -7,6 +7,7 @@
 | SDL2 2.32.10 | [libsdl-org/SDL](https://github.com/libsdl-org/SDL), pinned source archive | zlib; `licenses/SDL2.txt` |
 | Dear ImGui 1.91.9b | [ocornut/imgui](https://github.com/ocornut/imgui) | MIT; `licenses/ImGui.txt` |
 | zlib 1.3.1 | [madler/zlib](https://github.com/madler/zlib) | zlib; `licenses/zlib.txt` |
+| LZ4 1.10.0 library | [lz4/lz4](https://github.com/lz4/lz4/tree/v1.10.0/lib), pinned `lz4.c` / `lz4.h` | BSD-2-Clause; `licenses/LZ4.txt`; used only for transient rewind history |
 | OpenXR SDK / Android loader 1.1.65 | [KhronosGroup/OpenXR-SDK](https://github.com/KhronosGroup/OpenXR-SDK), Android AAR | Apache-2.0; `licenses/OpenXR-loader-Apache-2.0.txt` |
 | Shared spatial presentation and interaction modules | [vhaloo/SonicCompilationUltra](https://github.com/vhaloo/SonicCompilationUltra), frozen development reference 2026-10-29 | MIT, Valentin Wittwe; adapted to SNES and Mario's frontend |
 | Android NDK C++ runtime / toolchain dependencies | NDK 29.0.14206865 | Notices supplied in `licenses/Android-NDK-NOTICE.txt` and `licenses/Android-NDK-TOOLCHAIN-NOTICE.txt` |
@@ -22,6 +23,10 @@ SDL2's archive has SHA-256
 The ten-language font is reproducible with `tools/build_font.py`. Its upstream
 SHA-256 is `68a3fc98800b2a27b371f2fb79991daf3633bd89309d4ffaa6946fd587f375b5`.
 FontTools is a build-time utility; it is not required by the application.
+
+Unmodified LZ4 1.10.0 library source is included. SHA-256: `lz4.c`
+`9396f7de527bc8435de9c7569fb7998e56545a84b4f3c2d808c0235c01774539`,
+`lz4.h` `26b82efc53d1570f3b54eef02e9c4764c1ad374ff03cac04e2ced5ea4d4c552f`.
 
 The Quest package contains native Android runtime libraries and the OpenXR
 loader. The normal desktop executable does not depend on OpenXR or Android.

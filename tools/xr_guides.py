@@ -63,10 +63,11 @@ def main():
     for i,language in enumerate(languages):
         code=language['code'];catalog=json.loads((ROOT/f'assets/locales/{code}.json').read_text(encoding='utf8'))
         tr=lambda key:catalog[key]
-        content=[tr('questintro'),TEXT['status'][i],TEXT['install'][i],TEXT['placement'][i],tr('remote_hand_hint'),TEXT['room'][i],tr('Preview help detail'),tr('questpinballnote'),TEXT['desktop'][i]]
+        perf=json.loads((ROOT/'docs/guide-texts.json').read_text(encoding='utf8'))['performance_note'][i]
+        content=[tr('questintro'),TEXT['status'][i],TEXT['install'][i],TEXT['placement'][i],tr('remote_hand_hint'),TEXT['room'][i],tr('Preview help detail'),tr('questpinballnote'),TEXT['desktop'][i],perf]
         modes=['questscreenmode','questwallfit','questmural','questflooratlas','questpinball','questcrtroom','questcurved']
         nav=' · '.join(f"[{lang['name']}](../{lang['code']}/XR.md)" for lang in languages)
-        md=f'# Mario Compilation Ultra 0.5.0 · {tr("questtab")}\n\n{nav}\n\n![{tr("questtab")}](xr.svg)\n\n'
+        md=f'# Mario Compilation Ultra 0.6.0 · {tr("questtab")}\n\n{nav}\n\n![{tr("questtab")}](xr.svg)\n\n'
         md+='\n\n'.join(content[:3])+'\n\n'
         md+=' | '.join(tr(k) for k in modes)+'\n\n'+'\n\n'.join(content[3:])+'\n\n'
         md+='SNES: D-pad · A · B · X · Y · L · R · Start · Select\n\n'
@@ -77,7 +78,7 @@ def main():
         folder=ROOT/'docs'/code;folder.mkdir(exist_ok=True)
         outputs[folder/'XR.md']=md
         h=escape
-        html=f'<!doctype html><html lang="{code}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mario Compilation Ultra XR</title><style>@font-face{{font-family:MCU;src:url(../../assets/Interface.otf)}}body{{background:#0d1620;color:#e5eff2;font:18px/1.7 MCU,system-ui;max-width:1050px;margin:auto;padding:28px}}a{{color:#98d6d8}}img{{width:100%;height:auto}}li{{padding:8px}}p{{padding:12px;background:#162434;border-radius:8px}}h1{{color:#abd8bc}}</style><h1>Mario Compilation Ultra 0.5.0 · {h(tr("questtab"))}</h1><a href="guide.html">{h(tr("About"))}</a><img src="xr.svg" alt="{h(tr("questtab"))}">'
+        html=f'<!doctype html><html lang="{code}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mario Compilation Ultra XR</title><style>@font-face{{font-family:MCU;src:url(../../assets/Interface.otf)}}body{{background:#0d1620;color:#e5eff2;font:18px/1.7 MCU,system-ui;max-width:1050px;margin:auto;padding:28px}}a{{color:#98d6d8}}img{{width:100%;height:auto}}li{{padding:8px}}p{{padding:12px;background:#162434;border-radius:8px}}h1{{color:#abd8bc}}</style><h1>Mario Compilation Ultra 0.6.0 · {h(tr("questtab"))}</h1><a href="guide.html">{h(tr("About"))}</a><img src="xr.svg" alt="{h(tr("questtab"))}">'
         html+=''.join(f'<p>{h(p)}</p>' for p in content[:3])+'<ul>'+''.join(f'<li>{h(tr(k))}</li>' for k in modes)+'</ul>'+''.join(f'<p>{h(p)}</p>' for p in content[3:])
         html+='<p>SNES: D-pad · A · B · X · Y · L · R · Start · Select</p><p>'+h(mapping)+'</p><a href="../PARITY.md">Parity</a> · <a href="../TEST_REPORT.md">Validation</a></html>\n'
         outputs[folder/'xr.html']=html

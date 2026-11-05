@@ -16,12 +16,16 @@ class Blitter {
     SDL_Renderer *renderer;
     SDL_Texture *intermediate = nullptr;
     int width = 0, height = 0;
+    SDL_Texture *lastSource = nullptr;
+    uint64_t lastVersion = ~uint64_t(0);
 
   public:
     explicit Blitter(SDL_Renderer *r) : renderer(r) {}
     ~Blitter();
+    void invalidate(bool recreate = false);
     // 0: nearest, 1: crisp (integer nearest, then fractional linear), 2: linear.
     // A bounded target is optional; unsupported renderers fall back to nearest.
-    void copy(SDL_Texture *, int sourceWidth, int sourceHeight, const SDL_FRect &, int filter);
+    void copy(SDL_Texture *, int sourceWidth, int sourceHeight, const SDL_FRect &, int filter,
+              uint64_t sourceVersion = ~uint64_t(0));
 };
 } // namespace mcu

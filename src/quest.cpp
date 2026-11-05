@@ -122,8 +122,9 @@ struct QuestPresentation::Impl {
     float displayHz = 0, requestedHz = 0;
     int lastRefresh = -999, lastMode = -1, mapWidth = 0, mapHeight = 0, mapStage = -1,
         mapFamily = -1, lastMenuDistance = 0;
-    int adaptiveStep = 0, overBudget = 0, underBudget = 0;
-    uint64_t permissionPoll = 0, ratePoll = 0, adaptiveAt = 0, renderStarted = 0;
+    uint64_t permissionPoll = 0, ratePoll = 0, renderStarted = 0;
+    GpuTimer gpuTimer;
+    XrTime previousPredictedTime = 0;
     std::string mapGame;
     XrUuidEXT selectedUuid{};
     XrPosef wallBase = identity(), wallOffset = identity(), menuPanel = identity(),
@@ -625,13 +626,14 @@ struct QuestPresentation::Impl {
         int resolution = std::clamp(app.settings.questResolution, 0, 3);
         if (menu)
             return resolution == 0 ? sizes[0] : sizes[1];
+        float scale = app.resolutionScale();
         if (!fixed())
-            return sizes[resolution];
+            return {std::max(320, int(sizes[resolution].first * scale)),
+                    std::max(180, int(sizes[resolution].second * scale))};
         int detail = std::clamp(app.settings.questWallDetail, 0, 2);
         int capWidth = detail == 0 ? 4096 : detail == 1 ? 8192 : 12288;
         double pixels = detail == 0 ? 1048576. : detail == 1 ? 2097152. : 4194304.;
-        int step = app.settings.questAdaptive ? adaptiveStep : 0;
-        pixels /= double(1 << step);
+        pixels *= scale * scale;
         float ratio = aspect();
         int w = std::min(capWidth, int(std::sqrt(pixels * ratio)));
         int h = std::max(1, int(std::lround(w / ratio)));
@@ -1173,6 +1175,7 @@ struct QuestPresentation::Impl {
         check(xrBeginFrame(session, &begin), "Begin headset frame");
         frameOpen = true;
         renderStarted = SDL_GetPerformanceCounter();
+        gpuTimer.begin();
         if (!app.menu)
             menuRecovery = false;
         wasDrawn = false;
@@ -1357,7 +1360,7 @@ struct QuestPresentation::Impl {
                                  : worldPose();
             auto projection =
                 stage->render(local, frame.predictedDisplayTime, scenePose, app.settings, mode(),
-                              content, spatial, passthroughActive, capture);
+                              content, spatial, passthroughActive, capture, app.resolutionScale());
             if (projection) {
                 layers[layerCount++] =
                     reinterpret_cast<const XrCompositionLayerBaseHeader *>(projection);
@@ -1402,16 +1405,31 @@ struct QuestPresentation::Impl {
         end.environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
         end.layerCount = layerCount;
         end.layers = layers.data();
+        gpuTimer.end();
+        double workMs =
+            1000. * (SDL_GetPerformanceCounter() - renderStarted) / SDL_GetPerformanceFrequency();
+        app.framePressureMs = 0;
+        if (!gpuTimer.available() && previousPredictedTime &&
+            frame.predictedDisplayTime > previousPredictedTime)
+            app.framePressureMs =
+                missedFramePressure((frame.predictedDisplayTime - previousPredictedTime) * .000001,
+                                    frame.predictedDisplayPeriod * .000001);
+        previousPredictedTime = frame.predictedDisplayTime;
+        if (frame.shouldRender && haveHead && frame.predictedDisplayPeriod > 0)
+            app.finishFrame(workMs, gpuTimer.ms(), frame.predictedDisplayPeriod * .000001);
+        app.simulationWorkMs = 0;
         check(xrEndFrame(session, &end), "Submit headset frame");
         ++submittedFrames;
         auto now = SDL_GetTicks64();
         if ((layerCount && submittedFrames <= 3) || now - diagnosticAt >= 5000) {
             diagnosticAt = now;
             SDL_Log("MCU XR frame: submitted=%llu stereo=%llu layers=%u mode=%d menu=%d "
-                    "coreLoaded=%d coreFrame=%llu displayHz=%.0f verification=%d",
+                    "coreLoaded=%d coreFrame=%llu displayHz=%.0f verification=%d workMs=%.2f "
+                    "gpuMs=%.2f scale=%.3f",
                     (unsigned long long)submittedFrames, (unsigned long long)stage->frames(),
                     layerCount, mode(), app.menu, app.core.loaded,
-                    (unsigned long long)app.core.frame, displayHz, app.menuVerificationOnly);
+                    (unsigned long long)app.core.frame, displayHz, app.menuVerificationOnly, workMs,
+                    gpuTimer.ms(), app.resolutionScale());
             if (app.menuVerificationOnly)
                 SDL_Log("MCU XR tracking: headY=%.3f floorY=%.3f orientation=%.3f,%.3f,%.3f,%.3f",
                         head.position.y, floorY, head.orientation.x, head.orientation.y,
@@ -1420,26 +1438,9 @@ struct QuestPresentation::Impl {
         frameOpen = false;
         restoreGraphics.restore();
         SDL_SetRenderTarget(app.renderer, nullptr);
-        if (wasDrawn && activeScreen == &gameScreen && fixed() && !app.menu &&
-            app.settings.questAdaptive && frame.predictedDisplayPeriod > 0) {
-            double seconds =
-                double(SDL_GetPerformanceCounter() - renderStarted) / SDL_GetPerformanceFrequency();
-            double period = frame.predictedDisplayPeriod * 1e-9;
-            overBudget = seconds > period * .85 ? overBudget + 1 : std::max(0, overBudget - 1);
-            underBudget = seconds < period * .45 ? underBudget + 1 : 0;
-            auto now = SDL_GetTicks64();
-            if (now - adaptiveAt > 3000 && overBudget > 45 && adaptiveStep < 2) {
-                ++adaptiveStep;
-                adaptiveAt = now;
-                overBudget = underBudget = 0;
-            } else if (now - adaptiveAt > 10000 && underBudget > 600 && adaptiveStep > 0) {
-                --adaptiveStep;
-                adaptiveAt = now;
-                overBudget = underBudget = 0;
-            }
-        }
     }
     ~Impl() {
+        gpuTimer.release();
         if (frameOpen && session) {
             XrFrameEndInfo end{XR_TYPE_FRAME_END_INFO};
             end.displayTime = frame.predictedDisplayTime;
@@ -1771,6 +1772,7 @@ void QuestPresentation::options() {
     ImGui::EndDisabled();
     changed |= a.choice("questresolution", s.questResolution,
                         {"questeco", "questbalanced", "questsharp", "questwide"});
+    changed |= a.choice("VR shader", s.questShader, {"Efficient CRT", "Reference CRT"});
     changed |= a.tick("questtouch", s.questTouch);
     changed |= a.slider("questhaptics", s.questHaptics, 0, 100, "%d%%");
     changed |= a.tick("questflip", s.questFlip);

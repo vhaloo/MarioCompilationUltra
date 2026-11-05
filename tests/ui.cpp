@@ -87,15 +87,82 @@ int main() {
             rom[0x7fd7] = 5;
             rom[0x7fd9] = 1;
             rom[0x7fdc] = rom[0x7fdd] = 255;
+            rom[0x7ffc] = 0;
             rom[0x7ffd] = 0x80;
             // The recognised title exercises the importer; every program byte and pixel is
             // original.
             atomicWrite(data / "original-fixture.sfc", rom);
             a.library.import(data / "original-fixture.sfc");
             check(a.play("world", false), "Import and play original synthetic cartridge");
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 30; i++)
                 step();
             check(!a.menu && a.core.frame > 0, "Gameplay advances after the menu closes");
+            check(!a.core.native.empty() &&
+                      (a.core.native[a.core.native.size() / 2] & 0xffffff) == 0xff0000,
+                  "Synthetic native frame is visible after its startup blanking interval");
+            a.settings.view = 0;
+            a.settings.background = 3;
+            for (int i = 0; i < 300; ++i)
+                a.finishFrame(30, 0, 1000. / 60.);
+            check(a.resolutionScale() == .375f,
+                  "Sustained work pressure adapts the real presenter");
+            a.render();
+            a.capture(data / "adaptive-original.bmp");
+            auto *adapted = SDL_LoadBMP((data / "adaptive-original.bmp").u8string().c_str());
+            check(adapted && adapted->w == 1280 && adapted->h == 720,
+                  "Adaptive game buffers retain full output and UI dimensions");
+            auto *rgba = SDL_ConvertSurfaceFormat(adapted, SDL_PIXELFORMAT_ARGB8888, 0);
+            auto sample = [&](int x, int y) {
+                return reinterpret_cast<uint32_t *>(static_cast<uint8_t *>(rgba->pixels) +
+                                                    y * rgba->pitch)[x];
+            };
+            check((sample(640, 360) & 0xffffff) == 0xff0000 &&
+                      (sample(10, 360) & 0xffffff) != 0xff0000,
+                  "Reduced game target preserves the native image and centered letterbox bounds");
+            SDL_FreeSurface(rgba);
+            SDL_FreeSurface(adapted);
+            a.scriptCommand("metrics", "reset");
+            a.render();
+            a.render();
+            a.report(data / "scene-cache.json", 0);
+            auto bytes = readFile(data / "scene-cache.json");
+            std::string cached(bytes.begin(), bytes.end());
+            check(cached.find("\"scene_reuses\":2") != std::string::npos &&
+                      cached.find("\"texture_uploads\":0") != std::string::npos,
+                  "Unchanged frames reuse scene pixels and avoid duplicate texture uploads");
+            for (Uint32 type :
+                 {Uint32(SDL_RENDER_TARGETS_RESET), Uint32(SDL_RENDER_DEVICE_RESET)}) {
+                SDL_Event reset{};
+                reset.type = type;
+                SDL_PushEvent(&reset);
+                a.events();
+                a.render();
+                auto file = data / ("graphics-reset-" + std::to_string(type) + ".bmp");
+                a.capture(file);
+                auto *image = SDL_LoadBMP(file.u8string().c_str());
+                auto *pixels =
+                    image ? SDL_ConvertSurfaceFormat(image, SDL_PIXELFORMAT_ARGB8888, 0) : nullptr;
+                check(pixels &&
+                          (reinterpret_cast<uint32_t *>(static_cast<uint8_t *>(pixels->pixels) +
+                                                        360 * pixels->pitch)[640] &
+                           0xffffff) == 0xff0000,
+                      "Renderer reset invalidates caches and restores the native image");
+                SDL_FreeSurface(pixels);
+                SDL_FreeSurface(image);
+                a.menu = true;
+                a.render();
+                check(ImGui::GetDrawData()->TotalVtxCount > 100,
+                      "Renderer recovery also restores the options font and controls");
+                a.menu = false;
+            }
+            a.settings.adaptiveResolution = false;
+            a.finishFrame(30, 0, 1000. / 60.);
+            a.render();
+            check(a.resolutionScale() == 1.f,
+                  "Manual quality restores full resolution immediately");
+            a.settings.adaptiveResolution = true;
+            a.settings.view = 1;
+            a.settings.background = 0;
             press(SDL_CONTROLLER_BUTTON_BACK);
             uint64_t before = a.core.frame;
             for (int i = 0; i < 10; i++)

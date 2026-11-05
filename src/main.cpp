@@ -1,6 +1,7 @@
 #include "app.h"
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -27,7 +28,7 @@ int run(const std::vector<std::string> &args) {
                 << "\n--import FILE_OR_FOLDER --game "
                    "smb1|smb2|smb3|world|yoshi|lostlevels\n--data-dir FOLDER --size WIDTHxHEIGHT "
                    "--headless --software --frames COUNT\n--script FILE --capture BMP --report "
-                   "JSON --dump RAMFILE --menu --no-resume --benchmark\n"
+                   "JSON --dump RAMFILE --menu --no-resume --benchmark --realtime\n"
                    "--locale en|fr|es|ja|de|it|pt|ru|zh|ko\n"
                    "--mobile-preview --mobile-density NUMBER --mobile-insets "
                    "LEFT,TOP,RIGHT,BOTTOM\n"
@@ -58,6 +59,8 @@ int run(const std::vector<std::string> &args) {
             o.headless = true, o.realtime = false;
         else if (a == "--benchmark")
             o.realtime = false;
+        else if (a == "--realtime")
+            o.realtime = true;
         else if (a == "--software")
             o.software = true;
         else if (a == "--script")
@@ -200,8 +203,6 @@ int run(const std::vector<std::string> &args) {
                 fs::u8path(o.liveReport),
                 std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count());
         }
-        if (o.realtime)
-            SDL_Delay(1);
     }
 #ifndef MCU_QUEST
     app.render();

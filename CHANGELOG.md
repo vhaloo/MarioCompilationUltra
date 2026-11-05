@@ -1,5 +1,14 @@
 # Releases
 
+## 0.6.0 — 2026-11-05
+
+- Automatic game/scenery resolution for five desktop/mobile views and seven Quest modes; CPU, optional asynchronous GPU timing and missed-deadline fallback, with slow quality recovery.
+- Present-aligned 60 Hz scheduling without vsync; high-resolution Windows waits and the original SNES clock. Quest retains its selected headset Hz.
+- Exact linear-time ambient blur, native color tables, reusable scene/upload/crisp caches, incremental tile graphics and bounded sampling in every expanded view.
+- Fast lossless LZ4 rewind, compact history allocations and capacity-based memory accounting. Disk save/resume format remains compatible.
+- Efficient CRT scan/shading with reference option, adaptive stereo subimages, renderer-reset recovery and cached Android/Quest asset preparation.
+- Ten-language controls/guides and renewed ROM-free screenshots; expanded public tests and six-game private regression/performance evidence. Physical mobile, Mac and Quest performance limits remain explicit.
+
 ## 0.5.0 — 2026-10-29
 
 - Add a normal Android phone/tablet APK with ARM64, ARMv7 and x86_64 libraries,

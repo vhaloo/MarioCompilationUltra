@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.5.0 · Androidスマートフォンとタブレット
+# Mario Compilation Ultra 0.6.0 · Androidスマートフォンとタブレット
 
 [English](../en/MOBILE.md) · [Français](../fr/MOBILE.md) · [Español](../es/MOBILE.md) · [日本語](../ja/MOBILE.md) · [Deutsch](../de/MOBILE.md) · [Italiano](../it/MOBILE.md) · [Português](../pt/MOBILE.md) · [Русский](../ru/MOBILE.md) · [简体中文](../zh/MOBILE.md) · [한국어](../ko/MOBILE.md)
 
@@ -23,10 +23,12 @@
 
 ステート・巻き戻し・バッテリーセーブはアプリ専用領域に保存します。バックグラウンド移行時にバッテリーを保存し、有効なら再開用スロット0も保存します。同じ署名のAPKで更新すれば進行を保持します。アンインストールやデータ消去でカートリッジとセーブは削除されます。保存操作はセーブ・サウンド項目にあります。
 
+背景の細部を調整して60 fpsを目指します。ゲームの画素とメニューの鮮明さを保ちます。
+
 スマートフォン・タブレットのエミュレーター検証と実機検証は区別しています。性能、ゲームパッド、切り欠き、ウィンドウ動作は機種により異なります。macOS版は実機Macでは未検証の実験版です。詳しい範囲は検証レポートを確認してください。
 
 ![コレクション](screenshots/android-phone.png)
 
-[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.5.0/MarioCompilationUltra-0.5.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
+[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
 
 [Adaptive Android apps](https://developer.android.com/develop/adaptive-apps/guides/support-different-display-sizes) · [16 KiB page sizes](https://developer.android.com/guide/practices/page-sizes)

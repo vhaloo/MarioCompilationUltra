@@ -12,8 +12,8 @@ android {
         applicationId 'com.vhaloo.mariocompilationultra.android'
         minSdk 26
         targetSdk 36
-        versionCode 500
-        versionName '0.5.0'
+        versionCode 600
+        versionName '0.6.0'
         ndk { abiFilters 'arm64-v8a','armeabi-v7a','x86_64' }
         externalNativeBuild { cmake {
             arguments '-DBUILD_TESTING=OFF','-DANDROID_STL=c++_shared','-DMCU_BUILD_QUEST=OFF',
@@ -37,6 +37,7 @@ android {
     buildFeatures { buildConfig false }
     sourceSets { main {
         java.srcDir new File(sdl,'android-project/app/src/main/java')
+        java.srcDir '../common/src/main/java'
         res.srcDir '../app/src/main/res'
         assets.srcDir generatedAssets.get().asFile
         if(privateAssets)assets.srcDir file(privateAssets)

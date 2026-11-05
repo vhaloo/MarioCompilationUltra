@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.5.0 · Quest RV / RA
+# Mario Compilation Ultra 0.6.0 · Quest RV / RA
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -23,6 +23,8 @@ As imagens fantasma são informativas e não simulam objetos distantes. Posiçõ
 A mesa arcade mostra a área carregada. A física e a ativação dos objetos continuam originais.
 
 Atalhos no PC: segure o clique do analógico direito; direcional esquerda/direita muda zoom, cima 1:1, baixo mapa inteiro, A trava, B câmera original, X captura, Y segue o jogador. Soltar restaura os controles SNES. F1 ou ajuda Y no menu abre a explicação ilustrada.
+
+A versão 0.6 busca 60 fps com resolução automática do jogo e do cenário; menus e controles mantêm a resolução da tela. O ritmo SNES e os saves são preservados; o retrocesso rápido sem perdas reduz o trabalho da CPU. Quest ajusta a resolução estéreo à frequência escolhida e oferece CRT eficiente ou de referência. A velocidade depende do aparelho. Falta medir telefones, Mac e Quest físicos.
 
 SNES: D-pad · A · B · X · Y · L · R · Start · Select
 

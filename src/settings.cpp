@@ -45,6 +45,7 @@ void Settings::clamp() {
     padLayout = std::clamp(padLayout, 0, 2);
     menuDeadzone = std::clamp(menuDeadzone, 5, 60);
     questMode = std::clamp(questMode, 0, 6);
+    questShader = std::clamp(questShader, 0, 1);
     questScale = std::clamp(questScale, 5, 20000);
     questWidth = std::clamp(questWidth, 80, 800);
     questDistance = std::clamp(questDistance, 80, 600);
@@ -146,6 +147,7 @@ void Settings::load(Library &l) {
         B(touchLeftHanded);
         B(touchHaptics);
         B(mobileKeepAwake);
+        B(adaptiveResolution);
         I(panoramaHeight);
         I(rewindMemory);
         I(rewindButton);
@@ -170,6 +172,7 @@ void Settings::load(Library &l) {
         I(questAnchor);
         I(questHaptics);
         I(questMode);
+        I(questShader);
         I(questWallHeight);
         I(questWallGap);
         I(questRefresh);
@@ -270,6 +273,7 @@ void Settings::save(const Library &l) const {
     S(touchLeftHanded);
     S(touchHaptics);
     S(mobileKeepAwake);
+    S(adaptiveResolution);
     S(panoramaHeight);
     S(rewindMemory);
     S(rewindButton);
@@ -294,6 +298,7 @@ void Settings::save(const Library &l) const {
     S(questAnchor);
     S(questHaptics);
     S(questMode);
+    S(questShader);
     S(questWallHeight);
     S(questWallGap);
     S(questRefresh);

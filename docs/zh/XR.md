@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.5.0 · Quest VR / AR
+# Mario Compilation Ultra 0.6.0 · Quest VR / AR
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -23,6 +23,8 @@
 街机桌显示已加载区域。保留原作物理和物体激活规则。
 
 电脑快捷控制：按住右摇杆，方向键左右缩放，上为 1:1，下为全图，A 固定，B 原镜头，X 截图，Y 跟随玩家。松开后恢复 SNES 操作。F1 或菜单 Y 帮助打开图解。
+
+0.6版通过自动调整游戏和场景分辨率，以60帧/秒为目标；菜单和操作保持屏幕分辨率。保留SNES时钟和存档，无损快速倒带降低CPU负担。Quest根据所选刷新率调整立体分辨率，并提供高效CRT和参考CRT。持续速度取决于设备。尚未在实体手机、Mac和Quest上测量性能。
 
 SNES: D-pad · A · B · X · Y · L · R · Start · Select
 

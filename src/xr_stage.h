@@ -41,11 +41,10 @@ class XrStageRenderer {
     XrStageRenderer();
     ~XrStageRenderer();
     void initialise(XrInstance instance, XrSystemId system, XrSession session, int detail = 1);
-    const XrCompositionLayerProjection *render(XrSpace space, XrTime time, XrPosef origin,
-                                               const Settings &settings, int mode,
-                                               const XrStageContent &content,
-                                               const XrSpatialControls &controls, bool passthrough,
-                                               const std::string &capture = {});
+    const XrCompositionLayerProjection *
+    render(XrSpace space, XrTime time, XrPosef origin, const Settings &settings, int mode,
+           const XrStageContent &content, const XrSpatialControls &controls, bool passthrough,
+           const std::string &capture = {}, float resolutionScale = 1.f);
     uint64_t frames() const;
 };
 } // namespace mcu

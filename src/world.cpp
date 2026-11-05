@@ -354,21 +354,39 @@ void World::prepareGraphics(const Core &c, const Scene &s) {
         return;
     graphicsVersion = c.imageVersion;
     auto &v = c.snapshot;
-    for (auto &tiles : decodedTiles)
-        tiles.clear();
-    completeBlocks.clear();
-    completeIndex.assign(65536, -1);
+    std::array<int, 10> key{{v.mode, v.brightness, v.layers[0].tiles, v.layers[1].tiles,
+                             v.layers[2].tiles, v.layers[3].tiles, int(c.cart.checksum), s.kind,
+                             s.stage, v.ram[0x70a]}};
+    bool sameGraphics = graphicsCached && key == graphicsKey && v.palette == graphicsPalette &&
+                        graphicsVram.size() == v.vram.size() &&
+                        std::equal(graphicsVram.begin(), graphicsVram.end(), v.vram.begin());
+    if (!sameGraphics) {
+        for (auto &tiles : decodedTiles)
+            tiles.clear();
+        completeBlocks.clear();
+        completeIndex.assign(65536, -1);
+        graphicsVram.assign(v.vram.begin(), v.vram.end());
+        graphicsPalette = v.palette;
+        graphicsKey = key;
+        graphicsCached = true;
+    }
     sceneryW = int(c.width);
     sceneryH = int(c.height);
-    scenery.resize(size_t(sceneryW) * sceneryH);
-    for (int y = 0; y < sceneryH; y++) {
-        int dx = v.rasterValid ? v.raster[y][1].x : v.layers[1].x;
-        int dy = v.rasterValid ? v.raster[y][1].y : v.layers[1].y + 1;
-        for (int x = 0; x < sceneryW; x++)
-            scenery[y * sceneryW + x] = bgPixel(v, 1, x + dx, y + dy, true);
-    }
+    if (needScenery) {
+        scenery.resize(size_t(sceneryW) * sceneryH);
+        for (int y = 0; y < sceneryH; y++) {
+            int dx = v.rasterValid ? v.raster[y][1].x : v.layers[1].x;
+            int dy = v.rasterValid ? v.raster[y][1].y : v.layers[1].y + 1;
+            for (int x = 0; x < sceneryW; x++)
+                scenery[y * sceneryW + x] = bgPixel(v, 1, x + dx, y + dy, true);
+        }
+    } else
+        scenery.clear();
     if (!s.fullMap || s.kind != 4)
         return;
+    bool secondary = wholeLevel && complete.secondary;
+    bool reusable = sameGraphics && blockPixels.size() == 544 &&
+                    (secondary ? secondaryPixels.size() == 544 : secondaryPixels.empty());
     blockPixels.resize(544);
     blockAttributes.resize(544);
     if (wholeLevel && complete.secondary)
@@ -393,12 +411,18 @@ void World::prepareGraphics(const Core &c, const Scene &s) {
                       : -1;
         }
         size_t p = bank * 0x8000 + (ptr & 0x7fff);
+        std::array<uint16_t, 4> attributes{};
+        bool valid = ptr >= 0x8000 && p + 7 < c.cart.bytes.size();
         for (int q = 0; q < 4; ++q) {
             size_t a = p + size_t(q) * 2;
-            blockAttributes[id][q] = ptr >= 0x8000 && a + 1 < c.cart.bytes.size()
-                                         ? uint16_t(c.cart.bytes[a] | c.cart.bytes[a + 1] << 8)
-                                         : 0;
+            attributes[q] = ptr >= 0x8000 && a + 1 < c.cart.bytes.size()
+                                ? uint16_t(c.cart.bytes[a] | c.cart.bytes[a + 1] << 8)
+                                : 0;
         }
+        if (reusable && attributes == blockAttributes[id] && valid == blockValid[id])
+            continue;
+        blockAttributes[id] = attributes;
+        blockValid[id] = valid;
         for (int y = 0; y < 16; y++)
             for (int x = 0; x < 16; x++) {
                 int q = ((x & 8) ? 2 : 0) + ((y & 8) ? 1 : 0);
@@ -416,7 +440,7 @@ void World::prepareGraphics(const Core &c, const Scene &s) {
             }
     }
 }
-void World::compose(const Core &c, Settings &s, int dw, int dh) {
+void World::compose(const Core &c, Settings &s, int dw, int dh, float resolutionScale) {
     if (wholeLevel != (s.view == 4))
         graphicsVersion = ~uint64_t(0);
     wholeLevel = s.view == 4;
@@ -433,7 +457,14 @@ void World::compose(const Core &c, Settings &s, int dw, int dh) {
             scene.height = complete.y + complete.height;
         }
     }
-    prepareGraphics(c, scene);
+    bool sceneryRequested = scene.fullMap && s.view > 0 && s.view < 3;
+    if (needScenery != sceneryRequested)
+        graphicsVersion = ~uint64_t(0);
+    needScenery = sceneryRequested;
+    // Original framing still remembers observed terrain for later map views,
+    // but does not decode a complete Map16 set that cannot be displayed.
+    if (s.view != 0 || !scene.fullMap)
+        prepareGraphics(c, scene);
     remember(c, scene);
     if (scene.valid && !scene.fullMap) {
         scene.width = std::max(scene.width, maxX);
@@ -532,10 +563,15 @@ void World::compose(const Core &c, Settings &s, int dw, int dh) {
     canvas.height = std::clamp(std::min(h / divisor, int(std::ceil(canvas.worldHeight))), 1, 8192);
     if (uint64_t(canvas.width) * canvas.height > 32 * 1024 * 1024)
         canvas.height = 32 * 1024 * 1024 / canvas.width;
-    if (s.view >= 3) {
-        // An atlas is an overview. Bound its CPU sampling cost independently of
-        // an 8K desktop; the separate native inset keeps the original fine detail.
-        int budget = s.quality == 0 ? 512 * 1024 : s.quality == 1 ? 1024 * 1024 : 2 * 1024 * 1024;
+    {
+        // Every expanded view has a bounded sampling budget. The native frame
+        // is drawn separately at full source resolution by the presenter.
+        int maximum = s.quality == 0 ? 512 * 1024 : s.quality == 1 ? 1024 * 1024 : 2 * 1024 * 1024;
+        float scale =
+            std::isfinite(resolutionScale) ? std::clamp(resolutionScale, .375f, 1.f) : 1.f;
+        int budget = std::max(16384, int(maximum * scale * scale));
+        canvas.width = std::max(1, int(canvas.width * scale));
+        canvas.height = std::max(1, int(canvas.height * scale));
         double pixels = double(canvas.width) * canvas.height;
         if (pixels > budget) {
             double scale = std::sqrt(budget / pixels);
