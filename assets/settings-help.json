@@ -1,0 +1,596 @@
+{
+  "topics": [
+    {
+      "id": "Library",
+      "picture": "Library",
+      "text": {
+        "en": "Choose a local cartridge, start a game or open its guide. Public downloads never include the games or your saves.",
+        "fr": "Choisis une cartouche locale, lance un jeu ou ouvre son guide. Les téléchargements publics ne contiennent ni les jeux ni tes sauvegardes.",
+        "es": "Elige un cartucho local, inicia una partida o abre su guía. Las descargas públicas no incluyen juegos ni tus partidas guardadas.",
+        "ja": "ローカルのカートリッジを選び、ゲームを起動したりガイドを開いたりします。公開ダウンロードにゲームや個人のセーブデータは含まれません。",
+        "de": "Wähle ein lokales Modul, starte ein Spiel oder öffne seine Anleitung. Öffentliche Downloads enthalten weder Spiele noch persönliche Spielstände.",
+        "it": "Scegli una cartuccia locale, avvia un gioco o apri la guida. I download pubblici non includono giochi né salvataggi personali.",
+        "pt": "Escolha um cartucho local, inicie um jogo ou abra o guia. Os downloads públicos não incluem jogos nem seus dados salvos.",
+        "ru": "Выберите локальный картридж, запустите игру или откройте руководство. Публичные загрузки не содержат игр и ваших сохранений.",
+        "zh": "选择本地卡带，启动游戏或打开指南。公开下载不包含游戏或你的存档。",
+        "ko": "로컬 카트리지를 선택해 게임을 시작하거나 안내서를 여세요. 공개 다운로드에는 게임이나 개인 저장 데이터가 포함되지 않습니다."
+      }
+    },
+    {
+      "id": "View",
+      "picture": "View",
+      "text": {
+        "en": "Original keeps the console screen. Panorama extends it. Atlas fits available terrain; Full level map reads the entire loaded area where its decoder is supported, including unexplored terrain. Doors can load another area.",
+        "fr": "Original garde l’écran de la console. Panorama l’étend. L’atlas cadre le terrain disponible ; Carte entière lit toute la zone chargée lorsque son décodage est pris en charge, même inexplorée. Une porte peut changer de zone.",
+        "es": "Original conserva la pantalla de la consola y Panorama la amplía. Atlas encuadra el terreno disponible; Mapa completo lee toda el área cargada cuando su formato es compatible, incluso sin explorar. Una puerta puede cambiar de área.",
+        "ja": "オリジナルは元の画面、パノラマは拡張表示です。アトラスは利用できる地形、全体マップは対応する形式の読み込み済みエリア全体を未探索部分も含めて表示します。扉で別エリアに移る場合があります。",
+        "de": "Original zeigt den Konsolenbildschirm, Panorama erweitert ihn. Atlas umfasst verfügbares Gelände; die vollständige Karte liest bei unterstütztem Format das gesamte geladene Gebiet, auch unerforschte Stellen. Türen können das Gebiet wechseln.",
+        "it": "Originale mantiene lo schermo della console e Panorama lo estende. Atlante mostra il terreno disponibile; Mappa completa legge tutta l’area caricata quando il formato è supportato, anche inesplorata. Una porta può cambiare area.",
+        "pt": "Original mantém a tela do console e Panorama a amplia. Atlas enquadra o terreno disponível; Mapa completo lê toda a área carregada quando o formato é compatível, inclusive sem exploração. Uma porta pode mudar de área.",
+        "ru": "Оригинал сохраняет экран консоли, панорама расширяет его. Атлас охватывает доступный рельеф; полная карта при поддерживаемом формате читает всю загруженную область, включая неизученную. Дверь может загрузить другую область.",
+        "zh": "原始视图保留主机画面，全景视图将其扩展。地图集显示可用地形；完整地图在解码器支持时读取整个已加载区域，包括未探索部分。门可能切换区域。",
+        "ko": "원본 보기는 콘솔 화면을 유지하고 파노라마는 이를 확장합니다. 아틀라스는 사용 가능한 지형을, 전체 지도는 지원되는 형식의 로드 영역 전체를 미탐색 부분까지 보여 줍니다. 문을 지나면 영역이 바뀔 수 있습니다."
+      }
+    },
+    {
+      "id": "Camera",
+      "picture": "Camera",
+      "text": {
+        "en": "Choose what the view follows: the original camera, the player or a fixed position. This changes the view, without moving the character or activating distant enemies.",
+        "fr": "Choisis ce que suit la vue : caméra originale, personnage ou position fixe. Le cadrage change sans déplacer le personnage ni activer les ennemis éloignés.",
+        "es": "Elige si la vista sigue la cámara original, al personaje o una posición fija. Cambia el encuadre sin mover al personaje ni activar enemigos lejanos.",
+        "ja": "元のカメラ、プレイヤー、固定位置から追従方法を選びます。表示範囲だけを変え、キャラクターを移動させたり遠くの敵を起動したりはしません。",
+        "de": "Die Ansicht folgt der Originalkamera, der Spielfigur oder einer festen Position. Das verändert nur den Ausschnitt, bewegt keine Figur und aktiviert keine entfernten Gegner.",
+        "it": "Scegli se seguire la telecamera originale, il personaggio o una posizione fissa. Cambia l’inquadratura senza muovere il personaggio né attivare nemici lontani.",
+        "pt": "Escolha se a vista segue a câmera original, o personagem ou uma posição fixa. Isso muda o enquadramento, sem mover o personagem nem ativar inimigos distantes.",
+        "ru": "Вид может следовать за исходной камерой, персонажем или оставаться неподвижным. Меняется только обзор: персонаж не перемещается, далёкие враги не активируются.",
+        "zh": "选择跟随原始镜头、角色或固定位置。这只改变取景，不会移动角色，也不会激活远处敌人。",
+        "ko": "원래 카메라, 플레이어 또는 고정 위치 중에서 선택합니다. 화면 범위만 바뀌며 캐릭터를 이동시키거나 멀리 있는 적을 활성화하지 않습니다."
+      }
+    },
+    {
+      "id": "Zoom",
+      "picture": "Zoom",
+      "text": {
+        "en": "Zoom changes how much of the area fits on screen. On a watch, 0% shows the complete loaded map and 100% reaches the original camera. Game speed stays unchanged.",
+        "fr": "Le zoom change la portion visible. Sur montre, 0 % montre toute la carte chargée et 100 % rejoint la caméra originale. La vitesse du jeu reste identique.",
+        "es": "El zoom cambia cuánto terreno cabe en pantalla. En el reloj, 0% muestra toda el área cargada y 100% llega a la cámara original. No cambia la velocidad del juego.",
+        "ja": "ズームで表示範囲を変えます。時計では0%で読み込み済みマップ全体、100%で元のカメラ画面になります。ゲーム速度は変わりません。",
+        "de": "Zoom bestimmt den sichtbaren Bereich. Auf der Uhr zeigt 0% die gesamte geladene Karte, 100% die Originalkamera. Die Spielgeschwindigkeit bleibt gleich.",
+        "it": "Lo zoom regola quanto terreno è visibile. Sull’orologio, 0% mostra tutta l’area caricata e 100% raggiunge la telecamera originale. La velocità del gioco resta invariata.",
+        "pt": "O zoom muda quanto terreno cabe na tela. No relógio, 0% mostra toda a área carregada e 100% chega à câmera original. A velocidade do jogo não muda.",
+        "ru": "Масштаб определяет видимую область. На часах 0% показывает всю загруженную карту, а 100% — исходную камеру. Скорость игры не меняется.",
+        "zh": "缩放决定屏幕可见范围。在手表上，0%显示整个已加载地图，100%回到原始镜头。游戏速度保持不变。",
+        "ko": "확대율은 화면에 보이는 범위를 정합니다. 시계에서는 0%가 로드된 지도 전체, 100%가 원래 카메라 화면입니다. 게임 속도는 바뀌지 않습니다."
+      }
+    },
+    {
+      "id": "Lens",
+      "picture": "Lens",
+      "text": {
+        "en": "On a round watch, the lens bends the whole game rectangle into a circle. Source edges remain visible. Controls and text stay flat; switch it off for an undistorted rectangle.",
+        "fr": "Sur une montre ronde, la lentille déforme tout le rectangle du jeu en cercle. Les bords restent visibles. Commandes et textes restent plats ; désactive-la pour un rectangle sans déformation.",
+        "es": "En un reloj redondo, la lente convierte todo el rectángulo del juego en un círculo sin perder sus bordes. Los controles y textos siguen planos. Desactívala para ver un rectángulo sin deformación.",
+        "ja": "丸い時計ではゲーム画面全体を円形に曲げ、元画像の端も残します。操作ボタンと文字は変形しません。無効にすると歪みのない長方形で表示します。",
+        "de": "Auf runden Uhren biegt die Linse das gesamte Spielrechteck zum Kreis, ohne Quellränder abzuschneiden. Bedienelemente und Text bleiben eben. Ausgeschaltet erscheint ein unverzerrtes Rechteck.",
+        "it": "Su un orologio rotondo, la lente piega l’intero rettangolo del gioco in un cerchio, mantenendo i bordi. Comandi e testo restano piani. Disattivala per un rettangolo senza deformazioni.",
+        "pt": "Em relógios redondos, a lente curva o retângulo inteiro do jogo para um círculo sem cortar suas bordas. Controles e textos ficam planos. Desative para um retângulo sem distorção.",
+        "ru": "На круглых часах линза преобразует весь прямоугольник игры в круг, сохраняя края изображения. Кнопки и текст не искажаются. Отключите её для обычного прямоугольника.",
+        "zh": "在圆形手表上，镜头将整个游戏矩形弯曲成圆形，同时保留图像边缘。按钮和文字保持平直。关闭后显示无变形矩形。",
+        "ko": "원형 시계에서는 렌즈가 게임 화면 전체를 원으로 휘게 하면서 이미지 가장자리를 보존합니다. 버튼과 글자는 변형하지 않습니다. 끄면 왜곡 없는 직사각형으로 표시합니다."
+      }
+    },
+    {
+      "id": "Crown",
+      "picture": "Zoom",
+      "text": {
+        "en": "A detected crown or rotating bezel controls zoom during play and scrolls menus. Sensitivity changes each turn’s effect; Reverse swaps directions. Touch zoom works without a crown.",
+        "fr": "La couronne ou lunette détectée règle le zoom en partie et fait défiler les menus. La sensibilité règle l’amplitude ; Inverser échange les sens. Le zoom tactile fonctionne sans couronne.",
+        "es": "La corona o bisel detectado controla el zoom al jugar y desplaza los menús. Sensibilidad ajusta el efecto de cada giro; Invertir cambia el sentido. El zoom táctil funciona sin corona.",
+        "ja": "検出したリューズや回転ベゼルで、プレイ中はズーム、メニューではスクロールできます。感度で回転量の効果、反転で方向を変えます。タッチでもズームできます。",
+        "de": "Eine erkannte Krone oder Drehlünette zoomt im Spiel und scrollt durch Menüs. Empfindlichkeit bestimmt die Wirkung jeder Drehung, Umkehren vertauscht die Richtung. Touch-Zoom funktioniert auch ohne Krone.",
+        "it": "La corona o ghiera rilevata controlla lo zoom in gioco e scorre i menu. Sensibilità regola l’effetto di ogni rotazione; Inverti cambia il verso. Lo zoom tattile funziona anche senza corona.",
+        "pt": "A coroa ou aro giratório detectado ajusta o zoom no jogo e rola os menus. Sensibilidade muda o efeito de cada giro; Inverter troca o sentido. O zoom por toque funciona sem coroa.",
+        "ru": "Обнаруженная коронка или вращающийся безель управляет масштабом в игре и прокруткой меню. Чувствительность меняет шаг вращения, инверсия — направление. Сенсорный масштаб работает и без коронки.",
+        "zh": "检测到的表冠或旋转表圈可在游戏中控制缩放，在菜单中滚动。灵敏度决定每次旋转幅度，反转可交换方向。没有表冠也能触控缩放。",
+        "ko": "감지된 크라운이나 회전 베젤은 게임에서 확대를, 메뉴에서 스크롤을 조절합니다. 감도는 회전량의 효과를, 반전은 방향을 바꿉니다. 크라운 없이 터치로도 확대할 수 있습니다."
+      }
+    },
+    {
+      "id": "Filter",
+      "picture": "Filter",
+      "text": {
+        "en": "Nearest preserves hard pixel edges. Crisp keeps them sharp at uneven sizes. Smooth softens enlargement. The source image and collision rules remain unchanged.",
+        "fr": "Pixels proches conserve les contours bruts. Net les garde précis aux tailles non entières. Doux adoucit l’agrandissement. L’image source et les collisions restent identiques.",
+        "es": "Píxeles cercanos mantiene bordes duros. Nítido conserva la claridad a escalas no enteras. Suave suaviza la ampliación. No cambia la imagen fuente ni las colisiones.",
+        "ja": "最近傍はピクセルの輪郭を保ち、くっきりは整数倍以外でも鮮明に表示します。なめらかは拡大を柔らかくします。元画像や当たり判定は変わりません。",
+        "de": "Nächste Pixel erhält harte Kanten. Scharf bleibt auch bei ungeraden Größen deutlich. Weich glättet Vergrößerungen. Quellbild und Kollisionen bleiben unverändert.",
+        "it": "Pixel vicini mantiene i bordi netti. Nitido conserva la chiarezza a dimensioni non intere. Morbido attenua l’ingrandimento. Immagine originale e collisioni restano invariate.",
+        "pt": "Pixels próximos mantém bordas duras. Nítido preserva a clareza em tamanhos não inteiros. Suave ameniza a ampliação. Imagem original e colisões não mudam.",
+        "ru": "Ближайшие пиксели сохраняют жёсткие края. Чёткий фильтр улучшает нецелый масштаб, мягкий сглаживает увеличение. Исходное изображение и столкновения не меняются.",
+        "zh": "最近邻保留硬像素边缘，清晰滤镜适合非整数缩放，平滑滤镜柔化放大图像。原始画面和碰撞规则不变。",
+        "ko": "최근접은 또렷한 픽셀 경계를 유지합니다. 선명 필터는 정수 배율이 아닐 때도 또렷하며, 부드러움은 확대를 완화합니다. 원본 이미지와 충돌 규칙은 바뀌지 않습니다."
+      }
+    },
+    {
+      "id": "Aspect",
+      "picture": "Display",
+      "text": {
+        "en": "Square pixels use the source pixel shape; TV 4:3 reproduces a television-shaped picture. Pixel world keeps square pixels and whole-pixel zoom.",
+        "fr": "Pixels carrés respecte la forme des pixels source ; TV 4:3 donne les proportions d’un téléviseur. Monde pixel conserve des pixels carrés et un zoom entier.",
+        "es": "Píxeles cuadrados conserva la forma original de cada píxel; TV 4:3 reproduce las proporciones de un televisor. Mundo píxel mantiene píxeles cuadrados y zoom entero.",
+        "ja": "正方形ピクセルは元のピクセル形状、TV 4:3はテレビの比率です。ピクセルワールドでは正方形ピクセルと整数倍ズームを使います。",
+        "de": "Quadratische Pixel erhalten die ursprüngliche Pixelform; TV 4:3 bildet ein Fernsehbild nach. Pixelwelt verwendet quadratische Pixel und ganzzahligen Zoom.",
+        "it": "Pixel quadrati conserva la forma dei pixel originali; TV 4:3 riproduce le proporzioni di un televisore. Mondo pixel usa pixel quadrati e zoom intero.",
+        "pt": "Pixels quadrados mantém o formato dos pixels originais; TV 4:3 reproduz as proporções de uma televisão. Mundo pixel usa pixels quadrados e zoom inteiro.",
+        "ru": "Квадратные пиксели сохраняют исходную форму пикселей; ТВ 4:3 воспроизводит пропорции телевизора. Пиксельный мир использует квадратные пиксели и целочисленный масштаб.",
+        "zh": "方形像素使用原始像素形状，电视4:3模拟电视画面比例。像素世界始终使用方形像素和整数缩放。",
+        "ko": "정사각 픽셀은 원본 픽셀 모양을 사용하며 TV 4:3은 텔레비전 비율을 재현합니다. 픽셀 월드는 정사각 픽셀과 정수 배율을 유지합니다."
+      }
+    },
+    {
+      "id": "Quality",
+      "picture": "Quality",
+      "text": {
+        "en": "Automatic quality starts at the chosen ceiling, reduces scene sampling and decorative update rates under sustained load, then restores them slowly. Native game pixels, menus and physics are preserved.",
+        "fr": "La qualité automatique part du plafond choisi, réduit l’échantillonnage et la cadence des effets décoratifs en charge durable, puis les rétablit lentement. Pixels natifs, menus et physique sont préservés.",
+        "es": "La calidad automática parte del límite elegido, reduce el muestreo y la frecuencia de efectos decorativos ante carga sostenida y los recupera lentamente. Conserva píxeles nativos, menús y física.",
+        "ja": "自動画質は選択した上限から始め、負荷が続くと描画解像度や装飾の更新頻度を下げ、余裕が戻るとゆっくり回復します。元のゲーム画素、メニュー、物理演算は保ちます。",
+        "de": "Automatische Qualität beginnt am gewählten Maximum, senkt bei anhaltender Last Abtastung und Aktualisierungsrate dekorativer Effekte und erhöht sie langsam wieder. Native Spielpixel, Menüs und Physik bleiben erhalten.",
+        "it": "La qualità automatica parte dal limite scelto, riduce campionamento e frequenza degli effetti decorativi sotto carico prolungato, poi li ripristina lentamente. Pixel nativi, menu e fisica restano intatti.",
+        "pt": "A qualidade automática parte do limite escolhido, reduz amostragem e frequência de efeitos decorativos sob carga contínua e recupera tudo lentamente. Pixels nativos, menus e física são preservados.",
+        "ru": "Автоматическое качество начинает с выбранного предела, при длительной нагрузке снижает детализацию и частоту обновления декора, затем медленно восстанавливает их. Исходные пиксели, меню и физика сохраняются.",
+        "zh": "自动画质从所选上限开始，在持续高负载时降低场景采样和装饰更新频率，再缓慢恢复。原生游戏像素、菜单和物理规则保持不变。",
+        "ko": "자동 화질은 선택한 상한에서 시작합니다. 부하가 지속되면 장면 샘플링과 장식 갱신 빈도를 낮추고 천천히 복구합니다. 원본 게임 픽셀, 메뉴, 물리는 유지합니다."
+      }
+    },
+    {
+      "id": "Headroom",
+      "picture": "Quality",
+      "text": {
+        "en": "Reserve keeps part of each frame budget free for unexpected work. A larger reserve favors smoothness. Extra smooth uses 40%; Quest reserves at least 35%. Quality can recover when there is room.",
+        "fr": "La réserve garde une part du temps de chaque image pour les imprévus. Une réserve plus grande favorise la fluidité. Très fluide utilise 40 % ; Quest garde au moins 35 %. La qualité remonte quand la marge le permet.",
+        "es": "La reserva deja tiempo libre para trabajo inesperado. Una reserva mayor favorece la fluidez. Extra fluido usa 40%; Quest reserva al menos 35%. La calidad se recupera cuando hay margen.",
+        "ja": "予備時間は各フレームに余裕を残します。大きいほど滑らかさを優先します。滑らかさ優先は40%、Questは最低35%を目標にします。余裕が続けば画質を戻します。",
+        "de": "Reserve lässt Zeit für unerwartete Arbeit frei. Mehr Reserve begünstigt flüssige Ausgabe. Extra flüssig nutzt 40%, Quest mindestens 35%. Bei dauerhaftem Spielraum steigt die Qualität wieder.",
+        "it": "La riserva lascia tempo per il lavoro imprevisto. Una riserva maggiore favorisce la fluidità. Molto fluido usa il 40%; Quest almeno il 35%. La qualità risale quando c’è margine.",
+        "pt": "A reserva deixa tempo livre para tarefas inesperadas. Uma reserva maior favorece a fluidez. Extra fluido usa 40%; Quest mantém pelo menos 35%. A qualidade sobe quando há margem.",
+        "ru": "Резерв оставляет время на непредвиденную работу. Больший резерв улучшает плавность. Режим повышенной плавности использует 40%, Quest — не менее 35%. При устойчивом запасе качество восстанавливается.",
+        "zh": "性能余量为每帧保留处理意外工作的时间。余量越大越重视流畅。超流畅使用40%，Quest至少保留35%。持续有余量时画质会恢复。",
+        "ko": "예비 시간은 예상하지 못한 작업을 위해 프레임마다 여유를 남깁니다. 높을수록 부드러움을 우선합니다. 매우 부드러움은 40%, Quest는 최소 35%를 목표로 합니다. 여유가 지속되면 화질을 복구합니다."
+      }
+    },
+    {
+      "id": "Thermal",
+      "picture": "Quality",
+      "text": {
+        "en": "Android’s local heat status can lower decorative detail before overheating grows. No temperature permission or network is needed. The operating system still controls real clocks and refresh rate.",
+        "fr": "L’état thermique local d’Android peut réduire les détails décoratifs avant que la chauffe augmente. Aucune permission ni connexion n’est nécessaire. Le système contrôle toujours les fréquences réelles.",
+        "es": "El estado térmico local de Android puede reducir detalles decorativos antes de que aumente el calor. No requiere permisos ni red. El sistema sigue controlando frecuencias reales y refresco.",
+        "ja": "Androidの端末内の発熱状態に応じて装飾を軽くします。温度の権限や通信は不要です。実際の動作クロックや画面更新頻度はOSが管理します。",
+        "de": "Androids lokaler Wärmestatus kann dekorative Details bei zunehmender Hitze begrenzen. Dafür sind weder zusätzliche Rechte noch Netzwerk nötig. Das System bestimmt weiterhin reale Taktraten und Bildfrequenz.",
+        "it": "Lo stato termico locale di Android può ridurre i dettagli decorativi prima che il calore aumenti. Non richiede permessi né rete. Il sistema controlla comunque frequenze reali e aggiornamento.",
+        "pt": "O estado térmico local do Android pode reduzir detalhes decorativos antes que o calor aumente. Não precisa de permissão extra nem rede. O sistema controla frequências reais e atualização.",
+        "ru": "Локальное тепловое состояние Android позволяет снизить декоративные детали при нагреве. Дополнительные разрешения и сеть не нужны. Реальные частоты и обновление экрана по-прежнему определяет система.",
+        "zh": "Android的本地热状态可在温度进一步升高前降低装饰细节，无需额外权限或联网。实际时钟和刷新率仍由系统控制。",
+        "ko": "Android의 로컬 발열 상태에 따라 장식 세부를 낮출 수 있습니다. 추가 권한이나 네트워크는 필요 없습니다. 실제 동작 클록과 주사율은 운영체제가 제어합니다."
+      }
+    },
+    {
+      "id": "Refresh",
+      "picture": "Quality",
+      "text": {
+        "en": "Vsync follows the display to reduce tearing. The game keeps its original clock. Quest uses its selected headset rate; the performance reserve is measured against that rate.",
+        "fr": "La synchronisation suit l’écran pour limiter les déchirures. Le jeu garde son horloge originale. Quest utilise la fréquence choisie du casque ; la réserve est calculée à cette fréquence.",
+        "es": "La sincronización vertical sigue la pantalla para reducir cortes de imagen. El juego conserva su reloj. Quest usa la frecuencia elegida del visor; la reserva se calcula para esa frecuencia.",
+        "ja": "垂直同期は画面に合わせてティアリングを減らします。ゲームは元の時計で動きます。Questでは選択したヘッドセットの更新頻度を使い、それに対して余裕を確保します。",
+        "de": "Vsync folgt dem Bildschirm und vermindert Bildrisse. Das Spiel behält seinen eigenen Takt. Quest verwendet die gewählte Headset-Frequenz; die Reserve richtet sich nach ihr.",
+        "it": "La sincronizzazione segue lo schermo per ridurre le immagini spezzate. Il gioco conserva il proprio ritmo. Quest usa la frequenza scelta del visore; la riserva è calcolata su quella frequenza.",
+        "pt": "A sincronização acompanha a tela para reduzir rasgos na imagem. O jogo mantém seu próprio ritmo. Quest usa a frequência escolhida do headset; a reserva é calculada para ela.",
+        "ru": "Вертикальная синхронизация следует за экраном и уменьшает разрывы. Игра сохраняет исходный такт. Quest использует выбранную частоту гарнитуры; резерв рассчитывается относительно неё.",
+        "zh": "垂直同步跟随显示器以减少画面撕裂。游戏保留原始时钟。Quest使用选定的头显刷新率，并据此计算性能余量。",
+        "ko": "수직 동기화는 디스플레이에 맞춰 화면 찢어짐을 줄입니다. 게임은 원래 시간을 유지합니다. Quest는 선택한 헤드셋 주사율을 사용하고 이를 기준으로 여유를 계산합니다."
+      }
+    },
+    {
+      "id": "Shader",
+      "picture": "Crt",
+      "text": {
+        "en": "Efficient CRT keeps the retro look with cheaper calculations. Automatic starts efficient and permits the reference only after sustained measured GPU headroom. Reference forces the more expensive calculation.",
+        "fr": "CRT léger garde l’aspect rétro avec moins de calculs. Automatique commence léger et autorise la référence après une marge GPU mesurée durable. Référence impose le calcul plus coûteux.",
+        "es": "CRT eficiente conserva el aspecto retro con menos cálculo. Automático empieza eficiente y permite la referencia tras medir margen GPU sostenido. Referencia fuerza el cálculo más costoso.",
+        "ja": "軽量CRTは計算を減らしてレトロな外観を保ちます。自動は軽量から始め、GPUの余裕を長く確認してから基準版を許可します。基準版は重い計算を固定します。",
+        "de": "Effizienter CRT erhält den Retro-Look mit weniger Rechenarbeit. Automatisch startet effizient und erlaubt die Referenz erst nach dauerhaft gemessener GPU-Reserve. Referenz erzwingt die aufwendigere Berechnung.",
+        "it": "CRT efficiente conserva l’aspetto rétro con meno calcoli. Automatico parte leggero e consente il riferimento dopo un margine GPU misurato duraturo. Riferimento forza il calcolo più costoso.",
+        "pt": "CRT eficiente mantém o visual retrô com menos cálculos. Automático começa leve e permite a referência após medir folga GPU contínua. Referência força o cálculo mais caro.",
+        "ru": "Эффективный ЭЛТ сохраняет ретростиль с меньшим объёмом вычислений. Автоматический режим разрешает эталонный вариант только после устойчивого измеренного запаса GPU. Эталонный принудительно использует более тяжёлый расчёт.",
+        "zh": "高效CRT以较少计算保留复古外观。自动模式先用高效版，仅在测得持续GPU余量后允许参考版。参考模式固定使用更昂贵的计算。",
+        "ko": "효율적 CRT는 계산을 줄이면서 복고풍을 유지합니다. 자동은 효율적 방식으로 시작하고 GPU 여유가 지속적으로 측정된 뒤에만 기준 방식을 허용합니다. 기준 모드는 더 무거운 계산을 고정합니다."
+      }
+    },
+    {
+      "id": "Screen",
+      "picture": "Display",
+      "text": {
+        "en": "Select the window, display or fullscreen behavior. These options change where the picture appears, without changing the loaded level or its saves.",
+        "fr": "Choisis la fenêtre, l’écran ou le plein écran. Ces options changent l’emplacement de l’image, sans modifier le niveau chargé ni ses sauvegardes.",
+        "es": "Elige ventana, pantalla o modo de pantalla completa. Cambia dónde aparece la imagen sin modificar el nivel cargado ni sus partidas guardadas.",
+        "ja": "ウィンドウ、使用画面、全画面表示を選びます。表示場所だけが変わり、読み込み済みステージやセーブデータは変わりません。",
+        "de": "Wähle Fenster, Bildschirm und Vollbildverhalten. Diese Optionen ändern den Anzeigeort, nicht das geladene Gebiet oder die Spielstände.",
+        "it": "Scegli finestra, schermo e comportamento a schermo intero. Cambia dove appare l’immagine, senza modificare il livello caricato o i salvataggi.",
+        "pt": "Escolha janela, monitor ou tela cheia. Essas opções mudam onde a imagem aparece, sem alterar a área carregada nem seus dados salvos.",
+        "ru": "Выберите окно, дисплей и полноэкранный режим. Эти параметры меняют место показа, не затрагивая загруженный уровень и сохранения.",
+        "zh": "选择窗口、显示器或全屏行为。这些选项只改变画面显示位置，不改变已加载关卡或存档。",
+        "ko": "창, 디스플레이 또는 전체 화면 동작을 선택합니다. 이미지가 나타나는 위치만 바뀌며 로드된 단계나 저장 데이터에는 영향을 주지 않습니다."
+      }
+    },
+    {
+      "id": "Backdrop",
+      "picture": "Backdrop",
+      "text": {
+        "en": "The backdrop fills empty space around the game. Soft scenery uses sampled game colors; Midnight and Black are quieter choices. Blur and brightness affect this surround.",
+        "fr": "Le fond remplit l’espace autour du jeu. Paysage doux reprend ses couleurs ; Minuit et Noir donnent un cadre plus sobre. Flou et luminosité agissent sur ce fond.",
+        "es": "El fondo llena el espacio alrededor del juego. Paisaje suave usa sus colores; Medianoche y Negro son más discretos. Desenfoque y brillo afectan a este entorno.",
+        "ja": "背景はゲームの周囲の空間を埋めます。柔らかい風景はゲームの色を使い、ミッドナイトと黒は落ち着いた表示です。ぼかしと明るさは周囲にだけ作用します。",
+        "de": "Der Hintergrund füllt den Raum um das Spiel. Weiche Landschaft übernimmt dessen Farben; Mitternacht und Schwarz sind ruhiger. Unschärfe und Helligkeit betreffen diese Umgebung.",
+        "it": "Lo sfondo riempie lo spazio attorno al gioco. Paesaggio morbido riprende i suoi colori; Mezzanotte e Nero sono più sobri. Sfocatura e luminosità agiscono su questo contorno.",
+        "pt": "O fundo preenche o espaço ao redor do jogo. Cenário suave usa suas cores; Meia-noite e Preto são mais discretos. Desfoque e brilho afetam esse entorno.",
+        "ru": "Фон заполняет пространство вокруг игры. Мягкий пейзаж использует её цвета; полночь и чёрный выглядят спокойнее. Размытие и яркость действуют на это окружение.",
+        "zh": "背景填充游戏周围的空白。柔和风景采用游戏色彩，午夜和黑色更简洁。模糊与亮度影响这个外围背景。",
+        "ko": "배경은 게임 주변의 빈 공간을 채웁니다. 부드러운 풍경은 게임 색을 사용하고 미드나이트와 검정은 차분한 선택입니다. 흐림과 밝기는 이 주변에 적용됩니다."
+      }
+    },
+    {
+      "id": "Blur",
+      "picture": "Backdrop",
+      "text": {
+        "en": "Blur softens the surrounding scenery; brightness controls its light level. Neither changes the native game image. Automatic quality may refresh this decoration less often under load.",
+        "fr": "Le flou adoucit le paysage autour du jeu ; la luminosité règle sa clarté. L’image native reste intacte. En charge, la qualité automatique peut rafraîchir ce décor moins souvent.",
+        "es": "El desenfoque suaviza el paisaje exterior y el brillo ajusta su luz. Ninguno cambia la imagen nativa. La calidad automática puede actualizar esta decoración menos veces bajo carga.",
+        "ja": "ぼかしは周囲の風景を柔らかくし、明るさはその光量を変えます。元のゲーム画像は変わりません。高負荷時は装飾の更新頻度を下げることがあります。",
+        "de": "Unschärfe glättet die umgebende Landschaft, Helligkeit regelt ihr Licht. Das native Spielbild bleibt unverändert. Bei Last kann die Automatik diese Dekoration seltener aktualisieren.",
+        "it": "La sfocatura ammorbidisce il paesaggio circostante e la luminosità ne regola la luce. L’immagine nativa non cambia. Sotto carico, l’automatismo può aggiornare meno spesso questa decorazione.",
+        "pt": "O desfoque suaviza o cenário ao redor e o brilho ajusta sua luz. A imagem nativa não muda. Sob carga, a qualidade automática pode atualizar essa decoração com menor frequência.",
+        "ru": "Размытие смягчает окружающий пейзаж, яркость меняет его свет. Исходное изображение игры остаётся прежним. При нагрузке автоматический режим может реже обновлять этот декор.",
+        "zh": "模糊柔化周围风景，亮度控制其明暗，两者都不改变原生画面。负载较高时，自动画质可能降低装饰更新频率。",
+        "ko": "흐림은 주변 풍경을 부드럽게 하고 밝기는 그 빛을 조절합니다. 원래 게임 이미지는 바뀌지 않습니다. 부하가 높으면 자동 화질이 이 장식의 갱신 빈도를 낮출 수 있습니다."
+      }
+    },
+    {
+      "id": "Edges",
+      "picture": "Backdrop",
+      "text": {
+        "en": "Soft edges blend the expanded scene into the surround near the original camera. Turn them off for a harder seam. Full level maps retain their own complete framing.",
+        "fr": "Les raccords doux fondent l’extension dans le fond près de la caméra originale. Désactive-les pour une limite franche. La carte entière conserve son cadrage complet.",
+        "es": "Los bordes suaves funden la escena ampliada con el fondo cerca de la cámara original. Desactívalos para una unión más marcada. El mapa completo conserva su encuadre.",
+        "ja": "柔らかい境界は元のカメラ付近で拡張風景を背景になじませます。無効にすると境界が明確になります。全体マップの表示範囲は保たれます。",
+        "de": "Weiche Ränder blenden die Erweiterung nahe der Originalkamera in die Umgebung. Ausgeschaltet bleibt eine klare Kante. Vollständige Karten behalten ihren eigenen Ausschnitt.",
+        "it": "I bordi morbidi fondono l’estensione con lo sfondo vicino alla telecamera originale. Disattivali per un raccordo netto. Le mappe complete conservano la propria inquadratura.",
+        "pt": "Bordas suaves misturam a cena ampliada ao fundo perto da câmera original. Desative para uma junção mais marcada. Mapas completos mantêm seu enquadramento.",
+        "ru": "Мягкие края соединяют расширенный пейзаж с фоном возле исходной камеры. Отключение делает границу резкой. Полная карта сохраняет собственное кадрирование.",
+        "zh": "柔和边缘在原始镜头附近将扩展场景融入背景。关闭后接缝更清晰。完整地图保留独立取景范围。",
+        "ko": "부드러운 경계는 원래 카메라 근처에서 확장 풍경과 배경을 자연스럽게 잇습니다. 끄면 경계가 뚜렷해집니다. 전체 지도는 고유한 화면 범위를 유지합니다."
+      }
+    },
+    {
+      "id": "Locator",
+      "picture": "View",
+      "text": {
+        "en": "The locator marks the player; the guide outlines the original camera; the minimap shows its position in the area. A close-up keeps the native screen readable when the map is far away.",
+        "fr": "Le repère indique le personnage ; le guide encadre la caméra originale ; la minicarte situe cette caméra. La vue rapprochée garde l’écran natif lisible quand la carte est éloignée.",
+        "es": "El localizador señala al personaje; la guía marca la cámara original; el minimapa muestra dónde está. Un primer plano mantiene legible la pantalla nativa al alejar el mapa.",
+        "ja": "マーカーはプレイヤー、ガイド枠は元のカメラ、ミニマップはエリア内の位置を示します。クローズアップはマップを引いたときも元の画面を読みやすくします。",
+        "de": "Die Markierung zeigt die Spielfigur, der Rahmen die Originalkamera, die Minikarte ihre Lage im Gebiet. Eine Nahansicht hält den nativen Bildschirm beim Herauszoomen lesbar.",
+        "it": "L’indicatore mostra il personaggio, la guida delimita la telecamera e la minimappa ne mostra la posizione. Il primo piano mantiene leggibile lo schermo originale quando la mappa è lontana.",
+        "pt": "O localizador marca o personagem, a guia contorna a câmera original e o minimapa mostra sua posição. O close mantém a tela nativa legível quando o mapa está distante.",
+        "ru": "Метка указывает персонажа, рамка — исходную камеру, миникарта — её положение в области. Крупный план сохраняет читаемость исходного экрана при отдалении карты.",
+        "zh": "定位标记指出角色，参考框表示原始镜头，小地图显示其在区域中的位置。拉远地图时，近景保留原生屏幕的可读性。",
+        "ko": "위치 표시는 캐릭터, 안내 프레임은 원래 카메라, 미니맵은 영역 안의 위치를 나타냅니다. 지도를 멀리 볼 때도 근접 화면으로 원본을 읽을 수 있습니다."
+      }
+    },
+    {
+      "id": "Preview",
+      "picture": "View",
+      "text": {
+        "en": "Previews show verified placements or locally observed appearances. Faded objects and outlines are guides, not extra active enemies. Opacity and labels change their visibility.",
+        "fr": "Les aperçus montrent des placements vérifiés ou des apparences observées localement. Objets estompés et contours sont des guides, pas des ennemis actifs supplémentaires. Opacité et étiquettes règlent leur visibilité.",
+        "es": "Las vistas previas usan posiciones verificadas o apariencias observadas localmente. Objetos atenuados y contornos son guías, no enemigos adicionales activos. Opacidad y etiquetas ajustan su visibilidad.",
+        "ja": "プレビューは確認済み配置や端末内で観察した外観を示します。薄い物体や輪郭は案内であり、追加の敵を起動しません。不透明度やラベルで見やすさを調整します。",
+        "de": "Vorschauen zeigen geprüfte Platzierungen oder lokal beobachtetes Aussehen. Blasse Objekte und Umrisse sind Hinweise, keine zusätzlich aktiven Gegner. Deckkraft und Beschriftungen ändern ihre Sichtbarkeit.",
+        "it": "Le anteprime mostrano posizioni verificate o aspetti osservati localmente. Oggetti sbiaditi e contorni sono guide, non nemici attivi aggiuntivi. Opacità ed etichette ne regolano la visibilità.",
+        "pt": "As prévias mostram posições verificadas ou aparências observadas localmente. Objetos esmaecidos e contornos são guias, não inimigos ativos extras. Opacidade e rótulos ajustam sua visibilidade.",
+        "ru": "Предпросмотр показывает проверенные позиции или облик, наблюдавшийся локально. Бледные объекты и контуры — подсказки, а не дополнительные активные враги. Видимость меняют прозрачность и подписи.",
+        "zh": "预览显示已验证的位置或本地观察到的外观。淡化物体与轮廓只是提示，不是额外激活的敌人。透明度和标签调整其可见性。",
+        "ko": "미리 보기는 확인된 배치나 로컬에서 관찰한 모습을 보여 줍니다. 희미한 물체와 윤곽은 안내이며 추가로 활성화된 적이 아닙니다. 불투명도와 이름표로 가시성을 조절합니다."
+      }
+    },
+    {
+      "id": "Hints",
+      "picture": "Display",
+      "text": {
+        "en": "Choose the corner, size, opacity and duration of control reminders. Zero timeout keeps a reminder visible. These overlays do not change the game or its camera.",
+        "fr": "Choisis le coin, la taille, l’opacité et la durée des rappels. Un délai nul garde le rappel visible. Ces indications ne changent ni le jeu ni sa caméra.",
+        "es": "Elige esquina, tamaño, opacidad y duración de los recordatorios. Un tiempo cero los mantiene visibles. Estas indicaciones no cambian el juego ni su cámara.",
+        "ja": "操作ヒントの位置、サイズ、不透明度、表示時間を選びます。時間を0にすると常に表示します。ゲームやカメラ自体は変わりません。",
+        "de": "Bestimme Ecke, Größe, Deckkraft und Dauer der Bedienhinweise. Bei Zeitlimit null bleiben sie sichtbar. Diese Einblendungen ändern weder Spiel noch Kamera.",
+        "it": "Scegli angolo, dimensione, opacità e durata dei promemoria. Un tempo pari a zero li mantiene visibili. Queste indicazioni non cambiano gioco o telecamera.",
+        "pt": "Escolha canto, tamanho, opacidade e duração dos lembretes. Tempo zero mantém a indicação visível. Essas sobreposições não mudam o jogo nem a câmera.",
+        "ru": "Выберите угол, размер, прозрачность и время подсказок. Нулевое время оставляет подсказку на экране. Эти элементы не меняют игру или камеру.",
+        "zh": "选择操作提示的位置、大小、透明度和持续时间。超时为零时持续显示。这些叠加信息不改变游戏或镜头。",
+        "ko": "조작 힌트의 모서리, 크기, 불투명도, 표시 시간을 선택합니다. 시간을 0으로 하면 계속 표시됩니다. 게임이나 카메라는 바뀌지 않습니다."
+      }
+    },
+    {
+      "id": "Interface",
+      "picture": "Display",
+      "text": {
+        "en": "Adjust menu language, size or contrast for comfortable reading. The illustrated guides are available offline. Game rendering and cartridge language are independent.",
+        "fr": "Règle la langue, la taille ou le contraste des menus pour lire confortablement. Les guides illustrés sont disponibles hors ligne. Le rendu et la langue de la cartouche sont indépendants.",
+        "es": "Ajusta idioma, tamaño y contraste de los menús. Las guías ilustradas funcionan sin conexión. El renderizado y el idioma del cartucho son independientes.",
+        "ja": "メニューの言語、サイズ、コントラストを調整します。図解ガイドはオフラインで読めます。ゲームの描画やカートリッジの言語とは別の設定です。",
+        "de": "Passe Menüsprache, Größe und Kontrast zum angenehmen Lesen an. Illustrierte Anleitungen sind offline verfügbar. Spielgrafik und Modulsprache sind davon unabhängig.",
+        "it": "Regola lingua, dimensione e contrasto dei menu per leggere comodamente. Le guide illustrate funzionano offline. Grafica e lingua della cartuccia sono indipendenti.",
+        "pt": "Ajuste idioma, tamanho e contraste dos menus para ler com conforto. Os guias ilustrados funcionam offline. Renderização e idioma do cartucho são independentes.",
+        "ru": "Настройте язык, размер и контраст меню для удобного чтения. Иллюстрированные руководства доступны без сети. Отрисовка игры и язык картриджа от этого не зависят.",
+        "zh": "调整菜单语言、大小和对比度以方便阅读。图解指南可离线使用。游戏渲染与卡带语言互相独立。",
+        "ko": "메뉴 언어, 크기, 대비를 편하게 읽도록 조절합니다. 그림 안내서는 오프라인에서 볼 수 있습니다. 게임 렌더링과 카트리지 언어는 별개의 설정입니다."
+      }
+    },
+    {
+      "id": "Controls",
+      "picture": "Controls",
+      "text": {
+        "en": "Choose button mapping and stick dead zones. A larger dead zone ignores more small movement. Quick controls add camera shortcuts; normal game actions remain available.",
+        "fr": "Choisis la correspondance des boutons et les zones mortes. Une zone plus grande ignore davantage de petits mouvements. Les commandes rapides ajoutent des raccourcis caméra ; les actions normales restent disponibles.",
+        "es": "Elige la asignación de botones y las zonas muertas. Una zona mayor ignora más movimientos pequeños. Los controles rápidos añaden atajos de cámara y conservan las acciones normales.",
+        "ja": "ボタン配置とスティックのデッドゾーンを選びます。大きくすると小さな揺れを無視します。クイック操作はカメラのショートカットを追加し、通常のゲーム操作も保ちます。",
+        "de": "Wähle Tastenbelegung und Stick-Totzonen. Größere Totzonen ignorieren mehr kleine Bewegungen. Schnellsteuerung ergänzt Kamerakürzel; normale Spielaktionen bleiben verfügbar.",
+        "it": "Scegli assegnazione dei pulsanti e zone morte. Una zona maggiore ignora più piccoli movimenti. I comandi rapidi aggiungono scorciatoie della telecamera, mantenendo le azioni normali.",
+        "pt": "Escolha o mapeamento dos botões e as zonas mortas. Uma zona maior ignora mais movimentos pequenos. Controles rápidos acrescentam atalhos de câmera, mantendo as ações normais.",
+        "ru": "Выберите раскладку кнопок и мёртвые зоны стиков. Большая зона игнорирует мелкие движения. Быстрое управление добавляет команды камеры, сохраняя обычные игровые действия.",
+        "zh": "选择按钮映射与摇杆死区。更大的死区会忽略更多微小移动。快捷控制增加镜头捷径，同时保留正常游戏动作。",
+        "ko": "버튼 배치와 스틱 데드존을 선택합니다. 데드존이 크면 작은 움직임을 더 무시합니다. 빠른 조작은 카메라 단축키를 추가하면서 일반 게임 동작을 보존합니다."
+      }
+    },
+    {
+      "id": "Touch",
+      "picture": "Controls",
+      "text": {
+        "en": "Touch buttons support simultaneous fingers. Automatic shows them when no gamepad is attached. Placement, size, opacity and handedness change the controls, not game physics.",
+        "fr": "Les boutons tactiles acceptent plusieurs doigts simultanés. Automatique les montre sans manette. Disposition, taille, opacité et côté changent les commandes, pas la physique du jeu.",
+        "es": "Los botones táctiles admiten varios dedos. Automático los muestra cuando no hay mando. Posición, tamaño, opacidad y lateralidad cambian los controles, no la física.",
+        "ja": "タッチボタンは複数の指に対応します。自動ではゲームパッド未接続時に表示します。配置、サイズ、不透明度、左右設定は操作表示だけを変え、物理演算は変えません。",
+        "de": "Touch-Tasten unterstützen mehrere Finger gleichzeitig. Automatisch zeigt sie ohne verbundenes Gamepad. Position, Größe, Deckkraft und Händigkeit ändern die Bedienung, nicht die Spielphysik.",
+        "it": "I pulsanti tattili accettano più dita contemporaneamente. Automatico li mostra senza gamepad. Posizione, dimensione, opacità e mano preferita cambiano i comandi, non la fisica.",
+        "pt": "Os botões de toque aceitam vários dedos ao mesmo tempo. Automático os mostra sem gamepad conectado. Posição, tamanho, opacidade e lado mudam os controles, não a física.",
+        "ru": "Сенсорные кнопки поддерживают несколько пальцев одновременно. Автоматический режим показывает их без подключённого геймпада. Положение, размер, прозрачность и сторона меняют управление, но не физику.",
+        "zh": "触控按钮支持多指同时操作。自动模式在没有连接手柄时显示。布局、大小、透明度和惯用手改变控件，不改变游戏物理。",
+        "ko": "터치 버튼은 여러 손가락을 동시에 지원합니다. 자동은 게임패드가 없을 때 표시합니다. 배치, 크기, 불투명도, 좌우 설정은 조작 표시만 바꾸며 물리는 바꾸지 않습니다."
+      }
+    },
+    {
+      "id": "Rewind",
+      "picture": "Rewind",
+      "text": {
+        "en": "Hold the selected rewind control to move through recent exact snapshots. History depends on memory and the cartridge. Reverse audio and the indicator are optional; disk saves remain separate.",
+        "fr": "Maintiens la commande choisie pour remonter les états récents exacts. La durée dépend de la mémoire et de la cartouche. Son inversé et indicateur sont facultatifs ; les sauvegardes disque sont séparées.",
+        "es": "Mantén el control elegido para recorrer estados recientes exactos. La duración depende de la memoria y del cartucho. Sonido inverso e indicador son opcionales; los guardados en disco son independientes.",
+        "ja": "指定した操作を押し続けると直近の正確な状態を巻き戻します。長さはメモリとゲームによって変わります。逆再生音と表示は任意で、保存スロットは別です。",
+        "de": "Halte die gewählte Taste, um exakte jüngere Zustände zurückzuspulen. Die Dauer hängt von Speicher und Spiel ab. Rückwärtston und Anzeige sind optional; Speicherplätze bleiben getrennt.",
+        "it": "Tieni premuto il comando scelto per tornare attraverso stati recenti esatti. La durata dipende da memoria e cartuccia. Audio inverso e indicatore sono facoltativi; i salvataggi restano separati.",
+        "pt": "Segure o comando escolhido para voltar por estados recentes exatos. A duração depende da memória e do cartucho. Áudio reverso e indicador são opcionais; os salvamentos em disco são separados.",
+        "ru": "Удерживайте выбранную кнопку для перемотки по точным недавним состояниям. Длительность зависит от памяти и игры. Обратный звук и индикатор необязательны; сохранения на диске отделены.",
+        "zh": "按住选定的回退控制，可返回近期精确状态。历史长度取决于内存与卡带。倒放音频和指示器可选，磁盘存档独立保存。",
+        "ko": "선택한 되감기 조작을 누르고 있으면 최근의 정확한 상태를 거슬러 갑니다. 길이는 메모리와 게임에 따라 달라집니다. 역재생 소리와 표시는 선택 사항이며 디스크 저장은 별개입니다."
+      }
+    },
+    {
+      "id": "Save",
+      "picture": "Save",
+      "text": {
+        "en": "A save slot stores the current machine state. Load returns to it; automatic resume uses its own slot. Battery progress is separate. Replacing a slot requires confirmation.",
+        "fr": "Un emplacement conserve l’état actuel de la machine. Charger y revient ; la reprise automatique utilise son propre emplacement. La progression de cartouche est distincte. Remplacer un emplacement demande confirmation.",
+        "es": "Un espacio guarda el estado actual de la máquina. Cargar vuelve a él; la reanudación automática usa su propio espacio. El progreso de batería es distinto. Reemplazar requiere confirmación.",
+        "ja": "スロットは現在のマシン状態を保存します。ロードでその時点に戻り、自動再開は専用スロットを使います。カートリッジの進行状況とは別で、上書きには確認があります。",
+        "de": "Ein Speicherplatz enthält den aktuellen Maschinenzustand. Laden stellt ihn wieder her; automatische Fortsetzung hat einen eigenen Platz. Batterie-Fortschritt ist getrennt. Ersetzen verlangt eine Bestätigung.",
+        "it": "Uno slot conserva lo stato corrente della macchina. Caricare vi ritorna; la ripresa automatica usa uno slot proprio. Il progresso della cartuccia è separato. La sostituzione richiede conferma.",
+        "pt": "Um espaço guarda o estado atual da máquina. Carregar volta a ele; a retomada automática usa outro espaço. O progresso da bateria é separado. Substituir exige confirmação.",
+        "ru": "Слот хранит текущее состояние машины. Загрузка возвращает его; автовозобновление использует отдельный слот. Прогресс картриджа хранится отдельно. Для замены требуется подтверждение.",
+        "zh": "存档槽保存当前机器状态，读取可返回该状态，自动续玩使用独立槽位。卡带进度另行保存，覆盖槽位需要确认。",
+        "ko": "슬롯은 현재 기계 상태를 저장합니다. 불러오면 그 시점으로 돌아가며 자동 재개는 별도 슬롯을 사용합니다. 카트리지 진행 상황은 별개이고 덮어쓰기는 확인이 필요합니다."
+      }
+    },
+    {
+      "id": "Audio",
+      "picture": "Audio",
+      "text": {
+        "en": "Volume and mute control local playback. They do not change game speed or erase saves. Rewind audio is adjusted separately.",
+        "fr": "Volume et silence règlent la lecture locale. Ils ne changent pas la vitesse du jeu et n’effacent aucune sauvegarde. Le son du retour arrière se règle séparément.",
+        "es": "Volumen y silencio controlan la reproducción local. No cambian la velocidad ni borran partidas. El sonido del rebobinado se ajusta por separado.",
+        "ja": "音量とミュートは端末の再生音を変えます。ゲーム速度やセーブデータには影響しません。巻き戻し音は別に設定します。",
+        "de": "Lautstärke und Stummschaltung steuern die lokale Wiedergabe. Sie verändern weder Spieltempo noch Spielstände. Rückspulton wird separat eingestellt.",
+        "it": "Volume e silenzio regolano la riproduzione locale. Non cambiano velocità né cancellano salvataggi. L’audio del riavvolgimento si imposta separatamente.",
+        "pt": "Volume e silêncio controlam a reprodução local. Não mudam a velocidade nem apagam dados salvos. O áudio da volta no tempo é ajustado separadamente.",
+        "ru": "Громкость и отключение звука управляют локальным воспроизведением. Они не меняют скорость и не удаляют сохранения. Звук перемотки настраивается отдельно.",
+        "zh": "音量与静音控制本地播放，不改变游戏速度或删除存档。回退音频可单独设置。",
+        "ko": "음량과 음소거는 로컬 재생을 조절합니다. 게임 속도를 바꾸거나 저장 데이터를 지우지 않습니다. 되감기 소리는 별도로 설정합니다."
+      }
+    },
+    {
+      "id": "Pause",
+      "picture": "Save",
+      "text": {
+        "en": "Pause releases held controls. Focus and tracking options decide when play pauses automatically. Returning or resuming keeps the current game; quitting flushes battery progress.",
+        "fr": "La pause relâche les commandes maintenues. Les options de focus et de suivi règlent les pauses automatiques. Reprendre garde la partie ; quitter enregistre la progression de cartouche.",
+        "es": "La pausa libera los controles mantenidos. El foco y el seguimiento deciden cuándo se pausa automáticamente. Reanudar conserva la partida; salir guarda el progreso de batería.",
+        "ja": "一時停止で押し続けた入力を解除します。フォーカスと追跡の設定で自動停止を選べます。再開は現在のゲームを続け、終了時はカートリッジの進行状況を保存します。",
+        "de": "Pause löst gehaltene Eingaben. Fokus und Tracking bestimmen automatische Pausen. Fortsetzen behält das Spiel bei; Beenden schreibt den Batterie-Fortschritt.",
+        "it": "La pausa rilascia i comandi mantenuti. Focus e tracciamento regolano le pause automatiche. Riprendere conserva la partita; uscire salva il progresso della cartuccia.",
+        "pt": "A pausa solta os comandos mantidos. Foco e rastreamento definem pausas automáticas. Retomar mantém a partida; sair grava o progresso da bateria.",
+        "ru": "Пауза освобождает удерживаемые кнопки. Фокус и отслеживание определяют автоматические паузы. Возобновление продолжает игру, выход записывает прогресс картриджа.",
+        "zh": "暂停会释放按住的操作。焦点与追踪选项决定何时自动暂停。继续会保留当前游戏，退出会写入卡带进度。",
+        "ko": "일시 정지는 누르고 있던 입력을 해제합니다. 포커스와 추적 설정이 자동 정지 시점을 정합니다. 재개는 현재 게임을 이어가고 종료는 카트리지 진행 상황을 저장합니다."
+      }
+    },
+    {
+      "id": "XRMode",
+      "picture": "Placement",
+      "text": {
+        "en": "Choose a floating screen, wall, floor atlas, arcade table, CRT room or curved screen. The same game continues; each mode changes only its spatial presentation.",
+        "fr": "Choisis écran flottant, mur, atlas au sol, table arcade, pièce CRT ou écran courbe. La même partie continue ; seul son affichage dans l’espace change.",
+        "es": "Elige pantalla flotante, pared, atlas de suelo, mesa arcade, sala CRT o pantalla curva. La misma partida continúa; solo cambia su presentación espacial.",
+        "ja": "浮遊画面、壁、床のマップ、アーケード台、CRTルーム、曲面画面を選びます。同じゲームを続けたまま、空間内での見せ方だけが変わります。",
+        "de": "Wähle schwebenden Bildschirm, Wand, Bodenatlas, Arcade-Tisch, CRT-Raum oder gebogenen Bildschirm. Dasselbe Spiel läuft weiter; nur seine räumliche Darstellung ändert sich.",
+        "it": "Scegli schermo sospeso, parete, atlante a terra, tavolo arcade, stanza CRT o schermo curvo. La stessa partita continua; cambia solo la presentazione nello spazio.",
+        "pt": "Escolha tela flutuante, parede, atlas no chão, mesa arcade, sala CRT ou tela curva. A mesma partida continua; só a apresentação no espaço muda.",
+        "ru": "Выберите плавающий экран, стену, напольный атлас, аркадный стол, комнату ЭЛТ или изогнутый экран. Та же игра продолжается; меняется только её расположение в пространстве.",
+        "zh": "选择浮动屏幕、墙面、地板地图、街机桌、CRT房间或曲面屏。同一游戏继续运行，只改变空间呈现方式。",
+        "ko": "떠 있는 화면, 벽, 바닥 지도, 아케이드 테이블, CRT 방 또는 곡면 화면을 선택합니다. 같은 게임을 이어가며 공간 표현만 달라집니다."
+      }
+    },
+    {
+      "id": "XRPlacement",
+      "picture": "Placement",
+      "text": {
+        "en": "Size, distance, height, tilt and gap place the virtual object in your room. Values use the displayed units. Recenter brings it back into reach without restarting the game.",
+        "fr": "Taille, distance, hauteur, inclinaison et écart placent l’objet virtuel dans la pièce. Les valeurs utilisent les unités affichées. Recentrer le remet à portée sans relancer le jeu.",
+        "es": "Tamaño, distancia, altura, inclinación y separación colocan el objeto virtual en la sala. Usa las unidades indicadas. Recentrar lo devuelve a tu alcance sin reiniciar la partida.",
+        "ja": "サイズ、距離、高さ、傾き、間隔で仮想物体を配置します。表示された単位で調整してください。リセンターはゲームを再起動せずに手の届く位置へ戻します。",
+        "de": "Größe, Abstand, Höhe, Neigung und Lücke platzieren das virtuelle Objekt im Raum. Es gelten die angezeigten Einheiten. Zentrieren bringt es ohne Spielneustart wieder in Reichweite.",
+        "it": "Dimensione, distanza, altezza, inclinazione e spazio posizionano l’oggetto virtuale nella stanza. Usa le unità indicate. Ricentra lo riporta a portata senza riavviare il gioco.",
+        "pt": "Tamanho, distância, altura, inclinação e espaço posicionam o objeto virtual na sala. Use as unidades mostradas. Recentralizar o traz ao alcance sem reiniciar o jogo.",
+        "ru": "Размер, расстояние, высота, наклон и отступ размещают виртуальный объект в комнате. Используйте показанные единицы. Центрирование возвращает его в доступную зону без перезапуска игры.",
+        "zh": "大小、距离、高度、倾斜和间隙用于在房间中摆放虚拟物体，请按显示单位调整。重新居中可让物体回到可触及位置，无需重启游戏。",
+        "ko": "크기, 거리, 높이, 기울기, 간격으로 가상 물체를 방 안에 배치합니다. 표시된 단위를 사용하세요. 재중앙 정렬은 게임을 다시 시작하지 않고 손이 닿는 위치로 돌려놓습니다."
+      }
+    },
+    {
+      "id": "XRAnchor",
+      "picture": "Anchor",
+      "text": {
+        "en": "Automatic wall placement uses permitted scene data when available. A locked or saved placement keeps the chosen location. Tracking loss can pause play; manual placement remains available.",
+        "fr": "Le placement automatique utilise les données de scène autorisées si disponibles. Un placement verrouillé ou enregistré garde le lieu choisi. Une perte de suivi peut mettre en pause ; le placement manuel reste accessible.",
+        "es": "La pared automática usa datos de escena autorizados cuando existen. Bloquear o guardar conserva la posición elegida. Perder seguimiento puede pausar; siempre queda la colocación manual.",
+        "ja": "自動の壁配置は許可されたシーン情報を使います。固定や保存で選んだ場所を維持します。追跡を失うと一時停止でき、手動配置も使えます。",
+        "de": "Automatische Wandplatzierung nutzt freigegebene Raumdaten, sofern vorhanden. Sperren oder Speichern hält die Position fest. Trackingverlust kann pausieren; manuelle Platzierung bleibt möglich.",
+        "it": "La parete automatica usa i dati della scena autorizzati, se disponibili. Bloccare o salvare mantiene il luogo scelto. La perdita del tracciamento può mettere in pausa; il posizionamento manuale resta disponibile.",
+        "pt": "A parede automática usa dados de cena autorizados, quando disponíveis. Travar ou salvar mantém o local escolhido. Perda de rastreamento pode pausar; a posição manual continua disponível.",
+        "ru": "Автоматическая стена использует разрешённые данные комнаты, если они доступны. Фиксация и сохранение удерживают выбранное место. Потеря отслеживания может ставить игру на паузу; ручное размещение остаётся доступным.",
+        "zh": "自动墙面使用可用且已授权的场景数据。锁定或保存可保留所选位置，追踪丢失时可暂停游戏，手动摆放仍可使用。",
+        "ko": "자동 벽 배치는 허용된 장면 데이터가 있으면 사용합니다. 고정하거나 저장하면 선택한 위치를 유지합니다. 추적을 잃으면 일시 정지할 수 있으며 수동 배치도 사용할 수 있습니다."
+      }
+    },
+    {
+      "id": "XRControls",
+      "picture": "Controls",
+      "text": {
+        "en": "The virtual remote, hands and direct touch operate the same game controls. Size and hints affect their usability. Haptic strength changes feedback, without changing button timing.",
+        "fr": "Télécommande virtuelle, mains et toucher direct commandent le même jeu. Taille et rappels règlent leur confort. L’intensité haptique change le retour, sans modifier le moment des actions.",
+        "es": "El mando virtual, las manos y el toque directo manejan los mismos controles. Tamaño y pistas mejoran su uso. La fuerza háptica cambia la respuesta, no el momento de los botones.",
+        "ja": "仮想リモコン、手、直接タッチで同じゲーム操作を行えます。サイズやヒントで使いやすさを調整します。振動の強さは触覚だけを変え、入力タイミングは変えません。",
+        "de": "Virtuelle Fernbedienung, Hände und direkte Berührung bedienen dieselben Spielaktionen. Größe und Hinweise verbessern die Bedienbarkeit. Haptikstärke verändert die Rückmeldung, nicht den Eingabezeitpunkt.",
+        "it": "Telecomando virtuale, mani e tocco diretto usano gli stessi comandi. Dimensione e suggerimenti migliorano l’uso. La forza aptica cambia il feedback, non il momento degli input.",
+        "pt": "Controle virtual, mãos e toque direto usam as mesmas ações do jogo. Tamanho e dicas melhoram o uso. A força háptica muda o retorno, não o instante dos botões.",
+        "ru": "Виртуальный пульт, руки и прямое касание вызывают те же игровые действия. Размер и подсказки улучшают удобство. Сила вибрации меняет отклик, но не время нажатий.",
+        "zh": "虚拟遥控器、手部与直接触碰操作相同的游戏控制。大小与提示改善易用性。触觉强度改变反馈，不改变按钮触发时间。",
+        "ko": "가상 리모컨, 손, 직접 터치는 같은 게임 동작을 조작합니다. 크기와 힌트는 사용 편의성을 바꿉니다. 진동 세기는 피드백만 바꾸며 입력 시점은 바꾸지 않습니다."
+      }
+    },
+    {
+      "id": "XRCrt",
+      "picture": "Crt",
+      "text": {
+        "en": "CRT controls add scanlines, RGB mask, curved glass and reflections. More strength is a visual choice, not new game detail. Automatic quality can simplify expensive decoration under pressure.",
+        "fr": "Les réglages CRT ajoutent balayage, masque RVB, verre courbe et reflets. Plus d’intensité est un choix visuel, pas du détail de jeu supplémentaire. La qualité automatique peut simplifier ce décor coûteux.",
+        "es": "CRT añade líneas de barrido, máscara RGB, vidrio curvo y reflejos. Más intensidad es una elección visual, no detalle nuevo del juego. La calidad automática puede simplificar la decoración costosa.",
+        "ja": "CRTは走査線、RGBマスク、曲面ガラス、反射を追加します。強くしてもゲームの情報は増えません。自動画質は負荷が高いと重い装飾を簡略化できます。",
+        "de": "CRT ergänzt Scanlines, RGB-Maske, gewölbtes Glas und Reflexionen. Mehr Stärke ist ein visueller Stil, keine neue Spielinformation. Automatische Qualität kann teure Dekoration vereinfachen.",
+        "it": "CRT aggiunge linee di scansione, maschera RGB, vetro curvo e riflessi. Più intensità è una scelta visiva, non nuovo dettaglio del gioco. La qualità automatica può semplificare la decorazione costosa.",
+        "pt": "CRT acrescenta linhas de varredura, máscara RGB, vidro curvo e reflexos. Mais intensidade é uma escolha visual, não novos detalhes do jogo. A qualidade automática pode simplificar decoração cara.",
+        "ru": "ЭЛТ добавляет строки развёртки, RGB-маску, изогнутое стекло и отражения. Усиление меняет стиль, а не информацию игры. Автоматический режим может упрощать затратный декор.",
+        "zh": "CRT效果添加扫描线、RGB遮罩、曲面玻璃与反光。更高强度是视觉选择，不会增加游戏细节。自动画质可简化昂贵装饰。",
+        "ko": "CRT는 주사선, RGB 마스크, 곡면 유리와 반사를 더합니다. 강도를 높여도 게임 정보는 늘지 않습니다. 자동 화질은 비용이 큰 장식을 단순화할 수 있습니다."
+      }
+    },
+    {
+      "id": "XREnvironment",
+      "picture": "Backdrop",
+      "text": {
+        "en": "Passthrough shows your real room; the virtual environment supplies a backdrop when it is off. Transparency, surrounding scenery and brightness change what surrounds the game.",
+        "fr": "La transparence AR montre ta pièce réelle ; l’environnement virtuel sert de décor sinon. Transparence, paysage périphérique et luminosité règlent ce qui entoure le jeu.",
+        "es": "Passthrough muestra tu habitación real; el entorno virtual sirve de fondo cuando está desactivado. Transparencia, paisaje y brillo ajustan lo que rodea al juego.",
+        "ja": "パススルーは実際の部屋を表示し、無効時は仮想環境が背景になります。透明度、周囲の風景、明るさでゲームを囲む表示を調整します。",
+        "de": "Passthrough zeigt deinen echten Raum; ohne ihn liefert die virtuelle Umgebung den Hintergrund. Transparenz, umgebende Landschaft und Helligkeit verändern die Spielumgebung.",
+        "it": "Passthrough mostra la stanza reale; quando è spento, l’ambiente virtuale fornisce lo sfondo. Trasparenza, paesaggio circostante e luminosità regolano ciò che circonda il gioco.",
+        "pt": "Passthrough mostra sua sala real; o ambiente virtual fornece o fundo quando ele está desligado. Transparência, cenário ao redor e brilho mudam o que cerca o jogo.",
+        "ru": "Сквозной просмотр показывает настоящую комнату; при его отключении фон создаёт виртуальное окружение. Прозрачность, пейзаж и яркость меняют пространство вокруг игры.",
+        "zh": "透视显示真实房间，关闭后由虚拟环境提供背景。透明度、周边风景和亮度改变游戏周围的显示。",
+        "ko": "패스스루는 실제 방을 보여 주고, 끄면 가상 환경이 배경을 제공합니다. 투명도, 주변 풍경과 밝기로 게임을 둘러싼 표시를 조절합니다."
+      }
+    },
+    {
+      "id": "XRDetail",
+      "picture": "Quality",
+      "text": {
+        "en": "Canvas detail and eye detail set quality ceilings for different layers. Automatic quality scales both when needed. The independent menu layer stays sharp; peripheral foveation is optional when supported.",
+        "fr": "Les détails du canevas et des yeux règlent les plafonds de couches distinctes. La qualité automatique les ajuste si nécessaire. Le menu indépendant reste net ; la fovéation périphérique est facultative si prise en charge.",
+        "es": "El detalle del lienzo y el de los ojos limitan capas distintas. La calidad automática ajusta ambas. El menú independiente sigue nítido; la foveación periférica es opcional si está disponible.",
+        "ja": "キャンバスと両眼画像の詳細度は別の上限です。自動画質は必要に応じて両方を調整します。独立したメニューは鮮明に保ち、対応時は周辺のフォビエーションも選べます。",
+        "de": "Leinwand- und Augendetail begrenzen unterschiedliche Ebenen. Die Automatik passt beide an. Die unabhängige Menüebene bleibt scharf; periphere Foveation ist bei Unterstützung optional.",
+        "it": "Dettaglio del quadro e degli occhi limitano strati distinti. L’automatismo adatta entrambi. Il menu indipendente resta nitido; la foveazione periferica è facoltativa, se supportata.",
+        "pt": "Detalhe da tela do jogo e dos olhos limita camadas diferentes. A qualidade automática ajusta ambas. O menu independente fica nítido; a foveação periférica é opcional quando suportada.",
+        "ru": "Детализация полотна и глаз ограничивает разные слои. Автоматическое качество регулирует оба. Отдельный слой меню остаётся чётким; периферийная фовеация необязательна и зависит от поддержки.",
+        "zh": "画布与双眼细节分别限制不同图层，自动画质按需调整两者。独立菜单保持清晰；支持时可选外围注视点渲染优化。",
+        "ko": "캔버스와 눈의 세부 수준은 서로 다른 층의 상한입니다. 자동 화질이 둘 다 조절합니다. 별도 메뉴는 선명하게 유지하며 지원되는 경우 주변 포비에이션을 선택할 수 있습니다."
+      }
+    },
+    {
+      "id": "Help",
+      "picture": "Library",
+      "text": {
+        "en": "Use the question mark for an illustrated explanation. Mouse hover and controller focus show a quick preview; touch can open the full card. Illustrations are original examples, not cartridge screenshots.",
+        "fr": "Utilise le point d’interrogation pour une explication illustrée. Survol et focus manette donnent un aperçu ; le toucher ouvre la fiche. Les illustrations sont des exemples originaux, pas des captures de cartouche.",
+        "es": "Usa el signo de interrogación para una explicación ilustrada. El cursor o foco del mando muestra una vista rápida; el toque abre la ficha. Las ilustraciones son originales, no capturas de cartuchos.",
+        "ja": "疑問符で図解説明を開きます。マウスのホバーやゲームパッドのフォーカスで短い説明、タッチで詳細カードを表示します。図はオリジナルの例で、ゲーム画像ではありません。",
+        "de": "Das Fragezeichen öffnet eine illustrierte Erklärung. Mauszeiger oder Controller-Fokus zeigen eine Vorschau; Berührung öffnet die Karte. Die Illustrationen sind eigene Beispiele, keine Modulbilder.",
+        "it": "Il punto interrogativo apre una spiegazione illustrata. Puntatore e focus del gamepad mostrano un’anteprima; il tocco apre la scheda. Le illustrazioni sono esempi originali, non immagini della cartuccia.",
+        "pt": "Use a interrogação para uma explicação ilustrada. O cursor ou foco do controle mostra uma prévia; o toque abre a ficha. As ilustrações são exemplos originais, não capturas de cartuchos.",
+        "ru": "Знак вопроса открывает иллюстрированное пояснение. Наведение мыши или фокус геймпада показывает краткий просмотр, касание — карточку. Иллюстрации созданы специально и не являются снимками игр.",
+        "zh": "使用问号打开图解说明。鼠标悬停或手柄焦点显示快速预览，触控打开完整卡片。插图是原创示例，不是卡带截图。",
+        "ko": "물음표로 그림 설명을 여세요. 마우스 호버나 게임패드 포커스는 짧은 미리 보기를, 터치는 설명 카드를 엽니다. 삽화는 직접 만든 예시이며 카트리지 화면이 아닙니다."
+      }
+    },
+    {
+      "id": "Manual",
+      "picture": "Quality",
+      "text": {
+        "en": "Manual quality disables the automatic governor and keeps your chosen detail ceiling. Select Automatic quality to restore adaptation, or Extra smooth for a larger performance reserve.",
+        "fr": "La qualité manuelle désactive l’adaptation et conserve le niveau de détail choisi. Qualité automatique rétablit l’adaptation ; Très fluide garde davantage de réserve de performance.",
+        "es": "La calidad manual desactiva la adaptación y mantiene el detalle elegido. Calidad automática restaura la adaptación; Extra fluido deja una mayor reserva de rendimiento.",
+        "ja": "手動画質では自動調整を止め、選んだ詳細度を維持します。自動画質で調整を再開でき、滑らかさ優先では処理時間の余裕を増やします。",
+        "de": "Manuelle Qualität stoppt die automatische Anpassung und behält die gewählte Detailstufe. Automatische Qualität aktiviert sie wieder; Extra flüssig lässt mehr Leistungsreserve.",
+        "it": "La qualità manuale disattiva l’adattamento e mantiene il dettaglio scelto. Qualità automatica ripristina l’adattamento; Molto fluido lascia più riserva di prestazioni.",
+        "pt": "A qualidade manual desativa a adaptação e mantém o detalhe escolhido. Qualidade automática restaura a adaptação; Extra fluido deixa mais reserva de desempenho.",
+        "ru": "Ручное качество отключает адаптацию и сохраняет выбранную детализацию. Автоматическое качество возвращает адаптацию; повышенная плавность оставляет больший запас времени.",
+        "zh": "手动画质关闭自动调节并保持所选细节等级。选择自动画质可恢复调节，超流畅模式则保留更多性能余量。",
+        "ko": "수동 화질은 자동 조절을 끄고 선택한 세부 수준을 유지합니다. 자동 화질로 조절을 다시 켜거나 매우 부드러움으로 성능 여유를 늘릴 수 있습니다."
+      }
+    },
+    {
+      "id": "Foveation",
+      "picture": "Quality",
+      "text": {
+        "en": "On compatible Quest runtimes, sustained load can reduce peripheral eye-image detail while retaining the center. Menus use a separate sharp layer. Unsupported devices fall back automatically. Physical headset quality remains untested.",
+        "fr": "Sur un Quest compatible, une charge durable peut réduire les détails périphériques tout en préservant le centre. Les menus gardent une couche nette distincte. Le rendu ordinaire prend automatiquement le relais si nécessaire. La qualité en casque reste à tester.",
+        "es": "En Quest compatibles, la carga sostenida puede reducir el detalle periférico y conservar el centro. Los menús usan una capa nítida separada. Hay alternativa automática si no es compatible. La calidad en casco físico sigue sin probarse.",
+        "ja": "対応するQuestでは負荷が続くと周辺部の詳細度を下げ、中央を保ちます。メニューは別の鮮明なレイヤーです。未対応時は通常描画に戻ります。実機ヘッドセットでの画質は未検証です。",
+        "de": "Auf kompatiblen Quest-Systemen kann Dauerlast periphere Bilddetails reduzieren und die Mitte erhalten. Menüs bleiben in einer separaten scharfen Ebene. Ohne Unterstützung greift der normale Renderer. Die Qualität im realen Headset ist ungeprüft.",
+        "it": "Sui Quest compatibili, il carico prolungato può ridurre il dettaglio periferico mantenendo il centro. I menu hanno un livello nitido separato. I dispositivi non compatibili usano il rendering normale. La qualità nel visore fisico resta da verificare.",
+        "pt": "Em Quest compatíveis, carga prolongada pode reduzir detalhes periféricos preservando o centro. Menus usam uma camada nítida separada. Sem suporte, o renderizador normal assume. A qualidade no headset físico ainda não foi testada.",
+        "ru": "На совместимых Quest длительная нагрузка может снизить детализацию по краям, сохраняя центр. Меню остаются на отдельном чётком слое. Без поддержки включается обычный рендеринг. Качество в физическом шлеме не проверено.",
+        "zh": "在兼容的Quest运行时中，持续负载可降低眼部图像外围细节并保留中央。菜单使用独立清晰图层。不支持时自动回退到普通渲染。实体头显画质仍未测试。",
+        "ko": "호환 Quest에서는 부하가 지속되면 중앙을 유지하며 주변부 세부를 줄일 수 있습니다. 메뉴는 별도의 선명한 레이어입니다. 미지원 기기에서는 일반 렌더링으로 전환됩니다. 실제 헤드셋 화질은 아직 검증하지 않았습니다."
+      }
+    }
+  ]
+}

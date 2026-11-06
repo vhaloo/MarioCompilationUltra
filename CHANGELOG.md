@@ -1,5 +1,16 @@
 # Releases
 
+## 0.7.0 — 2026-11-06
+
+- Shared adaptive quality policy with a configurable performance reserve, thermal limits and slow recovery. Quest keeps at least 35% of its frame budget in reserve; automatic CRT selection requires sustained measured GPU headroom.
+- Exact retained terrain, changed-region texture uploads, content-based crisp-image reuse and faster object-preview decoding. Decorative updates can slow under pressure while input, native game pixels and menus retain their cadence and sharpness.
+- Optional Quest peripheral foveation with capability checks and ordinary-rendering fallback; centered eye subimages and bounded clears. Physical headset performance remains unverified.
+- Dedicated standalone Wear OS APK, automatic round-watch and rotary detection, continuous crown/bezel zoom from the entire loaded area to the original camera, cached fisheye geometry and full SNES multi-touch controls.
+- Native offline watch guide and an app-owned cartridge transfer inbox, without requiring a document picker or WebView on the watch.
+- Checkpoint Android progress on the emulation thread before SDL pauses it, with a bounded lifecycle handshake; background simulation also stops when desktop focus pausing is disabled.
+- Simpler quality presets, illustrated setting cards, icons, delayed hover/focus help and touch explanations. Ten complete languages, new screenshots and offline watch/settings references.
+- Eight public test suites plus six-game local regressions. Wear OS, phone and tablet emulator evidence is explicitly separate from physical device testing.
+
 ## 0.6.0 — 2026-11-05
 
 - Automatic game/scenery resolution for five desktop/mobile views and seven Quest modes; CPU, optional asynchronous GPU timing and missed-deadline fallback, with slow quality recovery.

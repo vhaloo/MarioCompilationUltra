@@ -11,6 +11,8 @@ void App::mobileRefresh() {
     if (!options.mobilePreview && (!mobileMetricsAt || now - mobileMetricsAt >= 500)) {
         auto updated = androidDisplay();
         float next = std::isfinite(updated.density) ? std::clamp(updated.density, .5f, 5.f) : 1.f;
+        if (updated.watch)
+            next = std::min(next, std::min(drawableWidth, drawableHeight) / 320.f);
         if (std::abs(next - density) > .05f) {
             SDL_RenderFlush(renderer);
             ImGui_ImplSDLRenderer2_DestroyDeviceObjects();
@@ -41,9 +43,12 @@ void App::mobileRefresh() {
     for (auto p : pads)
         pad |= p && SDL_GameControllerGetAttached(p);
     bool visible = settings.touchMode == 1 || (settings.touchMode == 0 && !pad);
-    auto next = mobileLayout(drawableWidth, drawableHeight, density, mobileDisplay.insets,
-                             settings.touchScale, settings.touchPlacement, settings.touchLeftHanded,
-                             visible);
+    auto next = watchActive()
+                    ? watchLayout(drawableWidth, drawableHeight, density, settings.touchLeftHanded,
+                                  visible, settings.watchTouchScale)
+                    : mobileLayout(drawableWidth, drawableHeight, density, mobileDisplay.insets,
+                                   settings.touchScale, settings.touchPlacement,
+                                   settings.touchLeftHanded, visible);
     bool changed = next.safe.x != touchLayout.safe.x || next.safe.y != touchLayout.safe.y ||
                    next.safe.w != touchLayout.safe.w || next.safe.h != touchLayout.safe.h ||
                    next.count != touchLayout.count;
@@ -65,6 +70,8 @@ void App::mobileRefresh() {
     }
 }
 bool App::mobileEvent(const SDL_Event &e) {
+    if (watchEvent(e))
+        return true;
     bool synthetic = (e.type == SDL_MOUSEMOTION && e.motion.which == SDL_TOUCH_MOUSEID) ||
                      ((e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP) &&
                       e.button.which == SDL_TOUCH_MOUSEID);
@@ -74,6 +81,7 @@ bool App::mobileEvent(const SDL_Event &e) {
         return true;
     }
     if (e.type == SDL_APP_WILLENTERBACKGROUND || e.type == SDL_APP_DIDENTERBACKGROUND) {
+        backgrounded = true;
         touch.clear();
         pendingTouchButtons = 0;
         core.buttons[0] = core.buttons[1] = 0;
@@ -91,6 +99,7 @@ bool App::mobileEvent(const SDL_Event &e) {
         }
     }
     if (e.type == SDL_APP_DIDENTERFOREGROUND) {
+        backgrounded = false;
         focused = true;
         releaseInput = true;
         mobileMetricsAt = 0;
@@ -102,7 +111,8 @@ bool App::mobileEvent(const SDL_Event &e) {
         mobileMetricsAt = 0;
     }
     if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_AC_BACK) {
-        if(e.key.repeat)return true;
+        if (e.key.repeat)
+            return true;
         if (dialog) {
             dialog = 0;
         } else if (browser) {
@@ -151,15 +161,32 @@ bool App::mobileEvent(const SDL_Event &e) {
                 toggleMenu();
                 break;
             case TouchView:
+                if (watchActive()) {
+                    settings.watchZoom = settings.watchZoom < 250   ? 500
+                                         : settings.watchZoom < 750 ? 1000
+                                                                    : 0;
+                    dirty = true;
+                    break;
+                }
                 settings.view = (settings.view + 1) % 5;
                 dirty = true;
                 break;
             case TouchZoomOut:
+                if (watchActive()) {
+                    settings.watchZoom = std::max(0, settings.watchZoom - 100);
+                    dirty = true;
+                    break;
+                }
                 settings.view = 2;
                 settings.stepZoom(-1);
                 dirty = true;
                 break;
             case TouchZoomIn:
+                if (watchActive()) {
+                    settings.watchZoom = std::min(1000, settings.watchZoom + 100);
+                    dirty = true;
+                    break;
+                }
                 settings.view = 2;
                 settings.stepZoom(1);
                 dirty = true;
@@ -183,9 +210,10 @@ void App::mobileOverlay() {
     auto *draw = ImGui::GetForegroundDrawList();
     float alpha = settings.touchOpacity / 100.f;
     auto fill = [&](bool pressed) {
-        return ImGui::ColorConvertFloat4ToU32({pressed ? .32f : .07f, pressed ? .70f : .13f,
-                                               pressed ? .57f : .19f,
-                                               std::min(1.f, alpha + (pressed ? .25f : 0.f))});
+        return ImGui::ColorConvertFloat4ToU32(
+            {pressed ? .32f : .07f, pressed ? .70f : .13f, pressed ? .57f : .19f,
+             watchActive() ? (pressed ? .12f + alpha * .1f : alpha * .035f)
+                           : std::min(1.f, alpha + (pressed ? .25f : 0.f))});
     };
     auto edge = ImGui::ColorConvertFloat4ToU32({.65f, .85f, .80f, std::min(1.f, alpha + .15f)});
     for (int i = 0; i < touchLayout.count; ++i) {
@@ -215,6 +243,23 @@ void App::mobileOverlay() {
             draw->AddRectFilled(a, b, fill(held), 8 * density);
             draw->AddRect(a, b, edge, 8 * density, 0, density);
         }
+        if (watchActive() && button.action == TouchMenu) {
+            float u = r.w * .12f;
+            draw->AddRectFilled(centre - ImVec2(2.5f * u, 2 * u), centre + ImVec2(-u, 2 * u), edge,
+                                1);
+            draw->AddRectFilled(centre + ImVec2(u, -2 * u), centre + ImVec2(2.5f * u, 2 * u), edge,
+                                1);
+            continue;
+        }
+        if (watchActive() && button.action == TouchRewind) {
+            float u = r.w * .19f;
+            for (int k = 0; k < 2; ++k) {
+                float x = centre.x + (k - .5f) * u * 1.8f;
+                draw->AddTriangleFilled({x + u, centre.y - u}, {x + u, centre.y + u},
+                                        {x - u, centre.y}, edge);
+            }
+            continue;
+        }
         const char *text = tr(button.label);
         float px = button.action < 12 ? 19 * density : 12 * density;
         auto size = ImGui::GetFont()->CalcTextSizeA(px, FLT_MAX, 0, text);
@@ -225,12 +270,24 @@ void App::mobileOverlay() {
         draw->AddText(ImGui::GetFont(), px, centre - size * .5f, IM_COL32(232, 246, 239, 235),
                       text);
     }
+    if (watchActive() && settings.locator && world.expanded) {
+        auto &c = world.canvas;
+        float u = (world.scene.playerX + 8 - c.x) / c.worldWidth,
+              v = (world.scene.playerY + 8 - c.y) / c.worldHeight;
+        if (u >= 0 && u <= 1 && v >= 0 && v <= 1) {
+            auto at = watchMesh.project(u, v);
+            draw->AddCircle({at.x, at.y}, 4 * density, IM_COL32(255, 218, 128, 240), 16, density);
+        }
+    }
     if (rewinding && settings.rewindIndicator)
         draw->AddText({touchLayout.safe.x + 12 * density, touchLayout.game.y + 8 * density},
                       IM_COL32(250, 217, 109, 255), tr("Rewinding"));
 }
 void App::mobileOptions() {
+    watchOptions();
     if (!mobileActive())
+        return;
+    if (watchActive())
         return;
     if (tab == 1) {
         choice("Mobile orientation", settings.mobileOrientation,

@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.6.0
+# Mario Compilation Ultra 0.7.0
 
 Une collection SNES locale avec une interface PC adaptable et des vues de monde expérimentales. Snes9x assure la simulation des cartouches, y compris le Super FX. Le projet ne revendique pas une décompilation de tous les jeux.
 
-[Téléchargement et lancement sur le bureau](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.6.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Téléchargement et lancement sur le bureau](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.7.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Téléchargement et lancement sur le bureau
 
@@ -49,7 +49,7 @@ Les profils mémoire étendus et la sélection All-Stars automatique visent les 
 
 ## Résolution automatique
 
-La version 0.6 vise 60 images/s en adaptant la résolution du jeu et du décor ; les menus et les commandes gardent la résolution de l’écran. Le rythme SNES et les sauvegardes sont conservés ; le retour arrière sans perte réduit la charge du processeur. Sur Quest, la résolution stéréo suit la fréquence choisie et le shader CRT économe reste accompagné du shader de référence. La vitesse dépend du matériel. Les performances sur téléphone, Mac et Quest physiques restent à tester.
+La version 0.7 adapte la résolution des décors, la cadence décorative et le shader VR avec une réserve de performance. Pixels du jeu et menus restent nets. Quest réserve au moins 35 % du budget à la fréquence choisie ; le détail périphérique facultatif a un rendu de secours. Ces objectifs restent à vérifier sur appareil physique.
 
 [Performance / GPU](../PERFORMANCE.md)
 
@@ -63,11 +63,15 @@ La version 0.6 vise 60 images/s en adaptant la résolution du jeu et du décor ;
 
 ## Téléphones et tablettes Android
 
-[Téléphones et tablettes Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk)
+[Téléphones et tablettes Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Android-public.apk)
+
+## Vue montre
+
+[Vue montre](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Wear-public.apk) · [Réglages illustrés](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Commandes
 
@@ -137,9 +141,9 @@ Choisis à nouveau la cartouche si son fichier a été déplacé ou si le disque
 
 ![Quest VR / AR](screenshots/6.png)
 
-## Paquets et validation · 0.6.0
+## Paquets et validation · 0.7.0
 
-La validation 0.6 couvre sept suites de tests publics, les menus en dix langues, les six jeux locaux et les performances PC. Les essais téléphone et tablette utilisent des émulateurs. La cadence sur Android, Mac et Quest physiques reste à vérifier : voir le rapport détaillé.
+La validation 0.7 couvre huit suites publiques, les réglages illustrés en dix langues, six jeux locaux et des comparaisons PC. Téléphone, tablette et Wear OS sont vérifiés sur émulateurs. Les performances physiques montre, Android, Mac et Quest restent à valider ; voir le rapport.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

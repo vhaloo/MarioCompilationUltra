@@ -1,5 +1,6 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "app.h"
+#include "setting_help.h"
 #include <imgui_internal.h>
 #include <algorithm>
 #include <cmath>
@@ -11,9 +12,27 @@ void App::notify(const std::string &text) {
     dirty = true;
 }
 void App::control(const char *key) {
-    if (!guideOpen &&
-        (ImGui::IsItemFocused() || ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)))
+    bool focused = ImGui::IsItemFocused();
+    bool hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
+    if (!guideOpen && (focused || hovered))
         guideKey = key;
+    if (guideOpen || !settings.help)
+        return;
+    if (!mobileActive() && (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal |
+                                                 ImGuiHoveredFlags_AllowWhenDisabled) ||
+                            (focused && ImGui::GetIO().NavVisible))) {
+        ImGui::BeginTooltip();
+        float width = std::min(340.f * uiUnit(), ImGui::GetIO().DisplaySize.x - 24 * uiUnit());
+        ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + width);
+        ImGui::TextColored({.55f, .9f, .75f, 1}, "%s", tr(key));
+        settingPicture(key, width, true);
+        ImGui::TextWrapped("%s", tr(settingHelp(key).description));
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+    if (mobileActive() && hovered && ImGui::GetIO().MouseDownDuration[0] > .7f &&
+        ImLengthSqr(ImGui::GetMouseDragDelta()) < 36 * uiUnit() * uiUnit())
+        showGuide(key);
 }
 void App::showGuide(const std::string &key) {
     guideRequested = key.empty() ? "Full level map" : key;
@@ -25,7 +44,7 @@ void App::nextButton(const char *) {
 bool App::choice(const char *key, int &value, std::initializer_list<const char *> labels) {
     value = std::clamp(value, 0, int(labels.size()) - 1);
     ImGui::PushID(key);
-    ImGui::TextWrapped("%s", tr(key));
+    settingTitle(key);
     ImGui::SetNextItemWidth(-1);
     bool changed = false;
     if (ImGui::BeginCombo("##value", tr(*(labels.begin() + value)))) {
@@ -45,34 +64,41 @@ bool App::choice(const char *key, int &value, std::initializer_list<const char *
     return changed;
 }
 bool App::tick(const char *key, bool &value) {
-    bool changed;
-    if (mobileActive()) {
-        ImGui::PushID(key);
-        ImGui::BeginGroup();
-        changed = ImGui::Checkbox("##check", &value);
-        ImGui::SameLine();
-        ImGui::TextWrapped("%s", tr(key));
-        if (ImGui::IsItemClicked()) {
-            value = !value;
-            changed = true;
-        }
-        ImGui::EndGroup();
-        ImGui::PopID();
-    } else
-        changed = ImGui::Checkbox(tr(key), &value);
+    ImGui::PushID(key);
+    settingTitle(key);
+    bool changed = ImGui::Checkbox(tr(value ? "Enabled" : "Disabled"), &value);
     control(key);
+    ImGui::PopID();
     dirty |= changed;
     return changed;
 }
 bool App::slider(const char *key, int &value, int low, int high, const char *format) {
     ImGui::PushID(key);
-    ImGui::TextWrapped("%s", tr(key));
+    settingTitle(key);
     ImGui::SetNextItemWidth(-1);
-    bool changed = ImGui::SliderInt("##value", &value, low, high, format);
+    bool changed =
+        ImGui::SliderInt("##value", &value, low, high, format, ImGuiSliderFlags_AlwaysClamp);
     control(key);
     ImGui::PopID();
     dirty |= changed;
     return changed;
+}
+void App::languageControl() {
+    ImGui::PushID("##language-control");
+    settingTitle("Interface language");
+    ImGui::SetNextItemWidth(-1);
+    if (ImGui::BeginCombo("##language", locale(settings.language).name)) {
+        for (int i = 0; i < LocaleCount; ++i) {
+            if (ImGui::Selectable(locale(i).name, i == settings.language, 0,
+                                  {0, mobileActive() ? 48 * uiUnit() : 0}))
+                settings.language = i;
+            if (i == settings.language)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+    control("Interface language");
+    ImGui::PopID();
 }
 void App::extrasUi() {
     if (tab == 1) {
@@ -146,7 +172,8 @@ void App::extrasUi() {
         tick("questhandtracking", settings.questHandTracking);
         tick("questinsetcrt", settings.questInsetCrt);
         tick("questcoplanar", settings.questCrtCoplanar);
-        choice("VR shader", settings.questShader, {"Efficient CRT", "Reference CRT"});
+        choice("VR shader", settings.questShader,
+               {"Efficient CRT", "Reference CRT", "Automatic shader"});
     }
 }
 void App::helpUi() {
@@ -165,32 +192,28 @@ void App::helpUi() {
     float u = uiUnit();
     auto safe = mobileActive() ? touchLayout.safe
                                : MobileRect{0, 0, float(drawableWidth), float(drawableHeight)};
+    if (watchActive()) {
+        float side = std::min(safe.w, safe.h);
+        safe = {safe.x + (safe.w - side * .68f) * .5f, safe.y + (safe.h - side * .68f) * .5f,
+                side * .68f, side * .68f};
+    }
     ImGui::SetNextWindowPos({safe.x + safe.w * .5f, safe.y + safe.h * .5f}, ImGuiCond_Always,
                             {.5f, .5f});
     ImGui::SetNextWindowSize({std::max(80.f, std::min(680.f * u, safe.w - 16 * u)),
                               std::max(80.f, std::min(560.f * u, safe.h - 16 * u))},
                              ImGuiCond_Always);
-    if (ImGui::BeginPopupModal("##setting-guide", &guideOpen, ImGuiWindowFlags_NoSavedSettings)) {
-        ImGui::TextWrapped("%s", tr(guideKey.c_str()));
+    if (ImGui::BeginPopupModal("##setting-guide", &guideOpen,
+                               ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar)) {
+        ImGui::TextColored({.55f, .9f, .75f, 1}, "%s", tr(guideKey.c_str()));
         ImGui::BeginChild("##guide-body", {0, -60 * u}, ImGuiChildFlags_None);
-        const float width = std::min(420.f * u, ImGui::GetContentRegionAvail().x),
-                    height = width * .42f;
-        auto p = ImGui::GetCursorScreenPos();
-        auto *d = ImGui::GetWindowDrawList();
-        d->AddRectFilled(p, p + ImVec2(width, height), IM_COL32(14, 27, 40, 255), 10);
-        for (int i = 0; i < 9; ++i) {
-            float x = p.x + width * (.06f + i * .10f), y = p.y + height * (.62f - (i % 3) * .12f);
-            d->AddRectFilled({x, y}, {x + width * .085f, p.y + height * .9f},
-                             IM_COL32(90, 171, 152, 255), 3);
+        const float width = std::min(420.f * u, ImGui::GetContentRegionAvail().x);
+        if (watchActive() && watchScrollPending) {
+            ImGui::SetScrollY(ImGui::GetScrollY() + watchScrollPending);
+            watchScrollPending = 0;
         }
-        d->AddRect(p + ImVec2(width * .34f, height * .18f), p + ImVec2(width * .63f, height * .92f),
-                   IM_COL32(247, 211, 107, 255), 2, 0, 2);
-        ImGui::Dummy({width, height});
-        const char *topic = guideKey.find("quest") == 0                    ? "XR help detail"
-                            : guideKey.find("ewind") != std::string::npos  ? "Rewind help detail"
-                            : guideKey.find("review") != std::string::npos ? "Preview help detail"
-                                                                           : "Picture help detail";
-        ImGui::TextWrapped("%s", tr(topic));
+        settingPicture(guideKey.c_str(), watchActive() ? width * .7f : width, watchActive());
+        ImGui::TextWrapped("%s", tr(settingHelp(guideKey.c_str()).description));
+        ImGui::TextDisabled("%s", tr("Original illustration"));
         ImGui::EndChild();
         if (button("Close")) {
             guideOpen = false;

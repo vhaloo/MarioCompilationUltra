@@ -51,7 +51,7 @@ int run(const std::vector<std::string> &args) {
                 throw std::runtime_error("Expected WIDTHxHEIGHT");
             o.width = std::stoi(s.substr(0, p));
             o.height = std::stoi(s.substr(p + 1));
-            if (o.width < 320 || o.width > 16384 || o.height < 240 || o.height > 8192)
+            if (o.width < 192 || o.width > 16384 || o.height < 192 || o.height > 8192)
                 throw std::runtime_error("Unsupported output dimensions");
         } else if (a == "--frames")
             o.frames = std::stoi(value());
@@ -81,6 +81,12 @@ int run(const std::vector<std::string> &args) {
             o.xrCapture = value();
         else if (a == "--startup-error")
             o.startupError = value();
+        else if (a == "--watch-preview")
+            o.watchPreview = o.mobilePreview = true;
+        else if (a == "--watch-square")
+            o.watchRound = false;
+        else if (a == "--cold-scene")
+            o.coldScene = true;
         else if (a == "--mobile-preview")
             o.mobilePreview = true;
         else if (a == "--mobile-density")
@@ -159,7 +165,8 @@ int run(const std::vector<std::string> &args) {
             auto &cmd = it->second.first;
             auto &v = it->second.second;
             // Let ImGui resolve a changed tab/locale before a later scripted capture.
-            render |= cmd == "tab" || cmd == "language" || cmd == "menu" || cmd == "help";
+            render |= cmd == "tab" || cmd == "language" || cmd == "menu" || cmd == "help" ||
+                      cmd == "guide";
             if (cmd == "buttons")
                 held = uint16_t(std::stoul(v, nullptr, 0));
             if (cmd == "capture") {

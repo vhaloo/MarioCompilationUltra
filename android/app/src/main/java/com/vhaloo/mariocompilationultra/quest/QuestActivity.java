@@ -14,6 +14,7 @@ import java.io.*;
 
 /** Local-only storage and Android's document picker. No camera frames or network access. */
 public final class QuestActivity extends SDLActivity {
+    public int getThermalStatus(){return com.vhaloo.mariocompilationultra.DeviceCapabilities.thermal(this);}
     private File root;
     private String preparationError;
     private static final int IMPORT_ROM = 73;
@@ -22,6 +23,7 @@ public final class QuestActivity extends SDLActivity {
         // Runtime files belong to the app UID. Android 14 scoped-storage rules can
         // reject native stat/open on an external directory populated by ADB.
         root = getFilesDir();
+        com.vhaloo.mariocompilationultra.DeviceCapabilities.initialize(this);
         try {
             File old = getExternalFilesDir(null);
             File migration = new File(root, "external-data-migration-0400.done");

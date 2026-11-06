@@ -335,7 +335,10 @@ void World::remember(const Core &c, const Scene &s) {
                     int dy = row + c.snapshot.raster[row][0].y;
                     t.pixels[y * 8 + x] = bgPixel(c.snapshot, 0, dx, dy, true);
                 }
-            cache[key(tx, ty)] = t;
+            auto &previous = cache[key(tx, ty)];
+            if (previous.pixels != t.pixels)
+                ++observedRevision;
+            previous = t;
         }
     if (cache.size() > 262144) {
         cache.clear();
@@ -361,6 +364,7 @@ void World::prepareGraphics(const Core &c, const Scene &s) {
                         graphicsVram.size() == v.vram.size() &&
                         std::equal(graphicsVram.begin(), graphicsVram.end(), v.vram.begin());
     if (!sameGraphics) {
+        ++graphicsRevision;
         for (auto &tiles : decodedTiles)
             tiles.clear();
         completeBlocks.clear();
@@ -421,6 +425,7 @@ void World::prepareGraphics(const Core &c, const Scene &s) {
         }
         if (reusable && attributes == blockAttributes[id] && valid == blockValid[id])
             continue;
+        ++graphicsRevision;
         blockAttributes[id] = attributes;
         blockValid[id] = valid;
         for (int y = 0; y < 16; y++)
@@ -554,6 +559,24 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
         canvas.x = cx - canvas.worldWidth / 2;
         canvas.y = cy - canvas.worldHeight / 2;
     }
+    if (s.projectionWatch) {
+        float t = std::clamp(s.projectionWatchZoom, 0.f, 1.f);
+        float originalWidth = std::max(float(c.width), c.height * aspect);
+        float oldWidth = canvas.worldWidth, oldHeight = canvas.worldHeight;
+        float cx = canvas.x + oldWidth * .5f, cy = canvas.y + oldHeight * .5f;
+        float width = originalWidth * std::pow(std::max(1.f, oldWidth / originalWidth), 1 - t);
+        float height = width / aspect;
+        if (width <= oldWidth)
+            cx = std::clamp(sc.cameraX + c.width * .5f, canvas.x + width * .5f,
+                            canvas.x + oldWidth - width * .5f);
+        if (height <= oldHeight)
+            cy = std::clamp(sc.cameraY + c.height * .5f, canvas.y + height * .5f,
+                            canvas.y + oldHeight - height * .5f);
+        canvas.x = cx - width * .5f;
+        canvas.y = cy - height * .5f;
+        canvas.worldWidth = width;
+        canvas.worldHeight = height;
+    }
     int divisor = s.quality == 0 ? 3 : s.quality == 1 ? 2 : 1;
     if (s.view == 2)
         divisor = std::max(1, int(s.pixelScale(w, h, c.width, c.height)));
@@ -579,7 +602,101 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
             canvas.height = std::max(1, int(canvas.height * scale));
         }
     }
+    std::array<double, 28> renderKey{{double(canvas.width),
+                                      double(canvas.height),
+                                      canvas.x,
+                                      canvas.y,
+                                      canvas.worldWidth,
+                                      canvas.worldHeight,
+                                      double(s.view),
+                                      double(s.background),
+                                      double(s.softEdges),
+                                      double(s.freeze),
+                                      double(sc.kind),
+                                      double(sc.stage),
+                                      double(sc.width),
+                                      double(sc.height),
+                                      double(c.cart.checksum),
+                                      double(sc.cameraX),
+                                      double(sc.cameraY),
+                                      double(complete.secondaryX),
+                                      double(complete.secondaryY),
+                                      double(complete.primaryWidth),
+                                      double(complete.primaryHeight),
+                                      double(c.snapshot.mainLayers),
+                                      double(sceneryW),
+                                      double(sceneryH),
+                                      double(sc.vertical),
+                                      double(c.width),
+                                      double(c.height),
+                                      double(!c.native.empty())}};
+    uint64_t mapRevision = wholeLevel ? complete.contentFingerprint() : 0;
+    if (!wholeLevel && sc.kind == 4) {
+        int base = c.cart.family == Family::AllStarsWorld ? 0xc700 : 0xc800;
+        mapRevision = 1469598103934665603ull;
+        for (int i = 0; i < 0x3600; ++i) {
+            mapRevision ^= c.snapshot.ram[base + i];
+            mapRevision *= 1099511628211ull;
+            mapRevision ^= c.snapshot.ram[base + 0x10000 + i];
+            mapRevision *= 1099511628211ull;
+        }
+    }
+    if (needScenery)
+        for (auto pixel : scenery) {
+            mapRevision ^= pixel;
+            mapRevision *= 1099511628211ull;
+        }
+    auto overlayNative = [&] {
+        if (c.native.empty())
+            return;
+        int x0 =
+            std::clamp(int(std::ceil((sc.cameraX - canvas.x) * canvas.width / canvas.worldWidth)),
+                       0, canvas.width);
+        int x1 = std::clamp(int(std::ceil((sc.cameraX + int(c.width) - canvas.x) * canvas.width /
+                                          canvas.worldWidth)),
+                            0, canvas.width);
+        int y0 =
+            std::clamp(int(std::ceil((sc.cameraY - canvas.y) * canvas.height / canvas.worldHeight)),
+                       0, canvas.height);
+        int y1 = std::clamp(int(std::ceil((sc.cameraY + int(c.height) - canvas.y) * canvas.height /
+                                          canvas.worldHeight)),
+                            0, canvas.height);
+        for (int y = y0; y < y1; ++y) {
+            int ny =
+                int(std::floor(canvas.y + y * canvas.worldHeight / canvas.height)) - sc.cameraY;
+            if (ny < 0 || ny >= int(c.height))
+                continue;
+            for (int x = x0; x < x1; ++x) {
+                int nx =
+                    int(std::floor(canvas.x + x * canvas.worldWidth / canvas.width)) - sc.cameraX;
+                if (nx >= 0 && nx < int(c.width))
+                    canvas.pixels[size_t(y) * canvas.width + x] =
+                        c.native[size_t(ny) * c.width + nx];
+            }
+        }
+    };
+    if (retainTerrain && retainedValid && retainedKey == renderKey &&
+        retainedGraphics == graphicsRevision && retainedObserved == observedRevision &&
+        retainedMap == mapRevision) {
+        canvas.pixels = retainedPixels;
+        ++terrainReuses;
+        overlayNative();
+        return;
+    }
+    ++terrainBuilds;
     canvas.pixels.assign(size_t(canvas.width) * canvas.height, 0);
+    auto finishTerrain = [&] {
+        if (retainTerrain) {
+            retainedPixels = canvas.pixels;
+            retainedKey = renderKey;
+            retainedGraphics = graphicsRevision;
+            retainedObserved = observedRevision;
+            retainedMap = mapRevision;
+            retainedValid = true;
+        } else
+            retainedValid = false;
+        overlayNative();
+    };
     auto pixelX = [&](float x) {
         return int(std::ceil((x - canvas.x) * canvas.width / canvas.worldWidth));
     };
@@ -634,6 +751,12 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
                     wx = columns[x - left];
                     sx = wx - complete.secondaryX;
                     int nx = wx - sc.cameraX;
+                    // The authoritative camera covers this region. Retain a
+                    // hole instead of decoding scenery that is immediately
+                    // overwritten; camera bounds are part of the cache key.
+                    if (!c.native.empty() && nx >= 0 && nx < int(c.width) && ny >= 0 &&
+                        ny < int(c.height))
+                        continue;
                     uint32_t pixel = p ? (*p)[(wy & 15) * 16 + (wx & 15)] : 0;
                     uint32_t other = q ? (*q)[(sy & 15) * 16 + (sx & 15)] : 0;
                     if (other &&
@@ -643,13 +766,12 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
                           !(blockAttributes[first][((wx & 8) ? 2 : 0) + ((wy & 8) ? 1 : 0)] &
                             0x2000))))
                         pixel = other;
-                    if (nx >= 0 && nx < int(c.width) && ny >= 0 && ny < int(c.height) &&
-                        !c.native.empty())
-                        pixel = c.native[ny * c.width + nx];
+
                     canvas.pixels[y * canvas.width + x] = pixel;
                 }
             }
         }
+        finishTerrain();
         return;
     }
     for (int y = top; y < bottom; y++)
@@ -657,11 +779,8 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
             int wx = int(std::floor(canvas.x + x * canvas.worldWidth / canvas.width)),
                 wy = int(std::floor(canvas.y + y * canvas.worldHeight / canvas.height));
             int nx = wx - sc.cameraX, ny = wy - sc.cameraY;
-            if (nx >= 0 && nx < int(c.width) && ny >= 0 && ny < int(c.height) &&
-                !c.native.empty()) {
-                canvas.pixels[y * canvas.width + x] = c.native[ny * c.width + nx];
+            if (!c.native.empty() && nx >= 0 && nx < int(c.width) && ny >= 0 && ny < int(c.height))
                 continue;
-            }
             uint32_t p = 0;
             if (sc.fullMap && s.view < 3 && wx >= 0 && wx < sc.width && wy >= 0 && wy < sc.height)
                 p = s.background <= 1   ? backdrop(c, sc, wx, wy)
@@ -682,5 +801,6 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
                     p, extensionOpacity(wx, wy, sc.cameraX, sc.cameraY, c.width, c.height, known));
             canvas.pixels[y * canvas.width + x] = p;
         }
+    finishTerrain();
 }
 } // namespace mcu

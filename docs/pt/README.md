@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.6.0
+# Mario Compilation Ultra 0.7.0
 
 Coleção SNES local com interface adaptável ao PC e visualizações ampliadas experimentais. O Snes9x emula os cartuchos, incluindo Super FX. O projeto não afirma ter descompilado todos os jogos.
 
-[Download e início pela área de trabalho](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.6.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download e início pela área de trabalho](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.7.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download e início pela área de trabalho
 
@@ -49,7 +49,7 @@ Os perfis de memória e a seleção automática All-Stars usam as edições dos 
 
 ## Resolução automática
 
-A versão 0.6 busca 60 fps com resolução automática do jogo e do cenário; menus e controles mantêm a resolução da tela. O ritmo SNES e os saves são preservados; o retrocesso rápido sem perdas reduz o trabalho da CPU. Quest ajusta a resolução estéreo à frequência escolhida e oferece CRT eficiente ou de referência. A velocidade depende do aparelho. Falta medir telefones, Mac e Quest físicos.
+A versão 0.7 adapta resolução do cenário, frequência decorativa e shader VR com reserva de desempenho. Jogo e menus continuam nítidos. Quest reserva pelo menos 35% do tempo por quadro escolhido; detalhes periféricos são opcionais com alternativa. Os objetivos exigem testes físicos.
 
 [Performance / GPU](../PERFORMANCE.md)
 
@@ -63,11 +63,15 @@ A versão 0.6 busca 60 fps com resolução automática do jogo e do cenário; me
 
 ## Celulares e tablets Android
 
-[Celulares e tablets Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk)
+[Celulares e tablets Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Android-public.apk)
+
+## Vista do relógio
+
+[Vista do relógio](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Wear-public.apk) · [Configurações ilustradas](SETTINGS.md)
 
 ## Quest RV / RA
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Quest-public.apk) · [Quest RV / RA](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Quest-public.apk) · [Quest RV / RA](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Controles
 
@@ -137,9 +141,9 @@ Escolha o cartucho novamente se o arquivo foi movido ou a unidade desconectada. 
 
 ![Quest RV / RA](screenshots/6.png)
 
-## Pacotes e validação · 0.6.0
+## Pacotes e validação · 0.7.0
 
-A validação 0.6 abrange sete conjuntos públicos de testes, menus em dez idiomas, seis jogos locais e desempenho desktop. Celulares e tablets são emulados. Os fps em Android, Mac e Quest físicos ainda precisam de verificação; consulte o relatório.
+A validação 0.7 cobre oito suítes públicas, ajustes ilustrados em dez idiomas, seis jogos locais e comparações PC. Telefone, tablet e Wear OS usam emuladores. O desempenho físico de relógio, Android, Mac e Quest permanece sem verificação; veja o relatório.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

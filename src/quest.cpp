@@ -110,7 +110,7 @@ struct QuestPresentation::Impl {
     uint64_t diagnosticAt = 0, submittedFrames = 0, captureAfter = 0;
     bool menuCaptured = false;
     bool sceneSupported = false, storageSupported = false, captureSupported = false;
-    bool refreshSupported = false, localFloorSupported = false;
+    bool refreshSupported = false, localFloorSupported = false, foveationSupported = false;
     bool permissionAsked = false, permissionGranted = false, queriedScene = false, restored = false,
          captureAfterPermission = false;
     bool wallPlaced = false, wallTracked = true, selectedWall = false, useSavedAnchor = true,
@@ -198,6 +198,14 @@ struct QuestPresentation::Impl {
                 "This headset does not expose the Android OpenXR graphics interface");
         std::vector<const char *> enabled = {XR_KHR_OPENGL_ES_ENABLE_EXTENSION_NAME,
                                              XR_KHR_ANDROID_CREATE_INSTANCE_EXTENSION_NAME};
+        foveationSupported = supports(XR_FB_FOVEATION_EXTENSION_NAME) &&
+                             supports(XR_FB_FOVEATION_CONFIGURATION_EXTENSION_NAME) &&
+                             supports(XR_FB_SWAPCHAIN_UPDATE_STATE_EXTENSION_NAME);
+        if (foveationSupported) {
+            enabled.push_back(XR_FB_FOVEATION_EXTENSION_NAME);
+            enabled.push_back(XR_FB_FOVEATION_CONFIGURATION_EXTENSION_NAME);
+            enabled.push_back(XR_FB_SWAPCHAIN_UPDATE_STATE_EXTENSION_NAME);
+        }
         passthroughSupported = supports(XR_FB_PASSTHROUGH_EXTENSION_NAME);
         if (passthroughSupported)
             enabled.push_back(XR_FB_PASSTHROUGH_EXTENSION_NAME);
@@ -330,7 +338,8 @@ struct QuestPresentation::Impl {
         }
         glGenFramebuffers(1, &framebuffer);
         stage = std::make_unique<XrStageRenderer>();
-        stage->initialise(instance, system, session, app.settings.questEyeDetail);
+        stage->initialise(instance, system, session, app.settings.questEyeDetail,
+                          foveationSupported);
         captureAfter = SDL_GetTicks64() + 2000;
     }
     void createActions() {
@@ -1358,8 +1367,15 @@ struct QuestPresentation::Impl {
             auto scenePose = app.menuVerificationOnly
                                  ? transform(head, {{0, 0, 0, 1}, {0, -1.65f, -2.6f}})
                                  : worldPose();
+            Settings stereoSettings = app.settings;
+            if (stereoSettings.questShader == 2)
+                stereoSettings.questShader = app.referenceShaderReady() ? 1 : 0;
+            stereoSettings.projectionEffects =
+                app.settings.adaptiveResolution ? app.resolution.level() : 0;
+            if (stereoSettings.projectionEffects >= 4)
+                stereoSettings.questGlass = 0;
             auto projection =
-                stage->render(local, frame.predictedDisplayTime, scenePose, app.settings, mode(),
+                stage->render(local, frame.predictedDisplayTime, scenePose, stereoSettings, mode(),
                               content, spatial, passthroughActive, capture, app.resolutionScale());
             if (projection) {
                 layers[layerCount++] =
@@ -1406,6 +1422,8 @@ struct QuestPresentation::Impl {
         end.layerCount = layerCount;
         end.layers = layers.data();
         gpuTimer.end();
+        app.xrGpuTimerAvailable = gpuTimer.available();
+        app.xrGpuMs = gpuTimer.ms();
         double workMs =
             1000. * (SDL_GetPerformanceCounter() - renderStarted) / SDL_GetPerformanceFrequency();
         app.framePressureMs = 0;
@@ -1604,7 +1622,7 @@ void QuestPresentation::options() {
         changed = true;
     }
 
-    ImGui::TextWrapped("%s", tr("questscale", a.settings.language));
+    a.settingTitle("questscale");
     float scalePercent = float(s.questScale);
     ImGui::SetNextItemWidth(-1);
     if (ImGui::SliderFloat("##questscale", &scalePercent, 5.f, 20000.f, "%.0f%%",
@@ -1669,7 +1687,7 @@ void QuestPresentation::options() {
         changed |= a.slider("questoptionsscale", s.questOptionsScale, 50, 180, "%d%%");
         changed |= a.choice("questwalldetail", s.questWallDetail,
                             {"questdetailfast", "questdetailbalanced", "questdetailsharp"});
-        changed |= a.tick("questadaptive", s.questAdaptive);
+        changed |= a.tick("Automatic quality", s.adaptiveResolution);
         const char *state = !impl->wallTracked   ? "questwalltrackinglost"
                             : impl->selectedWall ? "questwallscanned"
                             : impl->useSavedAnchor && impl->scene->anchor() ? "questwallanchored"
@@ -1772,7 +1790,9 @@ void QuestPresentation::options() {
     ImGui::EndDisabled();
     changed |= a.choice("questresolution", s.questResolution,
                         {"questeco", "questbalanced", "questsharp", "questwide"});
-    changed |= a.choice("VR shader", s.questShader, {"Efficient CRT", "Reference CRT"});
+    changed |= a.choice("VR shader", s.questShader,
+                        {"Efficient CRT", "Reference CRT", "Automatic shader"});
+    changed |= a.tick("questfoveation", s.questFoveation);
     changed |= a.tick("questtouch", s.questTouch);
     changed |= a.slider("questhaptics", s.questHaptics, 0, 100, "%d%%");
     changed |= a.tick("questflip", s.questFlip);

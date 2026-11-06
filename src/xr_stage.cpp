@@ -361,13 +361,45 @@ struct XrStageRenderer::Impl {
         flipUniform = -1, holeUniform = -1, clipUniform = -1, efficientUniform = -1;
     uint64_t nativeVersion = ~uint64_t(0), backdropVersion = ~uint64_t(0), frameCount = 0,
              meshHash = 0;
-    bool srgb = false;
+    bool srgb = false, foveationAvailable = false;
+    PFN_xrCreateFoveationProfileFB createFoveation = nullptr;
+    PFN_xrDestroyFoveationProfileFB destroyFoveation = nullptr;
+    PFN_xrUpdateSwapchainFB updateFoveation = nullptr;
+    std::array<XrFoveationProfileFB, 3> foveationProfiles{};
+    int foveationLevel = -1;
     Mesh furniture, screen, glass, plain, surroundings;
     Matrix screenLocal = Matrix::identity(), glassLocal = Matrix::identity();
     int vp = -1, model = -1, kind = -1, eyePosition = -1;
-    void initialise(XrInstance instance, XrSystemId system, XrSession xrSession, int detail) {
+    void initialise(XrInstance instance, XrSystemId system, XrSession xrSession, int detail,
+                    bool enableFoveation) {
         GlState restore;
         session = xrSession;
+        if (enableFoveation) {
+            auto load = [&](const char *name, auto &function) {
+                return XR_SUCCEEDED(xrGetInstanceProcAddr(
+                    instance, name, reinterpret_cast<PFN_xrVoidFunction *>(&function)));
+            };
+            foveationAvailable = load("xrCreateFoveationProfileFB", createFoveation) &&
+                                 load("xrDestroyFoveationProfileFB", destroyFoveation) &&
+                                 load("xrUpdateSwapchainFB", updateFoveation);
+            if (foveationAvailable)
+                for (int i = 0; i < 3; ++i) {
+                    XrFoveationLevelProfileCreateInfoFB level{
+                        XR_TYPE_FOVEATION_LEVEL_PROFILE_CREATE_INFO_FB};
+                    level.level = std::array<XrFoveationLevelFB, 3>{
+                        XR_FOVEATION_LEVEL_NONE_FB, XR_FOVEATION_LEVEL_LOW_FB,
+                        XR_FOVEATION_LEVEL_MEDIUM_FB}[i];
+                    XrFoveationProfileCreateInfoFB profile{
+                        XR_TYPE_FOVEATION_PROFILE_CREATE_INFO_FB};
+                    profile.next = &level;
+                    if (XR_FAILED(createFoveation(session, &profile, &foveationProfiles[i]))) {
+                        foveationAvailable = false;
+                        break;
+                    }
+                }
+        }
+        SDL_Log("MCU XR optional peripheral foveation: %s",
+                foveationAvailable ? "available" : "ordinary-rendering fallback");
         GLuint vert = compile(GL_VERTEX_SHADER, vertexSource),
                frag = compile(GL_FRAGMENT_SHADER, fragmentSource);
         program = glCreateProgram();
@@ -473,6 +505,7 @@ struct XrStageRenderer::Impl {
         if (eyeDetail == detail)
             return;
         eyeDetail = detail;
+        foveationLevel = -1;
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
@@ -492,6 +525,10 @@ struct XrStageRenderer::Impl {
             e.width = std::max(256, int(eyeSizes[i].recommendedImageRectWidth * scale));
             e.height = std::max(256, int(eyeSizes[i].recommendedImageRectHeight * scale));
             XrSwapchainCreateInfo info{XR_TYPE_SWAPCHAIN_CREATE_INFO};
+            XrSwapchainCreateInfoFoveationFB foveation{XR_TYPE_SWAPCHAIN_CREATE_INFO_FOVEATION_FB};
+            foveation.flags = XR_SWAPCHAIN_CREATE_FOVEATION_SCALED_BIN_BIT_FB;
+            if (foveationAvailable)
+                info.next = &foveation;
             info.usageFlags =
                 XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT | XR_SWAPCHAIN_USAGE_SAMPLED_BIT;
             info.format = eyeFormat;
@@ -499,7 +536,13 @@ struct XrStageRenderer::Impl {
             info.width = e.width;
             info.height = e.height;
             info.faceCount = info.arraySize = info.mipCount = 1;
-            xrCheck(xrCreateSwapchain(session, &info, &e.chain), "Create stereo image");
+            XrResult created = xrCreateSwapchain(session, &info, &e.chain);
+            if (XR_FAILED(created) && info.next) {
+                info.next = nullptr;
+                foveationAvailable = false;
+                created = xrCreateSwapchain(session, &info, &e.chain);
+            }
+            xrCheck(created, "Create stereo swapchain");
             xrCheck(xrEnumerateSwapchainImages(e.chain, 0, &count, nullptr), "Read stereo images");
             e.images.assign(count, {XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_ES_KHR});
             xrCheck(xrEnumerateSwapchainImages(
@@ -806,6 +849,31 @@ struct XrStageRenderer::Impl {
         // The presenter owns the complete SDL/OpenXR state guard; avoid a nested
         // glGet* round trip on each eye frame.
         configureEyes(s.questEyeDetail);
+        int peripheral = s.questFoveation && s.adaptiveResolution
+                             ? (s.projectionEffects >= 3                        ? 2
+                                : s.projectionEffects >= 1 || s.performanceMode ? 1
+                                                                                : 0)
+                             : 0;
+        if (foveationAvailable && peripheral != foveationLevel) {
+            bool accepted = true;
+            XrSwapchainStateFoveationFB state{XR_TYPE_SWAPCHAIN_STATE_FOVEATION_FB};
+            state.profile = foveationProfiles[peripheral];
+            for (auto &eye : eyes)
+                if (XR_FAILED(updateFoveation(
+                        eye.chain, reinterpret_cast<XrSwapchainStateBaseHeaderFB *>(&state))))
+                    accepted = false;
+            if (accepted)
+                foveationLevel = peripheral;
+            else {
+                state.profile = foveationProfiles[0];
+                for (auto &eye : eyes)
+                    updateFoveation(eye.chain,
+                                    reinterpret_cast<XrSwapchainStateBaseHeaderFB *>(&state));
+                foveationAvailable = false;
+                SDL_Log("MCU XR peripheral detail unavailable; ordinary adaptive rendering remains "
+                        "active");
+            }
+        }
         glUseProgram(program);
         glActiveTexture(GL_TEXTURE0);
         glUniform1i(imageUniform, 0);
@@ -877,13 +945,26 @@ struct XrStageRenderer::Impl {
                                    e.images[index].image, 0);
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,
                                       e.depth);
-            if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+                XrSwapchainImageReleaseInfo release{XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO};
+                xrReleaseSwapchainImage(e.chain, &release);
+                if (foveationAvailable) {
+                    foveationAvailable = false;
+                    eyeDetail = -1;
+                    configureEyes(s.questEyeDetail);
+                    SDL_Log("MCU XR foveated framebuffer rejected; rebuilt ordinary eye images");
+                    return nullptr;
+                }
                 throw std::runtime_error("Incomplete XR stereo framebuffer");
+            }
             float scale =
                 std::isfinite(resolutionScale) ? std::clamp(resolutionScale, .375f, 1.f) : 1.f;
             int renderWidth = std::max(1, int(e.width * scale));
             int renderHeight = std::max(1, int(e.height * scale));
-            glViewport(0, 0, renderWidth, renderHeight);
+            int renderX = (e.width - renderWidth) / 2, renderY = (e.height - renderHeight) / 2;
+            glViewport(renderX, renderY, renderWidth, renderHeight);
+            glEnable(GL_SCISSOR_TEST);
+            glScissor(renderX, renderY, renderWidth, renderHeight);
             glClearColor(ar ? 0 : .008f, ar ? 0 : .013f, ar ? 0 : .025f, ar ? 0 : 1);
             glDepthMask(GL_TRUE);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -996,8 +1077,8 @@ struct XrStageRenderer::Impl {
                                                               SDL_PIXELFORMAT_RGBA32);
                 if (surface) {
                     glPixelStorei(GL_PACK_ALIGNMENT, 4);
-                    glReadPixels(0, 0, renderWidth, renderHeight, GL_RGBA, GL_UNSIGNED_BYTE,
-                                 surface->pixels);
+                    glReadPixels(renderX, renderY, renderWidth, renderHeight, GL_RGBA,
+                                 GL_UNSIGNED_BYTE, surface->pixels);
                     auto *pixels = static_cast<uint8_t *>(surface->pixels);
                     std::vector<uint8_t> row(surface->pitch);
                     for (int y = 0; y < renderHeight / 2; ++y) {
@@ -1023,7 +1104,8 @@ struct XrStageRenderer::Impl {
             p.pose = views[i].pose;
             p.fov = views[i].fov;
             p.subImage.swapchain = e.chain;
-            p.subImage.imageRect = {{0, 0}, {renderWidth, renderHeight}};
+            p.subImage.imageRect = {{renderX, renderY}, {renderWidth, renderHeight}};
+            glDisable(GL_SCISSOR_TEST);
         }
         if (labelsImage)
             SDL_GL_UnbindTexture(controls.labels);
@@ -1062,12 +1144,17 @@ struct XrStageRenderer::Impl {
             if (e.chain)
                 xrDestroySwapchain(e.chain);
         }
+        if (destroyFoveation)
+            for (auto profile : foveationProfiles)
+                if (profile)
+                    destroyFoveation(profile);
     }
 };
 XrStageRenderer::XrStageRenderer() : impl(std::make_unique<Impl>()) {}
 XrStageRenderer::~XrStageRenderer() = default;
-void XrStageRenderer::initialise(XrInstance i, XrSystemId s, XrSession session, int detail) {
-    impl->initialise(i, s, session, detail);
+void XrStageRenderer::initialise(XrInstance i, XrSystemId s, XrSession session, int detail,
+                                 bool foveation) {
+    impl->initialise(i, s, session, detail, foveation);
 }
 const XrCompositionLayerProjection *
 XrStageRenderer::render(XrSpace space, XrTime time, XrPosef origin, const Settings &s, int mode,

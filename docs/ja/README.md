@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.6.0
+# Mario Compilation Ultra 0.7.0
 
 PC向けの使いやすい画面と実験的な拡張表示を備えたローカルSNESコレクションです。Super FXを含むカートリッジの動作はSnes9xが再現します。全作品を逆コンパイルしたものではありません。
 
-[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.6.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.7.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## ダウンロードとデスクトップからの起動
 
@@ -49,7 +49,7 @@ sh ./Install-Linux.sh
 
 ## 自動解像度
 
-バージョン0.6はゲームと背景の解像度を自動調整し、60 fpsを目指します。メニューと操作は画面解像度を維持します。SNESの動作速度とセーブは保持され、可逆圧縮による巻き戻しでCPU負荷を減らします。Questは選択した更新頻度に合わせて立体描画の解像度を調整し、省電力CRTと基準CRTを選べます。速度は機器によって異なります。実機の電話、Mac、Questでの性能検証は未実施です。
+0.7は背景解像度、装飾更新頻度、VRシェーダーを処理時間の余裕に合わせて調整します。ゲーム本体とメニューは鮮明なままです。Questは選択したフレーム時間の35%以上を確保し、周辺描画の最適化には代替手段があります。実機検証は未完了です。
 
 [Performance / GPU](../PERFORMANCE.md)
 
@@ -63,11 +63,15 @@ sh ./Install-Linux.sh
 
 ## Androidスマートフォンとタブレット
 
-[Androidスマートフォンとタブレット](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk)
+[Androidスマートフォンとタブレット](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Android-public.apk)
+
+## 時計の表示
+
+[時計の表示](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Wear-public.apk) · [図解設定ガイド](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 操作
 
@@ -137,9 +141,9 @@ View/Back: 設定 · LT: 巻き戻し · RT: Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 配布パッケージと検証 · 0.6.0
+## 配布パッケージと検証 · 0.7.0
 
-0.6では公開テスト7組、10言語のメニュー、ローカルの6作品、PC性能を検証しています。電話とタブレットはエミュレーターで確認しました。実機のAndroid、Mac、Questのフレームレートは未検証です。詳しくは検証レポートをご覧ください。
+0.7の検証は8つの公開テスト、10言語の図解設定、ローカルの6ゲーム、PC比較を含みます。スマートフォン、タブレット、Wear OSはエミュレーターを使用します。時計、Android、Mac、Quest実機の性能は未検証です。詳細はレポートを参照してください。
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

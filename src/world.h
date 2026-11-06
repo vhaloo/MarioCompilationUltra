@@ -33,6 +33,11 @@ class World {
     mutable std::vector<std::array<uint32_t, 256>> completeBlocks;
     int sceneryW = 0, sceneryH = 0;
     uint64_t graphicsVersion = ~uint64_t(0);
+    uint64_t graphicsRevision = 0, observedRevision = 0;
+    std::vector<uint32_t> retainedPixels;
+    std::array<double, 28> retainedKey{};
+    uint64_t retainedGraphics = 0, retainedObserved = 0, retainedMap = 0;
+    bool retainedValid = false;
     std::vector<uint8_t> graphicsVram;
     std::array<bool, 544> blockValid{};
     std::array<uint16_t, 256> graphicsPalette{};
@@ -56,7 +61,8 @@ class World {
     Scene scene;
     CompleteMap complete;
     std::vector<uint32_t> backdropPixels;
-    bool expanded = false;
+    bool expanded = false, retainTerrain = true;
+    uint64_t terrainBuilds = 0, terrainReuses = 0;
     size_t knownTiles() const { return cache.size(); }
     void reset() {
         lastStage = -1;
@@ -65,6 +71,8 @@ class World {
         cache.clear();
         graphicsVersion = ~uint64_t(0);
         graphicsCached = false;
+        retainedValid = false;
+        retainedPixels.clear();
         complete.reset();
     }
     Scene inspect(const Core &, bool completeView = false) const;

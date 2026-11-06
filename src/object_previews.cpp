@@ -62,7 +62,7 @@ PreviewKind ObjectPreviews::classify(int family, int id) {
     }
     return PreviewKind::Enemy;
 }
-void ObjectPreviews::update(const Core &c, const Scene &s) {
+void ObjectPreviews::update(const Core &c, const Scene &s, int cadence) {
     if (!s.valid) {
         objects.clear();
         return;
@@ -188,7 +188,8 @@ void ObjectPreviews::update(const Core &c, const Scene &s) {
                     true);
         }
     }
-    learn(c, s);
+    if (c.imageVersion % std::max(1, cadence) == 0)
+        learn(c, s, cadence > 1 ? 1 : 128);
 }
 uint32_t ObjectPreviews::spritePixel(const McuVideo &v, const McuVideo::Object &o, int x, int y) {
     static const int widths[8][2]{{8, 16},  {8, 32},  {8, 64},  {16, 32},
@@ -218,7 +219,8 @@ uint32_t ObjectPreviews::spritePixel(const McuVideo &v, const McuVideo::Object &
     return 0xff000000u | uint32_t(expand(p & 31)) << 16 | uint32_t(expand((p >> 5) & 31)) << 8 |
            expand((p >> 10) & 31);
 }
-void ObjectPreviews::learn(const Core &c, const Scene &s) {
+void ObjectPreviews::learn(const Core &c, const Scene &s, size_t budget) {
+    size_t learned = 0;
     if (c.snapshot.brightness < 12)
         return;
     for (const auto &m : objects) {
@@ -254,29 +256,36 @@ void ObjectPreviews::learn(const Core &c, const Scene &s) {
             if (nearest)
                 pieces.push_back(i);
         }
-        // Use only PPU object pixels, never a rectangle cut from the background.
-        for (int y = 0; y < 64; ++y)
-            for (int x = 0; x < 64; ++x) {
-                int px = cx + x - 16, py = cy + y - 24;
-                uint32_t pixel = 0;
-                for (int i : pieces) {
-                    const auto &o = c.snapshot.objects[i];
-                    int oy = o.y;
-                    if (oy > 239)
-                        oy -= 256;
-                    int ox = o.x;
-                    if (ox == -256)
-                        continue;
-                    // Reject a piece closer to the player than this observed object.
-                    auto q = spritePixel(c.snapshot, o, px - ox, py - oy);
-                    if (q)
-                        pixel = q;
+        if (pieces.empty())
+            continue;
+        // Rasterize each actual OAM piece once, preserving the original priority
+        // order. Empty portions of the 64x64 observation require no decoding.
+        static const int widths[8][2]{{8, 16},  {8, 32},  {8, 64},  {16, 32},
+                                      {16, 64}, {32, 64}, {16, 32}, {16, 32}};
+        static const int heights[8][2]{{8, 16},  {8, 32},  {8, 64},  {16, 32},
+                                       {16, 64}, {32, 64}, {32, 64}, {32, 32}};
+        for (int index : pieces) {
+            const auto &o = c.snapshot.objects[index];
+            int oy = o.y > 239 ? o.y - 256 : o.y;
+            int w = widths[c.snapshot.objectSize & 7][o.large ? 1 : 0],
+                h = heights[c.snapshot.objectSize & 7][o.large ? 1 : 0];
+            int left = std::clamp(o.x - cx + 16, 0, 64),
+                right = std::clamp(o.x + w - cx + 16, 0, 64);
+            int top = std::clamp(oy - cy + 24, 0, 64), bottom = std::clamp(oy + h - cy + 24, 0, 64);
+            for (int y = top; y < bottom; ++y)
+                for (int x = left; x < right; ++x) {
+                    auto pixel = spritePixel(c.snapshot, o, cx + x - 16 - o.x, cy + y - 24 - oy);
+                    if (pixel)
+                        image.pixels[y * 64 + x] = pixel;
                 }
-                image.pixels[y * 64 + x] = pixel;
-                colored += pixel != 0;
-            }
-        if (colored >= 8)
+        }
+        colored = int(std::count_if(image.pixels.begin(), image.pixels.end(),
+                                    [](uint32_t pixel) { return pixel != 0; }));
+        if (colored >= 8) {
             images.emplace(m.id, std::move(image));
+            if (++learned >= budget)
+                break;
+        }
     }
 }
 void ObjectPreviews::paint(Canvas &c, const Scene &s, const Settings &settings) {

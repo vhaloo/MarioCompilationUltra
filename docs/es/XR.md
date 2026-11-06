@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.6.0 · Quest VR / RA
+# Mario Compilation Ultra 0.7.0 · Quest VR / RA
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -24,7 +24,7 @@ La mesa arcade muestra el área cargada. Se conservan la física y la activació
 
 Controles rápidos en PC: mantén pulsado el stick derecho; cruceta izquierda/derecha cambia zoom, arriba 1:1, abajo mapa completo, A fija, B cámara original, X captura, Y sigue al jugador. Al soltar vuelven los controles SNES. F1 o ayuda Y del menú abre la explicación ilustrada.
 
-La versión 0.6 busca 60 fps ajustando la resolución del juego y el escenario, con menús y controles a resolución de pantalla. Conserva el reloj SNES y las partidas; el rebobinado rápido sin pérdidas reduce el trabajo de CPU. Quest adapta la resolución estéreo a la frecuencia elegida y ofrece CRT eficiente o de referencia. La velocidad depende del dispositivo. Falta probar el rendimiento en teléfonos, Mac y Quest físicos.
+La versión 0.7 adapta resolución del entorno, frecuencia decorativa y sombreado VR con reserva de rendimiento. Juego y menús siguen nítidos. Quest reserva al menos el 35% del tiempo por imagen seleccionado; el detalle periférico opcional tiene alternativa. Los objetivos requieren pruebas físicas.
 
 SNES: D-pad · A · B · X · Y · L · R · Start · Select
 

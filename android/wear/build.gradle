@@ -1,0 +1,58 @@
+plugins { id 'com.android.application' }
+def sdl = file(providers.gradleProperty('mcuSdlDir').getOrElse('../.deps/SDL2-2.32.10'))
+if(System.getenv('MCU_WEAR_BUILD_DIR'))layout.buildDirectory.set(file(System.getenv('MCU_WEAR_BUILD_DIR')))
+def generatedAssets=layout.buildDirectory.dir('generated/mcu-assets')
+def privateAssets=providers.gradleProperty('mcuPrivateAssets').orNull
+def keyFile=providers.gradleProperty('mcuKeyStore').orElse(providers.environmentVariable('MCU_QUEST_KEYSTORE')).orNull
+android {
+    namespace 'com.vhaloo.mariocompilationultra.wear'
+    compileSdk 36
+    ndkVersion '29.0.14206865'
+    defaultConfig {
+        applicationId 'com.vhaloo.mariocompilationultra.wear'
+        minSdk 28
+        targetSdk 36
+        versionCode 700
+        versionName '0.7.0'
+        ndk { abiFilters 'arm64-v8a','armeabi-v7a','x86_64' }
+
+    }
+    signingConfigs { if(keyFile) { portable {
+        storeFile file(keyFile)
+        storePassword providers.environmentVariable('MCU_QUEST_KEY_PASSWORD').get()
+        keyAlias 'mcu-quest'
+        keyPassword providers.environmentVariable('MCU_QUEST_KEY_PASSWORD').get()
+    } } }
+    buildTypes { release { minifyEnabled false; signingConfig keyFile?signingConfigs.portable:signingConfigs.debug } }
+
+    buildFeatures { buildConfig false }
+    sourceSets { main {
+        java.srcDir new File(sdl,'android-project/app/src/main/java')
+        java.srcDir '../common/src/main/java'
+        java.srcDir '../mobile/src/main/java'
+        res.srcDir '../app/src/main/res'
+        assets.srcDir generatedAssets.get().asFile
+        jniLibs.srcDir layout.buildDirectory.dir('generated/shared-native').get().asFile
+        if(privateAssets)assets.srcDir file(privateAssets)
+    } }
+    packaging { jniLibs { useLegacyPackaging true } }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    lint { abortOnError true;checkReleaseBuilds true;lintConfig file('../mobile/lint.xml') }
+}
+tasks.register('prepareMobileAssets',Sync) {
+    from('../../assets') { into 'mcu/assets' }
+    from('../../docs') { into 'mcu/docs' }
+    from('../../LICENSE') { into 'mcu/licences' }
+    from('../../THIRD_PARTY_NOTICES.md') { into 'mcu/licences' }
+    from('../../licenses') { into 'mcu/licences' }
+    into generatedAssets
+}
+tasks.named('preBuild').configure { dependsOn 'prepareMobileAssets' }
+
+// Both packages run the same capability-aware engine; compile native code once.
+tasks.register('prepareWearNative', Sync) {
+    dependsOn ':mobile:mergeReleaseNativeLibs'
+    from(project(':mobile').layout.buildDirectory.dir('intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib'))
+    into layout.buildDirectory.dir('generated/shared-native')
+}
+tasks.named('preBuild').configure { dependsOn 'prepareWearNative' }

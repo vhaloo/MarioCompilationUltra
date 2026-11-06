@@ -1,0 +1,24 @@
+Mario Compilation Ultra 0.7.0 · Watch view
+
+Turn the crown or bezel to zoom. In menus it scrolls; touch + and - also work.
+
+0%: whole loaded area. 100%: original camera. Doors and pipes may load another area.
+
+In most games, B jumps and Y runs or grabs. Hold direction and action buttons with different fingers.
+
+Pause with the pause icon or Android Back. Resume keeps your game. Quit is at the bottom of Collection.
+
+A personal package includes your local cartridges. Public packages need your own compatible cartridge files.
+
+Transfer cartridges to CartridgeInbox, then choose Check transferred cartridges or restart the app. Existing files are preserved.
+
+Physical watch controls and sustained hardware performance remain untested. This edition is experimental.
+
+Updating a signed APK preserves app data. Uninstalling or clearing app data removes local cartridges and saves.
+
+Physical watch controls and sustained hardware performance remain untested. This edition is experimental.
+
+/sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
+
+adb install -r MarioCompilationUltra-0.7.0-Wear-public.apk
+adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

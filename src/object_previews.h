@@ -18,12 +18,12 @@ class ObjectPreviews {
     uint32_t cartridge = 0;
     int room = -1;
     uint64_t version = ~uint64_t(0);
-    void learn(const Core &, const Scene &);
+    void learn(const Core &, const Scene &, size_t budget = 128);
 
   public:
     std::vector<PreviewObject> objects;
     size_t spritesDrawn = 0, outlinesDrawn = 0;
-    void update(const Core &, const Scene &);
+    void update(const Core &, const Scene &, int cadence = 1);
     void paint(Canvas &, const Scene &, const Settings &);
     void reset() {
         room = -1;

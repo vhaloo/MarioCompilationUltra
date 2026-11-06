@@ -40,7 +40,8 @@ class XrStageRenderer {
   public:
     XrStageRenderer();
     ~XrStageRenderer();
-    void initialise(XrInstance instance, XrSystemId system, XrSession session, int detail = 1);
+    void initialise(XrInstance instance, XrSystemId system, XrSession session, int detail = 1,
+                    bool foveation = false);
     const XrCompositionLayerProjection *
     render(XrSpace space, XrTime time, XrPosef origin, const Settings &settings, int mode,
            const XrStageContent &content, const XrSpatialControls &controls, bool passthrough,

@@ -1,4 +1,4 @@
-# Sonic feature parity — Mario 0.5.0
+# Sonic feature parity — Mario 0.7.0
 
 This comparison uses the Sonic collection's 0.6 XR implementation and a frozen
 snapshot of its ongoing 0.7 development on 2026-10-29. Mario retains its own
@@ -37,3 +37,15 @@ See the [versioned test report](TEST_REPORT.md), [Quest guide](QUEST.md) and
 [build instructions](BUILD.md). Public illustrations are original diagrams and
 ROM-free interface captures. Local cartridge graphics, gameplay captures and
 progress files remain outside Git and public packages.
+
+## 0.7 additions
+
+The dedicated Wear OS edition adds capability-detected rotary zoom, a cached
+round fisheye, complete independent SNES touch targets, an offline native
+guide and a transfer inbox. Phone, tablet and desktop retain their own layouts.
+The shared quality controller now manages reserve, thermal caps, decorative
+cadence and automatic VR shading, with optional peripheral foveation.
+All settings use semantic icons and explanatory original illustrations with
+hover/focus, question-button and touch access, in ten languages.
+The table above describes feature scope inherited from 0.5; current evidence
+and hardware limits are in the [0.7 report](TEST_REPORT.md).

@@ -3,17 +3,17 @@
 
 [English](docs/en/README.md) · [Français](docs/fr/README.md) · [Español](docs/es/README.md) · [日本語](docs/ja/README.md) · [Deutsch](docs/de/README.md) · [Italiano](docs/it/README.md) · [Português](docs/pt/README.md) · [Русский](docs/ru/README.md) · [简体中文](docs/zh/README.md) · [한국어](docs/ko/README.md)
 
-# Mario Compilation Ultra 0.6.0
+# Mario Compilation Ultra 0.7.0
 
 A local SNES collection with an adaptive PC interface and experimental world views. Snes9x supplies the cartridge simulation, including Super FX. No decompilation of every game is claimed.
 
-[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.6.0) · [HTML](docs/en/guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.7.0) · [HTML](docs/en/guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download and desktop startup
 
 | Windows x64 | Linux x64 | macOS Intel x64 | macOS Apple Silicon arm64 |
 |---|---|---|---|
-| [ZIP](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-windows-x64.zip) | [ZIP](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-linux-x64.zip) | [ZIP — experimental](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-macos-x64.zip) | [ZIP — experimental](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-macos-arm64.zip) |
+| [ZIP](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-windows-x64.zip) | [ZIP](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-linux-x64.zip) | [ZIP — experimental](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-macos-x64.zip) | [ZIP — experimental](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-macos-arm64.zip) |
 
 All four packages contain all ten interface languages, illustrated guides, licences and original desktop icons.
 
@@ -55,7 +55,7 @@ Expanded memory profiles and automatic All-Stars selection target the listed US 
 
 ## Automatic resolution
 
-Version 0.6 targets 60 fps with automatic game-layer and scenery resolution, while menus and input stay at display resolution. The original SNES clock and save slots are preserved; fast lossless rewind reduces CPU work. Quest follows the selected headset refresh rate with adaptive stereo resolution and an efficient CRT shader; the reference shader remains selectable. Sustained speed depends on the device. Physical phone, Mac and Quest performance still requires testing.
+Version 0.7 adapts scenery resolution, decorative cadence and VR shading with a performance reserve. Native game pixels and menus stay sharp. Quest reserves at least 35% of its selected frame budget; optional peripheral detail has a fallback. These targets require physical device validation.
 
 [Performance / GPU](docs/PERFORMANCE.md)
 
@@ -69,11 +69,15 @@ Version 0.6 targets 60 fps with automatic game-layer and scenery resolution, whi
 
 ## Android phones and tablets
 
-[Android phones and tablets](docs/en/MOBILE.md) · [HTML](docs/en/mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Android-public.apk)
+[Android phones and tablets](docs/en/MOBILE.md) · [HTML](docs/en/mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Android-public.apk)
+
+## Watch view
+
+[Watch view](docs/en/WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Wear-public.apk) · [Illustrated settings](docs/en/SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.6.0/MarioCompilationUltra-0.6.0-Quest-public.apk) · [Quest VR / AR](docs/en/XR.md) · [HTML](docs/en/xr.html) · [Parity](docs/PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Quest-public.apk) · [Quest VR / AR](docs/en/XR.md) · [HTML](docs/en/xr.html) · [Parity](docs/PARITY.md)
 
 ## Controls
 
@@ -143,9 +147,9 @@ Choose cartridge again if its file was moved or a drive is disconnected. ZIPs mu
 
 ![Quest VR / AR](docs/en/screenshots/6.png)
 
-## Packages and validation · 0.6.0
+## Packages and validation · 0.7.0
 
-0.6 validation covers seven public test suites, menus in ten languages, local six-game regressions and desktop performance. Phone/tablet checks use emulators. Physical Android, Mac and Quest framerate remains unverified; see the detailed report.
+0.7 validation covers eight public test suites, ten-language illustrated settings, six local games and desktop comparisons. Phone, tablet and Wear OS checks use emulators. Physical watch, Android, Mac and Quest performance remains unverified; see the detailed report.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](docs/TEST_REPORT.md) · [Build](docs/BUILD.md) · [Source / research](docs/RESEARCH.md)
 

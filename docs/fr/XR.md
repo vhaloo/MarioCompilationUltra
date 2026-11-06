@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.6.0 · Quest VR / AR
+# Mario Compilation Ultra 0.7.0 · Quest VR / AR
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -24,7 +24,7 @@ La table arcade affiche la zone chargée. La physique et l’activation des obje
 
 Commandes rapides sur ordinateur : maintiens le clic du stick droit, puis croix gauche/droite pour le zoom, haut pour 1:1, bas pour la carte entière, A pour figer, B pour la caméra originale, X pour une capture, Y pour suivre le joueur. Relâcher rend les commandes SNES normales. F1 ou l’aide Y du menu ouvre une explication illustrée.
 
-La version 0.6 vise 60 images/s en adaptant la résolution du jeu et du décor ; les menus et les commandes gardent la résolution de l’écran. Le rythme SNES et les sauvegardes sont conservés ; le retour arrière sans perte réduit la charge du processeur. Sur Quest, la résolution stéréo suit la fréquence choisie et le shader CRT économe reste accompagné du shader de référence. La vitesse dépend du matériel. Les performances sur téléphone, Mac et Quest physiques restent à tester.
+La version 0.7 adapte la résolution des décors, la cadence décorative et le shader VR avec une réserve de performance. Pixels du jeu et menus restent nets. Quest réserve au moins 35 % du budget à la fréquence choisie ; le détail périphérique facultatif a un rendu de secours. Ces objectifs restent à vérifier sur appareil physique.
 
 SNES: D-pad · A · B · X · Y · L · R · Start · Select
 

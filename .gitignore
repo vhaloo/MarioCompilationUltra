@@ -18,6 +18,8 @@ local-config*
 /android/app/.cxx/
 /android/mobile/.cxx/
 /android/mobile/build/
+/android/wear/build/
+/android/wear/.cxx/
 /android/app/build/
 /android/build/
 /android/local.properties

@@ -224,7 +224,7 @@ void App::resetMetrics() {
     composeTimes.clear();
     simulationTimes.clear();
     presentTimes.clear();
-    sceneRebuilds = sceneReuses = textureUploads = 0;
+    sceneRebuilds = sceneReuses = textureUploads = textureUploadBytes = 0;
 }
 App::~App() {
     try {
@@ -241,6 +241,8 @@ App::~App() {
         nativeBlitter.reset();
         worldBlitter.reset();
         insetBlitter.reset();
+        if (watchTarget)
+            SDL_DestroyTexture(watchTarget);
         if (frameTarget)
             SDL_DestroyTexture(frameTarget);
         if (sceneTarget)
@@ -354,10 +356,14 @@ void App::invalidateGraphics(bool deviceReset) {
     insetBlitter->invalidate(deviceReset);
     if (deviceReset) {
         SDL_SetRenderTarget(renderer, nullptr);
-        for (auto texture : {nativeTex, worldTex, backgroundTex, frameTarget, sceneTarget})
+        for (auto texture :
+             {nativeTex, worldTex, backgroundTex, frameTarget, sceneTarget, watchTarget})
             if (texture)
                 SDL_DestroyTexture(texture);
-        nativeTex = worldTex = backgroundTex = frameTarget = sceneTarget = nullptr;
+        nativeTex = worldTex = backgroundTex = frameTarget = sceneTarget = watchTarget = nullptr;
+        nativeDamage.clear();
+        worldDamage.clear();
+        watchWidth = watchHeight = 0;
         nw = nh = ww = wh = frameWidth = frameHeight = sceneWidth = sceneHeight = 0;
         ImGui_ImplSDLRenderer2_DestroyDeviceObjects();
         gpuTimer.release();
@@ -367,6 +373,14 @@ void App::invalidateGraphics(bool deviceReset) {
 void App::events() {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
+        if (e.type == SDL_USEREVENT && e.user.code == AndroidCheckpointEvent) {
+            SDL_Event background{};
+            background.type = SDL_APP_WILLENTERBACKGROUND;
+            if (mobileActive())
+                mobileEvent(background);
+            androidCheckpointComplete(uint32_t(reinterpret_cast<uintptr_t>(e.user.data1)));
+            continue;
+        }
         if (mobileActive() && mobileEvent(e))
             continue;
         ImGui_ImplSDL2_ProcessEvent(&e);
@@ -384,8 +398,11 @@ void App::events() {
                 focused = false;
                 core.clearAudio();
             }
-            if (e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+            if (e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
                 focused = true;
+                if (mobileActive())
+                    backgrounded = false;
+            }
         }
         if (e.type == SDL_DROPFILE) {
             try {
@@ -604,7 +621,7 @@ void App::input() {
         any |= core.buttons[0] != 0;
     if (releaseInput && !any)
         releaseInput = false;
-    if (menu || releaseInput || !focused && settings.pauseFocus) {
+    if (menu || backgrounded || releaseInput || !focused && settings.pauseFocus) {
         core.buttons[0] = core.buttons[1] = 0;
     }
     if (settings.freeze && !menu) {
@@ -680,7 +697,8 @@ void App::bootstrapInput() {
     ++bootstrapAge;
 }
 void App::tick() {
-    if (menu || !core.loaded || (!focused && settings.pauseFocus && !options.headless))
+    if (menu || backgrounded || !core.loaded ||
+        (!focused && settings.pauseFocus && !options.headless))
         return;
     auto *k = SDL_GetKeyboardState(nullptr);
     bool rewindHeld =
@@ -718,6 +736,7 @@ void App::tick() {
 }
 void App::updateTexture(SDL_Texture *&t, int &ow, int &oh, int w, int h,
                         const std::vector<uint32_t> &b) {
+    auto &damage = &t == &nativeTex ? nativeDamage : worldDamage;
     if (!w || !h || b.empty())
         return;
     if (!t || ow != w || oh != h) {
@@ -730,9 +749,14 @@ void App::updateTexture(SDL_Texture *&t, int &ow, int &oh, int w, int h,
         SDL_SetTextureScaleMode(t, SDL_ScaleModeNearest);
         ow = w;
         oh = h;
+        damage.clear();
     }
-    SDL_UpdateTexture(t, nullptr, b.data(), w * 4);
-    ++textureUploads;
+    for (const auto &area : damage.update(w, h, b)) {
+        if (SDL_UpdateTexture(t, &area, b.data() + size_t(area.y) * w + area.x, w * 4) != 0)
+            throw std::runtime_error(SDL_GetError());
+        ++textureUploads;
+        textureUploadBytes += uint64_t(area.w) * area.h * 4;
+    }
 }
 void App::background() {
     if (settings.background == 3)
@@ -749,7 +773,8 @@ void App::background() {
         SDL_SetTextureScaleMode(backgroundTex, SDL_ScaleModeLinear);
     }
     std::array<int, 3> key{{settings.background, settings.blur, settings.brightness}};
-    if (backdropVersion != core.imageVersion || backdropKey != key) {
+    if (backdropVersion == ~uint64_t(0) || !backgroundTex || backdropKey != key ||
+        (backdropVersion != core.imageVersion && core.imageVersion % effectCadence() == 0)) {
         auto pixels =
             softenBackdrop(world.backdropPixels, w, h,
                            settings.background == 0 ? settings.blur / 4 : 0, settings.brightness);
@@ -766,7 +791,7 @@ void App::drawGame() {
     if (!core.loaded)
         return;
     uint64_t began = SDL_GetPerformanceCounter();
-    std::array<double, 20> key{{double(drawableWidth),
+    std::array<double, 22> key{{double(drawableWidth),
                                 double(drawableHeight),
                                 double(settings.view),
                                 double(settings.zoom),
@@ -785,9 +810,12 @@ void App::drawGame() {
                                 double(settings.enemyPreview),
                                 double(settings.bossPreview),
                                 double(settings.objectPreview),
-                                double(settings.spawnLabels)}};
+                                double(settings.spawnLabels),
+                                double(settings.projectionWatch),
+                                settings.projectionWatchZoom}};
     bool rebuild = lastCompose != core.imageVersion || compositionKey != key;
     if (rebuild) {
+        world.retainTerrain = !options.coldScene;
         world.compose(core, settings, drawableWidth, drawableHeight,
 #ifdef MCU_QUEST
                       1.f
@@ -795,7 +823,7 @@ void App::drawGame() {
                       resolutionScale()
 #endif
         );
-        previews.update(core, world.scene);
+        previews.update(core, world.scene, effectCadence());
         previews.paint(world.canvas, world.scene, settings);
         lastCompose = core.imageVersion;
         compositionKey = key;
@@ -811,20 +839,27 @@ void App::drawGame() {
     if (!settings.projectionTransparent)
         background();
     if (!nativeTex || nativeVersion != core.imageVersion) {
+        uint64_t before = textureUploads;
         updateTexture(nativeTex, nw, nh, core.width, core.height, core.native);
+        if (textureUploads != before)
+            ++nativeContentVersion;
         nativeVersion = core.imageVersion;
     }
     if (world.expanded) {
-        if (rebuild || !worldTex)
+        if (rebuild || !worldTex) {
+            uint64_t before = textureUploads;
             updateTexture(worldTex, ww, wh, world.canvas.width, world.canvas.height,
                           world.canvas.pixels);
+            if (textureUploads != before)
+                ++worldContentVersion;
+        }
         SDL_SetTextureBlendMode(worldTex, SDL_BLENDMODE_BLEND);
         worldBlitter->copy(worldTex, ww, wh, {0, 0, float(drawableWidth), float(drawableHeight)},
                            settings.view == 2 || (settings.view >= 3 &&
                                                   (!settings.smoothMap || settings.quality == 0))
                                ? 0
                                : settings.filter,
-                           canvasVersion);
+                           worldContentVersion);
         auto &cv = world.canvas;
         nativeRect = {(world.scene.cameraX - cv.x) * drawableWidth / cv.worldWidth,
                       (world.scene.cameraY - cv.y) * drawableHeight / cv.worldHeight,
@@ -843,8 +878,9 @@ void App::drawGame() {
     }
     // Draw the authoritative framebuffer again at full source resolution. Atlas
     // quality budgets and panorama sampling must never downsample the live game.
-    nativeBlitter->copy(nativeTex, core.width, core.height, nativeRect,
-                        settings.view == 2 ? 0 : settings.filter, core.imageVersion);
+    if (!deferNative)
+        nativeBlitter->copy(nativeTex, core.width, core.height, nativeRect,
+                            settings.view == 2 ? 0 : settings.filter, nativeContentVersion);
     float rowHeight = nativeRect.h / core.height;
     if (settings.scanlines && rowHeight >= 2.f) {
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -919,8 +955,9 @@ void App::drawGame() {
         SDL_FRect border{insetRect.x - 2, insetRect.y - 2, w + 4, h + 4};
         SDL_SetRenderDrawColor(renderer, 154, 203, 179, 255);
         SDL_RenderFillRectF(renderer, &border);
-        insetBlitter->copy(nativeTex, core.width, core.height, insetRect, settings.filter,
-                           core.imageVersion);
+        if (!deferNative)
+            insetBlitter->copy(nativeTex, core.width, core.height, insetRect, settings.filter,
+                               core.imageVersion);
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
     }
 }
@@ -970,7 +1007,7 @@ void App::libraryUi() {
         if (quest)
             quest->chooseRom();
 #elif defined(MCU_MOBILE)
-        androidChooseRom();
+        androidChooseRom(locale(settings.language).code);
 #else
         browser = true;
         pathEdit = false;
@@ -980,7 +1017,7 @@ void App::libraryUi() {
         ImGui::SameLine();
         if (button("Import folder...", "Importer un dossier...")) {
 #ifdef MCU_MOBILE
-            androidChooseRom();
+            androidChooseRom(locale(settings.language).code);
 #else
             browser = true;
             pathEdit = false;
@@ -1029,41 +1066,19 @@ void App::libraryUi() {
                                 "contain the software and documentation."));
 }
 void App::optionsUi() {
+#ifdef MCU_QUEST
+    constexpr int reserveFloor = 35, automaticReserve = 35;
+#else
+    constexpr int reserveFloor = 15, automaticReserve = 25;
+#endif
     mobileOptions();
-    auto combo = [&](const char *en, const char *fr, int &v,
-                     std::initializer_list<const char *> labels) {
-        ImGui::PushID(en);
-        ImGui::TextWrapped("%s", tr(en, fr));
-        ImGui::SetNextItemWidth(-1);
-        if (ImGui::BeginCombo("##value", tr(*(labels.begin() + v)))) {
-            int i = 0;
-            for (auto label : labels) {
-                if (ImGui::Selectable(tr(label), i == v, 0,
-                                      {0, mobileActive() ? 48 * uiUnit() : 0}))
-                    v = i;
-                if (i == v)
-                    ImGui::SetItemDefaultFocus();
-                ++i;
-            }
-            ImGui::EndCombo();
-        }
-        control(en);
-        ImGui::PopID();
-    };
-    auto check = [&](const char *en, const char *fr, bool &v) {
-        if (mobileActive()) {
-            tick(en, v);
-            return;
-        }
-        ImGui::Checkbox(tr(en, fr), &v);
-        control(en);
-    };
-    auto slider = [&](const char *en, const char *fr, int &v, int lo, int hi) {
-        ImGui::PushID(en);
-        ImGui::TextWrapped("%s", tr(en, fr));
-        ImGui::SetNextItemWidth(-1);
-        ImGui::SliderInt("##value", &v, lo, hi);
-        ImGui::PopID();
+    if (watchActive() && (tab == 1 || tab == 2 || tab == 4 || tab == 5))
+        return;
+    auto combo = [&](const char *en, const char *, int &v,
+                     std::initializer_list<const char *> labels) { choice(en, v, labels); };
+    auto check = [&](const char *en, const char *, bool &v) { tick(en, v); };
+    auto slider = [&](const char *en, const char *, int &v, int lo, int hi) {
+        this->slider(en, v, lo, hi);
     };
     if (tab == 1) {
         ImGui::TextWrapped(
@@ -1071,44 +1086,76 @@ void App::optionsUi() {
                      "Le jeu garde son rythme SNES d'origine. Les vues modifient son affichage."));
         combo("View", "Vue", settings.view,
               {"Original framing", "Panorama", "Pixel world", "Stage atlas", "Full level map"});
-        combo("Image filter", "Filtre d'image", settings.filter,
-              {"Nearest pixels", "Crisp (recommended)", "Smooth"});
-        combo("Aspect ratio", "Proportions", settings.aspect, {"Square pixels", "TV 4:3"});
-        ImGui::TextWrapped("%s",
-                           tr("Pixel world keeps square pixels and integer zoom. The crisp "
-                              "filter balances sharp detail and even pixels at other sizes."));
-        if (button("Recommended picture", "Image recommandée"))
-            settings.recommendedPicture();
-        ImGui::PushID("Pixel zoom");
-        ImGui::TextWrapped("%s", tr("Pixel zoom"));
-        ImGui::SetNextItemWidth(-1);
-        ImGui::SliderInt("##value", &settings.zoom, 0, 8,
-                         settings.zoom == 0 ? tr("Auto (fit window)") : "%d×");
-        ImGui::PopID();
-        combo("Quality", "Qualité", settings.quality, {"Lightweight", "Balanced", "Ultra"});
-        check("Automatic resolution", nullptr, settings.adaptiveResolution);
-        ImGui::TextWrapped(
-            "%s",
-            tr("Targets 60 fps by adapting scenery detail. Game pixels and menus stay sharp."));
-        if (!mobileActive()) {
-            check("Borderless fullscreen", "Plein écran sans bordure", settings.fullscreen);
-            check("Span all displays", "Étendre sur tous les écrans", settings.span);
-            if (ImGui::BeginCombo(tr("Display", "Écran"),
-                                  settings.display < 0 ? tr("Current display", "Écran actuel")
-                                                       : SDL_GetDisplayName(settings.display))) {
-                if (ImGui::Selectable(tr("Current display", "Écran actuel"), settings.display < 0))
-                    settings.display = -1;
-                for (int i = 0; i < SDL_GetNumVideoDisplays(); i++) {
-                    ImGui::PushID(i);
-                    if (ImGui::Selectable(SDL_GetDisplayName(i), settings.display == i))
-                        settings.display = i;
-                    ImGui::PopID();
-                }
-                ImGui::EndCombo();
-            }
+        ImGui::TextColored({.55f, .9f, .75f, 1}, "%s", tr("Find your balance"));
+        bool presetRow = ImGui::GetContentRegionAvail().x > 720 * uiUnit();
+        if (button("Automatic quality")) {
+            settings.adaptiveResolution = true;
+            settings.performanceMode = 0;
+            settings.performanceReserve = automaticReserve;
+            settings.quality = 2;
         }
-        check("Vertical sync", "Synchronisation verticale", settings.vsync);
-        slider("Scanlines", "Lignes de balayage", settings.scanlines, 0, 80);
+        if (presetRow)
+            ImGui::SameLine();
+        if (button("Extra smooth")) {
+            settings.adaptiveResolution = true;
+            settings.performanceMode = 1;
+            settings.performanceReserve = 40;
+            settings.quality = 2;
+        }
+        if (presetRow)
+            ImGui::SameLine();
+        if (button("Manual quality")) {
+            settings.adaptiveResolution = false;
+            settings.performanceMode = 0;
+        }
+        check("Automatic quality", nullptr, settings.adaptiveResolution);
+        combo("Quality", nullptr, settings.quality, {"Lightweight", "Balanced", "Ultra"});
+        if (ImGui::CollapsingHeader(tr("Advanced picture controls"))) {
+            if (this->slider("Performance reserve", settings.performanceReserve, reserveFloor, 45,
+                             "%d%%"))
+                settings.performanceMode = 0;
+            check("React to device heat", nullptr, settings.thermalAware);
+            combo("Image filter", "Filtre d'image", settings.filter,
+                  {"Nearest pixels", "Crisp (recommended)", "Smooth"});
+            combo("Aspect ratio", "Proportions", settings.aspect, {"Square pixels", "TV 4:3"});
+            ImGui::TextWrapped("%s",
+                               tr("Pixel world keeps square pixels and integer zoom. The crisp "
+                                  "filter balances sharp detail and even pixels at other sizes."));
+            if (button("Recommended picture", "Image recommandée"))
+                settings.recommendedPicture();
+            ImGui::PushID("Pixel zoom");
+            settingTitle("Pixel zoom");
+            ImGui::SetNextItemWidth(-1);
+            ImGui::SliderInt("##value", &settings.zoom, 0, 8,
+                             settings.zoom == 0 ? tr("Auto (fit window)") : "%d×");
+            ImGui::PopID();
+
+            ImGui::TextWrapped(
+                "%s",
+                tr("Targets 60 fps by adapting scenery detail. Game pixels and menus stay sharp."));
+            if (!mobileActive()) {
+                check("Borderless fullscreen", "Plein écran sans bordure", settings.fullscreen);
+                check("Span all displays", "Étendre sur tous les écrans", settings.span);
+                settingTitle("Display");
+                if (ImGui::BeginCombo(tr("Display", "Écran"),
+                                      settings.display < 0
+                                          ? tr("Current display", "Écran actuel")
+                                          : SDL_GetDisplayName(settings.display))) {
+                    if (ImGui::Selectable(tr("Current display", "Écran actuel"),
+                                          settings.display < 0))
+                        settings.display = -1;
+                    for (int i = 0; i < SDL_GetNumVideoDisplays(); i++) {
+                        ImGui::PushID(i);
+                        if (ImGui::Selectable(SDL_GetDisplayName(i), settings.display == i))
+                            settings.display = i;
+                        ImGui::PopID();
+                    }
+                    ImGui::EndCombo();
+                }
+            }
+            check("Vertical sync", "Synchronisation verticale", settings.vsync);
+            slider("Scanlines", "Lignes de balayage", settings.scanlines, 0, 80);
+        }
         check("Performance overlay", "Afficher les performances", settings.showStats);
     }
     if (tab == 2) {
@@ -1183,17 +1230,7 @@ void App::optionsUi() {
     }
     if (tab == 4) {
         slider("Stick dead zone (%)", "Zone morte du stick (%)", settings.deadzone, 5, 60);
-        ImGui::TextWrapped("%s", tr("Interface language"));
-        ImGui::SetNextItemWidth(-1);
-        if (ImGui::BeginCombo("##language", locale(settings.language).name)) {
-            for (int i = 0; i < LocaleCount; ++i) {
-                if (ImGui::Selectable(locale(i).name, i == settings.language))
-                    settings.language = i;
-                if (i == settings.language)
-                    ImGui::SetItemDefaultFocus();
-            }
-            ImGui::EndCombo();
-        }
+        languageControl();
         ImGui::TextWrapped("%s", tr("Original cartridge text keeps its original language."));
         slider("Interface size (%)", "Taille de l'interface (%)", settings.uiScale, 75, 175);
         check("High contrast", "Contraste élevé", settings.highContrast);
@@ -1277,6 +1314,10 @@ void App::optionsUi() {
     extrasUi();
 }
 void App::menuUi() {
+    if (watchActive()) {
+        watchMenu();
+        return;
+    }
     auto &io = ImGui::GetIO();
     float u = uiUnit();
     float scale = settings.uiScale / 100.f;
@@ -1518,7 +1559,9 @@ void App::dialogs() {
     ImGui::OpenPopup("##confirm");
     ImGui::SetNextWindowPos(ImGui::GetIO().DisplaySize * .5f, ImGuiCond_Always, {.5f, .5f});
     ImGui::SetNextWindowSize(
-        {std::min(520.f * uiUnit(), ImGui::GetIO().DisplaySize.x - 20 * uiUnit()), 0},
+        {watchActive() ? std::min(drawableWidth, drawableHeight) * .66f
+                       : std::min(520.f * uiUnit(), ImGui::GetIO().DisplaySize.x - 20 * uiUnit()),
+         0},
         ImGuiCond_Always);
     if (ImGui::BeginPopupModal("##confirm", nullptr,
                                ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -1617,7 +1660,24 @@ void App::render() {
     if (quest)
         quest->configureRender(settings);
 #endif
-    bool cleanProjection = settings.projectionCleanScene;
+    bool watchFrame = watchActive() && !menu && core.loaded;
+    Settings watchPersistent;
+    if (watchFrame) {
+        watchPersistent = settings;
+        uint64_t now = SDL_GetTicks64();
+        watchZoomCurrent = watchZoomAt
+                               ? smoothWatchZoom(watchZoomCurrent, settings.watchZoom * .001f,
+                                                 (now - watchZoomAt) * .001)
+                               : settings.watchZoom * .001f;
+        watchZoomAt = now;
+        settings.view = 4;
+        settings.inset = false;
+        settings.freeze = false;
+        settings.desktopPresentation = 0;
+        settings.projectionWatch = true;
+        settings.projectionWatchZoom = watchZoomCurrent;
+    }
+    bool cleanProjection = settings.projectionCleanScene || watchFrame;
     SDL_SetRenderDrawColor(
         renderer, settings.projectionTransparent ? 0 : 12, settings.projectionTransparent ? 0 : 19,
         settings.projectionTransparent ? 0 : 28, settings.projectionTransparent ? 0 : 255);
@@ -1631,11 +1691,30 @@ void App::render() {
         drawableWidth = gameViewport.w;
         drawableHeight = gameViewport.h;
     }
+    SDL_Texture *watchPreviousTarget = nullptr;
+    SDL_Rect watchOutput = gameViewport;
+    if (watchFrame) {
+        if (!watchTarget || watchWidth != drawableWidth || watchHeight != drawableHeight) {
+            if (watchTarget)
+                SDL_DestroyTexture(watchTarget);
+            watchWidth = drawableWidth;
+            watchHeight = drawableHeight;
+            watchTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
+                                            SDL_TEXTUREACCESS_TARGET, watchWidth, watchHeight);
+            if (!watchTarget)
+                throw std::runtime_error(SDL_GetError());
+            SDL_SetTextureScaleMode(watchTarget, SDL_ScaleModeLinear);
+        }
+        watchPreviousTarget = SDL_GetRenderTarget(renderer);
+        SDL_SetRenderTarget(renderer, watchTarget);
+        SDL_RenderSetViewport(renderer, nullptr);
+        gameViewport = {0, 0, drawableWidth, drawableHeight};
+    }
     if (!settings.projectionUiOnly) {
 #ifndef MCU_QUEST
         SDL_Texture *previousTarget = SDL_GetRenderTarget(renderer);
         bool reduced = false;
-        if (!menu && core.loaded && resolutionScale() < 1.f) {
+        if (!menu && core.loaded && settings.view != 0 && resolutionScale() < 1.f) {
             // Keep logical geometry, input, HUD and UI at display resolution.
             // Only the game layer uses the smaller physical target.
             float scale = std::min(
@@ -1664,7 +1743,12 @@ void App::render() {
             }
         }
 #endif
+        deferNative = false;
+#ifndef MCU_QUEST
+        deferNative = reduced;
+#endif
         drawGame();
+        deferNative = false;
 #ifndef MCU_QUEST
         if (reduced) {
             SDL_SetRenderTarget(renderer, previousTarget);
@@ -1674,6 +1758,24 @@ void App::render() {
             SDL_SetTextureScaleMode(sceneTarget, settings.view == 2 ? SDL_ScaleModeNearest
                                                                     : SDL_ScaleModeLinear);
             SDL_RenderCopyF(renderer, sceneTarget, nullptr, &dest);
+            // The expensive surround can be smaller, but never resample the
+            // authoritative camera through that reduced intermediate target.
+            nativeBlitter->copy(nativeTex, core.width, core.height, nativeRect,
+                                settings.view == 2 ? 0 : settings.filter, nativeContentVersion);
+            if (settings.scanlines && nativeRect.h / core.height >= 2) {
+                float row = nativeRect.h / core.height;
+                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, uint8_t(settings.scanlines * 255 / 100));
+                for (int y = 0; y < int(core.height); ++y) {
+                    SDL_FRect line{nativeRect.x, nativeRect.y + (y + .75f) * row, nativeRect.w,
+                                   row * .25f};
+                    SDL_RenderFillRectF(renderer, &line);
+                }
+                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+            }
+            if (insetRect.w > 0 && insetRect.h > 0)
+                insetBlitter->copy(nativeTex, core.width, core.height, insetRect, settings.filter,
+                                   nativeContentVersion);
         } else {
             sceneWidth = drawableWidth;
             sceneHeight = drawableHeight;
@@ -1681,6 +1783,17 @@ void App::render() {
 #endif
     }
     furniture();
+    if (watchFrame) {
+        SDL_SetRenderTarget(renderer, watchPreviousTarget);
+        SDL_RenderSetViewport(renderer, nullptr);
+        SDL_RenderSetScale(renderer, 1, 1);
+        float lens = watchRound() && settings.watchLens ? 1.f : 0.f;
+        if (!watchMesh.draw(renderer, watchTarget, fullWidth, fullHeight,
+                            float(watchWidth) / watchHeight, lens, watchRound()))
+            SDL_RenderCopy(renderer, watchTarget, nullptr, &watchOutput);
+        gameViewport = watchOutput;
+        settings = std::move(watchPersistent);
+    }
     if (mobileActive()) {
         SDL_RenderSetViewport(renderer, nullptr);
         drawableWidth = fullWidth;
@@ -1867,7 +1980,12 @@ void App::render() {
         previousPresentation = 0;
 }
 void App::finishFrame(double workMs, double gpuMs, double budgetMs) {
-    if (menu || !core.loaded || (!focused && !options.headless)) {
+    uint64_t now = SDL_GetTicks64();
+    if (!options.mobilePreview && (!thermalAt || now - thermalAt >= 1000)) {
+        thermalStatus = androidThermalStatus();
+        thermalAt = now;
+    }
+    if (menu || backgrounded || !core.loaded || (!focused && !options.headless)) {
         simulationWorkMs = 0;
         return;
     }
@@ -1878,11 +1996,15 @@ void App::finishFrame(double workMs, double gpuMs, double budgetMs) {
     if (simulationTimes.size() > 600)
         simulationTimes.erase(simulationTimes.begin());
     resolution.observe(workMs, std::max(gpuMs, framePressureMs), budgetMs,
-                       settings.adaptiveResolution
+                       settings.adaptiveResolution,
+                       std::max(settings.performanceMode ? 40 : settings.performanceReserve,
 #ifdef MCU_QUEST
-                           && settings.questAdaptive
+                                35
+#else
+                                15
 #endif
-    );
+                                ),
+                       settings.thermalAware ? thermalStatus : 0);
 }
 void App::capture(const fs::path &p) {
     fs::create_directories(p.parent_path());
@@ -1959,10 +2081,19 @@ void App::report(const fs::path &p, double elapsed) const {
       << ",\n\"compose_ms_p95\":" << percentile(composeTimes, .95)
       << ",\n\"simulation_ms_p95\":" << percentile(simulationTimes, .95)
       << ",\n\"present_ms_p95\":" << percentile(presentTimes, .95)
-      << ",\n\"gpu_ms\":" << gpuTimer.ms() << ",\n\"frame_pressure_ms\":" << framePressureMs
-      << ",\n\"gpu_timer_available\":" << (gpuTimer.available() ? "true" : "false")
+      << ",\n\"gpu_ms\":" << (xrGpuTimerAvailable ? xrGpuMs : gpuTimer.ms())
+      << ",\n\"frame_pressure_ms\":" << framePressureMs << ",\n\"gpu_timer_available\":"
+      << ((gpuTimer.available() || xrGpuTimerAvailable) ? "true" : "false")
       << ",\n\"resolution_scale\":" << resolutionScale() << ",\n\"scene_render_size\":["
       << sceneWidth << ',' << sceneHeight << ']' << ",\n\"adaptive_level\":" << resolution.level()
+      << ",\n\"watch\":" << (watchActive() ? "true" : "false")
+      << ",\n\"watch_round\":" << (watchRound() ? "true" : "false")
+      << ",\n\"watch_crown\":" << (mobileDisplay.rotary ? "true" : "false")
+      << ",\n\"watch_zoom\":" << settings.watchZoom << ",\n\"thermal_status\":" << thermalStatus
+      << ",\n\"effect_cadence\":" << effectCadence()
+      << ",\n\"texture_upload_bytes\":" << textureUploadBytes
+      << ",\n\"terrain_builds\":" << world.terrainBuilds
+      << ",\n\"terrain_reuses\":" << world.terrainReuses
       << ",\n\"scene_rebuilds\":" << sceneRebuilds << ",\n\"scene_reuses\":" << sceneReuses
       << ",\n\"texture_uploads\":" << textureUploads
       << ",\n\"frame_interval_ms_p95\":" << percentile(presentationIntervals, .95)
@@ -2002,7 +2133,12 @@ void App::report(const fs::path &p, double elapsed) const {
       << ",\n\"rewind_states\":" << core.rewindCount() << ",\n\"native_crc32\":"
       << jsonString(hex32(
              (uint32_t)crc32(0, (const Bytef *)core.native.data(), (uInt)(core.native.size() * 4))))
-      << "\n}\n";
+      << ",\n\"canvas_crc32\":"
+      << jsonString(
+             hex32(uint32_t(crc32(0, reinterpret_cast<const Bytef *>(world.canvas.pixels.data()),
+                                  uInt(world.canvas.pixels.size() * 4)))))
+      << ",\n\"performance_reserve\":" << settings.performanceReserve
+      << ",\n\"quality_ceiling\":" << settings.quality << "\n}\n";
     std::string report = o.str();
     report.insert(
         report.size() - 3,
@@ -2068,7 +2204,15 @@ void App::scriptCommand(const std::string &cmd, const std::string &value) {
         settings.language = std::stoi(value);
     else if (cmd == "quality")
         settings.quality = std::stoi(value);
-    else if (cmd == "adaptive")
+    else if (cmd == "watchzoom")
+        settings.watchZoom = std::clamp(std::stoi(value), 0, 1000);
+    else if (cmd == "crown") {
+        SDL_Event e{};
+        e.type = SDL_USEREVENT;
+        e.user.code = RotaryEvent;
+        e.user.data1 = reinterpret_cast<void *>(intptr_t(std::lround(std::stof(value) * 1000)));
+        watchEvent(e);
+    } else if (cmd == "adaptive")
         settings.adaptiveResolution = std::stoi(value) != 0;
     else if (cmd == "zoomOut")
         settings.zoomOut = std::stoi(value);

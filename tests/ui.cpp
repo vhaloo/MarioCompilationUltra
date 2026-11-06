@@ -121,6 +121,37 @@ int main() {
                   "Reduced game target preserves the native image and centered letterbox bounds");
             SDL_FreeSurface(rgba);
             SDL_FreeSurface(adapted);
+            auto originalNative = a.core.native;
+            a.settings.view = 2;
+            a.settings.zoom = 1;
+            a.settings.zoomOut = 0;
+            for (unsigned y = 0; y < a.core.height; ++y)
+                for (unsigned x = 0; x < a.core.width; ++x)
+                    a.core.native[y * a.core.width + x] = ((x ^ y) & 1) ? 0xff17c943 : 0xffed703b;
+            ++a.core.imageVersion;
+            a.render();
+            a.capture(data / "adaptive-exact-pixels.bmp");
+            auto pixelImage = SDL_LoadBMP((data / "adaptive-exact-pixels.bmp").u8string().c_str());
+            auto pixels = SDL_ConvertSurfaceFormat(pixelImage, SDL_PIXELFORMAT_ARGB8888, 0);
+            bool exact = pixels != nullptr;
+            int left = (1280 - int(a.core.width)) / 2, top = (720 - int(a.core.height)) / 2;
+            for (unsigned y = 0; exact && y < a.core.height; ++y)
+                for (unsigned x = 0; x < a.core.width; ++x)
+                    if (reinterpret_cast<uint32_t *>(static_cast<uint8_t *>(pixels->pixels) +
+                                                     (top + y) * pixels->pitch)[left + x] !=
+                        a.core.native[y * a.core.width + x]) {
+                        exact = false;
+                        break;
+                    }
+            check(exact, "Adaptive surroundings preserve every authoritative native pixel at exact "
+                         "1:1 zoom");
+            SDL_FreeSurface(pixels);
+            SDL_FreeSurface(pixelImage);
+            a.core.native = std::move(originalNative);
+            ++a.core.imageVersion;
+            a.settings.view = 0;
+            a.settings.zoom = 0;
+            a.render();
             a.scriptCommand("metrics", "reset");
             a.render();
             a.render();
@@ -383,12 +414,31 @@ int main() {
             step();
             check(!mobile.core.buttons[0] && fs::exists(mobile.core.statePath(0)),
                   "Backgrounding releases touch input and saves the resume slot");
+            auto backgroundFrame = mobile.core.frame;
+            mobile.settings.pauseFocus = false;
+            mobile.tick();
+            check(mobile.core.frame == backgroundFrame,
+                  "Android backgrounding stops simulation independently of desktop focus "
+                  "preferences");
             SDL_Event foreground{};
             foreground.type = SDL_APP_DIDENTERFOREGROUND;
             SDL_PushEvent(&foreground);
             step();
             check(mobile.core.loaded && mobile.focused && !mobile.core.buttons[0],
                   "Foreground resumes with the cartridge and neutral controls");
+            auto checkpointImage = mobile.core.native;
+            SDL_Event checkpoint{};
+            checkpoint.type = SDL_USEREVENT;
+            checkpoint.user.code = AndroidCheckpointEvent;
+            checkpoint.user.data1 = reinterpret_cast<void *>(uintptr_t(1));
+            SDL_PushEvent(&checkpoint);
+            step();
+            check(mobile.backgrounded && mobile.core.loadState(0) &&
+                      mobile.core.native == checkpointImage,
+                  "The pre-pause event checkpoints the latest exact native image on the emulation "
+                  "thread");
+            SDL_PushEvent(&foreground);
+            step();
             mobile.settings.touchScale = 140;
             mobile.settings.touchOpacity = 20;
             mobile.settings.touchPlacement = 2;

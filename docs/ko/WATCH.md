@@ -1,0 +1,32 @@
+# Mario Compilation Ultra 0.7.0 · 시계 보기
+
+[English](../en/WATCH.md) · [Français](../fr/WATCH.md) · [Español](../es/WATCH.md) · [日本語](../ja/WATCH.md) · [Deutsch](../de/WATCH.md) · [Italiano](../it/WATCH.md) · [Português](../pt/WATCH.md) · [Русский](../ru/WATCH.md) · [简体中文](../zh/WATCH.md) · [한국어](../ko/WATCH.md)
+
+![시계 보기](watch.svg)
+
+크라운이나 베젤을 돌려 확대하세요. 메뉴에서는 스크롤하며 터치 +와 -도 사용할 수 있습니다.
+
+0%는 로드 영역 전체, 100%는 원래 카메라입니다. 문과 파이프는 다른 영역을 불러올 수 있습니다.
+
+대부분의 게임에서 B는 점프, Y는 달리기 또는 잡기입니다. 서로 다른 손가락으로 방향과 동작을 함께 누르세요.
+
+일시 정지 아이콘이나 Android 뒤로를 사용하세요. 재개하면 게임을 이어갑니다. 종료는 컬렉션 맨 아래에 있습니다.
+
+개인용 패키지는 보유한 로컬 카트리지를 포함합니다. 공개 패키지에는 직접 준비한 호환 파일이 필요합니다.
+
+CartridgeInbox로 전송한 뒤 전송한 카트리지 확인을 누르거나 앱을 다시 시작하세요. 기존 파일은 보존됩니다.
+
+실제 시계 조작감과 장시간 성능은 아직 검증하지 않았습니다. 이 버전은 실험용입니다.
+
+서명된 APK 업데이트는 데이터를 보존합니다. 앱 삭제나 데이터 지우기는 로컬 카트리지와 저장을 제거합니다.
+
+실제 시계 조작감과 장시간 성능은 아직 검증하지 않았습니다. 이 버전은 실험용입니다.
+
+```text
+/sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
+
+adb install -r MarioCompilationUltra-0.7.0-Wear-public.apk
+adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
+```
+
+[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Wear-public.apk) · [HTML](watch.html) · [그림으로 보는 설정](SETTINGS.md) · [Guide](README.md)

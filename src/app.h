@@ -12,6 +12,7 @@
 #include "object_previews.h"
 #include "mobile_controls.h"
 #include "android_bridge.h"
+#include "watch.h"
 #include "performance.h"
 #include "gpu_timer.h"
 namespace mcu {
@@ -20,7 +21,7 @@ struct Options {
          menuOnly = false;
     int xrPreview = -1;
     bool xrOptions = false;
-    bool mobilePreview = false;
+    bool mobilePreview = false, watchPreview = false, watchRound = true, coldScene = false;
     float mobileDensity = 1;
     MobileInsets mobileInsets;
     std::string liveReport;
@@ -45,6 +46,7 @@ class App {
     std::string pendingGame, message;
     bool browser = false, pathEdit = false, releaseInput = false, focusPage = true,
          focusLibrary = true;
+    bool deferNative = false;
     fs::path browserPath;
     fs::path programPath;
     ImVector<ImWchar> fontRanges;
@@ -67,14 +69,18 @@ class App {
     std::vector<double> workTimes, composeTimes, simulationTimes, presentTimes;
     AdaptiveResolution resolution;
     GpuTimer gpuTimer;
+    bool xrGpuTimerAvailable = false;
+    double xrGpuMs = 0;
     FrameDeadline presentationDeadline;
     FrameWaiter presentationWaiter;
     double simulationWorkMs = 0;
     double framePressureMs = 0;
     uint64_t sceneRebuilds = 0, sceneReuses = 0, textureUploads = 0;
-    uint64_t canvasVersion = 0;
+    uint64_t textureUploadBytes = 0;
+    TextureDamage nativeDamage, worldDamage;
+    uint64_t canvasVersion = 0, nativeContentVersion = 0, worldContentVersion = 0;
     uint64_t nativeVersion = ~uint64_t(0), backdropVersion = ~uint64_t(0);
-    std::array<double, 20> compositionKey{};
+    std::array<double, 22> compositionKey{};
     std::array<int, 3> backdropKey{};
     void resetMetrics();
     void invalidateGraphics(bool deviceReset);
@@ -104,6 +110,18 @@ class App {
     bool rewinding = false;
     std::array<uint16_t, 2> previousQuick{};
     AndroidDisplay mobileDisplay;
+    int thermalStatus = 0;
+    uint64_t thermalAt = 0, watchZoomAt = 0;
+    float watchZoomCurrent = 1, watchScrollPending = 0;
+    SDL_Texture *watchTarget = nullptr;
+    int watchWidth = 0, watchHeight = 0;
+    WatchLens watchMesh;
+    void watchMenu();
+    void watchOptions();
+    bool watchEvent(const SDL_Event &);
+    void settingTitle(const char *key);
+    void languageControl();
+    void settingPicture(const char *key, float width, bool compact = false);
     MobileLayout touchLayout;
     MobileTouches touch;
     uint16_t pendingTouchButtons = 0;
@@ -128,7 +146,7 @@ class App {
     Core core;
     World world;
     ObjectPreviews previews;
-    bool menu = true, quit = false, focused = true;
+    bool menu = true, quit = false, focused = true, backgrounded = false;
     bool dirty = true, menuVerificationOnly = false;
     bool vsyncActive = false;
     uint16_t spatialButtons = 0;
@@ -142,6 +160,11 @@ class App {
     App(Options o, fs::path data) : options(std::move(o)), core(settings) {
         settings.dataDir = std::move(data);
         settings.load(library);
+#ifdef MCU_QUEST
+        if (!settings.questAdaptive)
+            settings.adaptiveResolution = false;
+        settings.performanceReserve = std::max(35, settings.performanceReserve);
+#endif
         core.headless = options.headless;
     }
     ~App();
@@ -151,14 +174,7 @@ class App {
     void tick();
     void render();
     void finishFrame(double workMs, double gpuMs, double budgetMs);
-    float resolutionScale() const {
-        return settings.adaptiveResolution
-#ifdef MCU_QUEST
-                       && settings.questAdaptive
-#endif
-                   ? resolution.scale()
-                   : 1.f;
-    }
+    float resolutionScale() const { return settings.adaptiveResolution ? resolution.scale() : 1.f; }
     void toggleMenu();
     bool play(const std::string &, bool resume = true);
     void capture(const fs::path &);
@@ -184,6 +200,14 @@ class App {
     bool gameAvailable(const std::string &id) const;
     int availableGames() const;
     int missingLocalizedGlyphs() const { return missingGlyphs; }
+    bool watchActive() const { return options.watchPreview || mobileDisplay.watch; }
+    bool watchRound() const {
+        return options.watchPreview ? options.watchRound : mobileDisplay.round;
+    }
+    int effectCadence() const {
+        return settings.adaptiveResolution ? resolution.effectCadence() : 1;
+    }
+    bool referenceShaderReady() const { return resolution.referenceReady(); }
     bool mobileActive() const {
 #ifdef MCU_MOBILE
         return true;

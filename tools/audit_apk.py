@@ -28,7 +28,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('apk', type=Path)
     parser.add_argument('--report', type=Path)
-    parser.add_argument('--edition',choices=['quest','mobile'],default='quest')
+    parser.add_argument('--edition',choices=['quest','mobile','wear'],default='quest')
     args = parser.parse_args()
     names = audit_archive(args.apk)
     assert not any(Path(n).suffix.lower() in {'.jks','.keystore','.p12','.pem'} for n in names)
@@ -43,12 +43,13 @@ def main():
         for forbidden in ['android.permission.INTERNET','android.permission.CAMERA','android.permission.RECORD_AUDIO','android.permission.MANAGE_EXTERNAL_STORAGE']:
             assert forbidden.encode() not in manifest and forbidden.encode('utf-16le') not in manifest, forbidden
         assert 'assets/mcu/assets/Interface.otf' in names
-        if args.edition=='mobile':
+        if args.edition in ('mobile','wear'):
             for forbidden in ['android.hardware.vr.headtracking','org.khronos.openxr','com.oculus.permission']:
                 assert forbidden.encode() not in manifest and forbidden.encode('utf-16le') not in manifest,forbidden
         for code in ['en','fr','es','ja','de','it','pt','ru','zh','ko']:
             assert f'assets/mcu/docs/{code}/xr.html' in names, code
-            if args.edition=='mobile':assert f'assets/mcu/docs/{code}/mobile.html' in names,code
+            if args.edition in ('mobile','wear'):assert f'assets/mcu/docs/{code}/mobile.html' in names,code
+            if args.edition=='wear':assert f'assets/mcu/docs/{code}/watch.txt' in names,code
     report = dict(result='passed', files=len(names), sha256=hashlib.sha256(args.apk.read_bytes()).hexdigest(),
                   edition=args.edition, native_libraries=libraries, commercial_game_data=False, private_signing_key=False,
                   device_connected=False, hardware_tested=False)

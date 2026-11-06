@@ -167,3 +167,31 @@ Android 13+ uses an `OnBackInvokedCallback`; the legacy Back method and hardware
 key dispatch send the same native menu action. Method-local lint exceptions
 document those legacy paths. Android 13+ USB receiver flags and alphabetic
 keyboard filtering are reproducible Java adaptations in `prepare_android.py`.
+
+## Wear OS watches
+
+The separate `wear` module targets Wear OS with API 28 or newer and declares
+watch hardware as required. Its package is
+`com.vhaloo.mariocompilationultra.wear`. Native ARM64, ARMv7 and x86_64 libraries
+are copied from the same `mobile` engine build, avoiding divergent engines.
+
+```sh
+cd android
+./gradlew --no-daemon --console=plain --max-workers=2 :wear:assembleRelease :wear:lintRelease
+cd ..
+python tools/audit_apk.py android/wear/build/outputs/apk/release/wear-release.apk --edition wear
+```
+
+`MCU_WEAR_BUILD_DIR` relocates the watch build. Stable private signing and
+`mcuPrivateAssets` work like the other Android editions; private owner and
+isolated QA packages must never be published. `tools/watch_guides.py --check`
+validates the ten offline native watch guides and settings references.
+`tools/settings_help.py --check` checks semantic help coverage and translations.
+`tools/smoke_watch.py --exe PATH --out FOLDER` captures round and square previews
+without a cartridge. `--watch-preview` and `--watch-square` are desktop QA
+options, not physical device emulation or performance evidence.
+
+Rotary detection uses Android input capabilities and observed rotary events,
+without a vendor name check. Menus scroll; gameplay adjusts continuous zoom.
+The app's external `CartridgeInbox` imports compatible local cartridges when
+no document picker is installed; see the ten [watch guides](en/WATCH.md).

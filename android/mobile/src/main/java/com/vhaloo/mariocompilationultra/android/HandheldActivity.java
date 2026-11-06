@@ -2,6 +2,10 @@ package com.vhaloo.mariocompilationultra.android;
 
 import org.libsdl.app.SDLActivity;
 import com.vhaloo.mariocompilationultra.AssetPreparation;
+import com.vhaloo.mariocompilationultra.DeviceCapabilities;
+import android.view.InputDevice;
+import android.view.MotionEvent;
+import android.view.Surface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -25,14 +29,43 @@ import java.util.ArrayList;
 /** Ordinary Android application: no headset, network or storage-wide permission. */
 public final class HandheldActivity extends SDLActivity {
     private File root;
+    private volatile boolean rotarySeen;
+    private static native void nativeRotary(float delta);
+    private static native void nativePreparePause();
+    private boolean pausePrepared;
+    private void checkpointBeforePause() {
+        if(!pausePrepared&&!mBrokenLibraries){nativePreparePause();pausePrepared=true;}
+    }
+    @Override public void onWindowFocusChanged(boolean hasFocus) {
+        if(!hasFocus&&!isInMultiWindowMode())checkpointBeforePause();
+        super.onWindowFocusChanged(hasFocus);
+        if(hasFocus)pausePrepared=false;
+    }
+    @Override protected void onPause() {
+        if(!isInMultiWindowMode())checkpointBeforePause();
+        super.onPause();
+    }
+    @Override protected void onStop() {checkpointBeforePause();super.onStop();}
+    public int getThermalStatus(){return DeviceCapabilities.thermal(this);}
+    @Override public boolean dispatchGenericMotionEvent(MotionEvent event) {
+        if(DeviceCapabilities.watch(this)&&event.getAction()==MotionEvent.ACTION_SCROLL
+            &&event.isFromSource(InputDevice.SOURCE_ROTARY_ENCODER)) {
+            rotarySeen=true;
+            if(!mBrokenLibraries)nativeRotary(event.getAxisValue(MotionEvent.AXIS_SCROLL));
+            return true;
+        }
+        return super.dispatchGenericMotionEvent(event);
+    }
     private String preparationError;
     private volatile int insetLeft,insetTop,insetRight,insetBottom;
     private static final String[] LANGUAGES={"en","fr","es","ja","de","it","pt","ru","zh","ko"};
     private static final int IMPORT_ROM=73;
     @Override protected void onCreate(Bundle state) {
+        com.vhaloo.mariocompilationultra.DeviceCapabilities.initialize(this);
         root=getFilesDir();
         try {
             AssetPreparation.prepare(this,root);
+            com.vhaloo.mariocompilationultra.CartridgeInbox.collect(this,root);
             File data=new File(root,"UserData");ensureDirectory(data);ensureDirectory(new File(root,"ROMs"));
             File settings=new File(data,"settings.ini");
             if(!settings.exists()) {
@@ -85,14 +118,18 @@ public final class HandheldActivity extends SDLActivity {
         insetLeft=l;insetTop=t;insetRight=r;insetBottom=b;
     }
     public int[] getLayoutMetrics() {
-        return new int[]{Math.round(getResources().getDisplayMetrics().density*1000),insetLeft,insetTop,insetRight,insetBottom};
+        return new int[]{Math.round(getResources().getDisplayMetrics().density*1000),insetLeft,insetTop,insetRight,insetBottom,
+            DeviceCapabilities.watch(this)?1:0,getResources().getConfiguration().isScreenRound()?1:0,
+            rotarySeen||DeviceCapabilities.rotary()?1:0,getThermalStatus()};
     }
     @Override public void onConfigurationChanged(Configuration configuration) {
         super.onConfigurationChanged(configuration);getWindow().getDecorView().requestApplyInsets();
     }
     public void configurePresentation(int orientation,boolean awake) {
         runOnUiThread(()->{
-            if(!isInMultiWindowMode()) {
+            if(Build.VERSION.SDK_INT>=30&&mSurface!=null&&mSurface.getHolder().getSurface().isValid())
+                mSurface.getHolder().getSurface().setFrameRate(awake?60:0,Surface.FRAME_RATE_COMPATIBILITY_FIXED_SOURCE);
+            if(!DeviceCapabilities.watch(this)&&!isInMultiWindowMode()) {
                 int wanted=orientation==1?ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT:orientation==2?ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE:ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
                 if(getRequestedOrientation()!=wanted)setRequestedOrientation(wanted);
             }
@@ -127,10 +164,24 @@ public final class HandheldActivity extends SDLActivity {
         if(preparationError!=null){args.add("--startup-error");args.add(preparationError);}
         return args.toArray(new String[0]);
     }
-    public void chooseRom() {
+    public void chooseRom(){chooseRom("en");}
+    public void chooseRom(String language) {
         runOnUiThread(()->{
-            Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT);intent.addCategory(Intent.CATEGORY_OPENABLE);intent.setType("*/*");startActivityForResult(intent,IMPORT_ROM);
+            Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT);intent.addCategory(Intent.CATEGORY_OPENABLE);intent.setType("*/*");
+            try{startActivityForResult(intent,IMPORT_ROM);}catch(android.content.ActivityNotFoundException unavailable) {
+                Toast.makeText(this,com.vhaloo.mariocompilationultra.LocalText.text(this,language,"No document picker. See the offline guide for cartridge transfer or use your prepared personal edition."),Toast.LENGTH_LONG).show();
+            }
         });
+    }
+    public void checkTransferredCartridges(String language) {
+        new Thread(()->{
+            try {
+                java.util.List<File> files=com.vhaloo.mariocompilationultra.CartridgeInbox.collect(this,root);
+                for(File file:files)if(!mBrokenLibraries)SDLActivity.onNativeDropFile(file.getAbsolutePath());
+                String message=files.isEmpty()?"No new cartridges in the transfer inbox.":"Transferred cartridges imported.";
+                runOnUiThread(()->Toast.makeText(this,com.vhaloo.mariocompilationultra.LocalText.text(this,language,message),Toast.LENGTH_LONG).show());
+            }catch(IOException error){runOnUiThread(()->Toast.makeText(this,error.getMessage(),Toast.LENGTH_LONG).show());}
+        },"MCU-cartridge-inbox").start();
     }
     @Override protected void onActivityResult(int request,int result,Intent data) {
         super.onActivityResult(request,result,data);

@@ -15,6 +15,20 @@ class CompleteMap {
     int readCell(const Core &, int wx, int wy) const;
 
   public:
+    uint64_t contentFingerprint() const {
+        uint64_t value = 1469598103934665603ull;
+        for (auto word : cells) {
+            value ^= word;
+            value *= 1099511628211ull;
+        }
+        value ^= secondary ? 1 : 0;
+        value *= 1099511628211ull;
+        for (auto word : secondaryCells) {
+            value ^= word;
+            value *= 1099511628211ull;
+        }
+        return value;
+    }
     bool ready = false;
     int x = 0, y = 0, width = 0, height = 0;
     bool secondary = false;

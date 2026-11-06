@@ -21,6 +21,11 @@ void Settings::recommendedPicture() {
     inset = true;
 }
 void Settings::clamp() {
+    performanceReserve = std::clamp(performanceReserve, 15, 45);
+    performanceMode = std::clamp(performanceMode, 0, 1);
+    watchZoom = std::clamp(watchZoom, 0, 1000);
+    watchTouchScale = std::clamp(watchTouchScale, 70, 110);
+    watchCrownSensitivity = std::clamp(watchCrownSensitivity, 25, 250);
     touchMode = std::clamp(touchMode, 0, 2);
     touchPlacement = std::clamp(touchPlacement, 0, 2);
     touchScale = std::clamp(touchScale, 70, 140);
@@ -45,7 +50,7 @@ void Settings::clamp() {
     padLayout = std::clamp(padLayout, 0, 2);
     menuDeadzone = std::clamp(menuDeadzone, 5, 60);
     questMode = std::clamp(questMode, 0, 6);
-    questShader = std::clamp(questShader, 0, 1);
+    questShader = std::clamp(questShader, 0, 2);
     questScale = std::clamp(questScale, 5, 20000);
     questWidth = std::clamp(questWidth, 80, 800);
     questDistance = std::clamp(questDistance, 80, 600);
@@ -116,6 +121,7 @@ void Settings::stepZoom(int direction) {
 }
 void Settings::load(Library &l) {
     std::ifstream f(dataDir / "settings.ini");
+    bool qualityPolicy = false;
     std::string key;
     int n;
     while (f >> key) {
@@ -138,6 +144,8 @@ void Settings::load(Library &l) {
 #define B(x)                                                                                       \
     if (key == #x)                                                                                 \
     x = n != 0
+        if (key == "qualityPolicy")
+            qualityPolicy = true;
         I(zoomOut);
         I(touchMode);
         I(touchPlacement);
@@ -148,6 +156,15 @@ void Settings::load(Library &l) {
         B(touchHaptics);
         B(mobileKeepAwake);
         B(adaptiveResolution);
+        B(thermalAware);
+        B(questFoveation);
+        I(performanceReserve);
+        I(performanceMode);
+        I(watchZoom);
+        I(watchTouchScale);
+        I(watchCrownSensitivity);
+        B(watchLens);
+        B(watchCrownReverse);
         I(panoramaHeight);
         I(rewindMemory);
         I(rewindButton);
@@ -258,11 +275,19 @@ void Settings::load(Library &l) {
 #undef I
 #undef B
     }
+    if (!qualityPolicy && adaptiveResolution && questAdaptive) {
+        quality = 2;
+        questResolution = 3;
+        questEyeDetail = 2;
+        questWallDetail = 2;
+        questShader = 2;
+    }
     clamp();
     freeze = cameraMode == 2;
 }
 void Settings::save(const Library &l) const {
     std::ostringstream o;
+    o << "qualityPolicy 1\n";
 #define S(x) o << #x << ' ' << int(x) << '\n'
     S(zoomOut);
     S(touchMode);
@@ -274,6 +299,15 @@ void Settings::save(const Library &l) const {
     S(touchHaptics);
     S(mobileKeepAwake);
     S(adaptiveResolution);
+    S(thermalAware);
+    S(questFoveation);
+    S(performanceReserve);
+    S(performanceMode);
+    S(watchZoom);
+    S(watchTouchScale);
+    S(watchCrownSensitivity);
+    S(watchLens);
+    S(watchCrownReverse);
     S(panoramaHeight);
     S(rewindMemory);
     S(rewindButton);
@@ -340,7 +374,7 @@ void Settings::save(const Library &l) const {
     S(questWorldBackdrop);
     S(questAutoWall);
     S(questWallLocked);
-    S(questAdaptive);
+    o << "questAdaptive " << int(adaptiveResolution) << "\n";
     S(questPauseLost);
     S(questCompanion);
     S(questRemote);

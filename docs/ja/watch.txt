@@ -1,0 +1,24 @@
+Mario Compilation Ultra 0.7.0 · 時計の表示
+
+リューズやベゼルを回すとズーム、メニューではスクロールします。タッチの+と-も使えます。
+
+0%は読み込み済みエリア全体、100%は元のカメラです。扉や土管で別エリアを読み込む場合があります。
+
+多くのゲームでBはジャンプ、Yは走る・つかむ操作です。方向とアクションを別の指で同時に押せます。
+
+一時停止アイコンかAndroidの戻るで停止します。再開で同じゲームを続けます。終了はコレクションの一番下です。
+
+個人用パッケージには所有するローカルカートリッジが含まれます。公開版では自分の対応ファイルを取り込んでください。
+
+CartridgeInboxに転送し、転送したカートリッジを確認するかアプリを再起動してください。既存ファイルは保護されます。
+
+実機時計の操作感と長時間性能は未検証です。このエディションは実験版です。
+
+署名済みAPKの更新はアプリデータを保ちます。アンインストールやデータ消去ではローカルのカートリッジとセーブが消えます。
+
+実機時計の操作感と長時間性能は未検証です。このエディションは実験版です。
+
+/sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
+
+adb install -r MarioCompilationUltra-0.7.0-Wear-public.apk
+adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

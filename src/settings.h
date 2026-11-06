@@ -26,7 +26,7 @@ struct Settings {
     int questCrtStrength = 80, questCrtCurve = 35, questGlass = 35, questSurroundBrightness = 100;
     int questEnvironment = 1, questEyeDetail = 1, questRemoteScale = 100, questInsetWidth = 60;
     int questHandJoystick = 0, questTvModel = 0, questOptionsScale = 100;
-    int questShader = 0;
+    int questShader = 2;
     bool questPassthrough = true, questTransparent = true, questTouch = true, questFlip = false;
     bool questSurround = true, questWorldBackdrop = true, questAutoWall = true,
          questWallLocked = true;
@@ -37,7 +37,14 @@ struct Settings {
     int touchMode = 0, touchPlacement = 0, touchScale = 100, touchOpacity = 65,
         mobileOrientation = 0;
     bool touchLeftHanded = false, touchHaptics = false, mobileKeepAwake = true;
-    bool adaptiveResolution = true;
+    bool adaptiveResolution = true, thermalAware = true;
+    int performanceReserve = 25, performanceMode = 0;
+    int watchZoom = 1000, watchCrownSensitivity = 100, watchTouchScale = 100;
+    bool watchLens = true, watchCrownReverse = false;
+    bool questFoveation = true;
+    int projectionEffects = 0;
+    bool projectionWatch = false;
+    float projectionWatchZoom = 1;
     // Render-pass controls are ephemeral and are never written to disk.
     bool projectionUiOnly = false, projectionCleanScene = false, projectionTransparent = false;
     double pixelScale(int w, int h, int nw, int nh) const;

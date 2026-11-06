@@ -3,6 +3,7 @@
 #include <cmath>
 #include <chrono>
 #include <thread>
+#include <cstring>
 #ifdef _WIN32
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -11,11 +12,12 @@
 
 namespace mcu {
 void AdaptiveResolution::reset() {
-    tier = slow = fast = cooldown = 0;
-    average = 0;
+    tier = slow = fast = cooldown = referenceFrames = thermalTier = thermalRecovery = stalls = 0;
+    average = gpuAverage = 0;
 }
-bool AdaptiveResolution::observe(double cpu, double gpu, double budget, bool enabled) {
-    int previous = tier;
+bool AdaptiveResolution::observe(double cpu, double gpu, double budget, bool enabled,
+                                 int reservePercent, int thermalStatus) {
+    int previous = level();
     if (!enabled) {
         reset();
         return previous != 0;
@@ -24,10 +26,36 @@ bool AdaptiveResolution::observe(double cpu, double gpu, double budget, bool ena
     if (!std::isfinite(cpu) || !std::isfinite(gpu) || !std::isfinite(budget) || cpu < 0 ||
         gpu < 0 || budget < 1 || work > 1000)
         return false;
+    // Save/load and suspended-thread stalls are not a sustainable rendering cost.
+    if (work > 100) {
+        stalls = std::min(stalls + 1, 3);
+        if (stalls < 3)
+            return false;
+        // A genuinely slow device must still adapt. Repeated heavy frames are
+        // sustained pressure, unlike an isolated save or suspended thread.
+        work = 100;
+        cooldown = std::min(cooldown, 6);
+    } else
+        stalls = 0;
     average = average ? average * .9 + work * .1 : work;
+    gpuAverage = gpu > 0 ? (gpuAverage ? gpuAverage * .9 + gpu * .1 : gpu) : 0;
+    int heat = thermalStatus >= 4 ? 4 : thermalStatus >= 3 ? 3 : thermalStatus >= 2 ? 1 : 0;
+    if (heat > thermalTier) {
+        thermalTier = heat;
+        thermalRecovery = 0;
+    } else if (heat < thermalTier && ++thermalRecovery >= 240) {
+        --thermalTier;
+        thermalRecovery = 0;
+    } else if (heat == thermalTier)
+        thermalRecovery = 0;
+    double target = budget * (1. - std::clamp(reservePercent, 15, 45) * .01);
     // Leave time for input, driver submission and incidental OS work.
-    slow = average > budget * .82 ? slow + 1 : std::max(0, slow - 2);
-    fast = average < budget * .48 ? fast + 1 : 0;
+    slow = average > target ? std::min(slow + 1, 120) : std::max(0, slow - 2);
+    fast = average < target * .63 && !thermalTier ? std::min(fast + 1, 240) : 0;
+    referenceFrames =
+        gpuAverage > 0 && gpuAverage < target * .55 && average < target * .7 && !thermalTier
+            ? std::min(referenceFrames + 1, 360)
+            : 0;
     if (cooldown > 0)
         --cooldown;
     if (!cooldown && slow >= 12 && tier < int(scales.size()) - 1) {
@@ -39,7 +67,7 @@ bool AdaptiveResolution::observe(double cpu, double gpu, double budget, bool ena
         cooldown = 120;
         slow = fast = 0;
     }
-    return tier != previous;
+    return level() != previous;
 }
 const std::array<uint32_t, 65536> &nativeColorTable(bool rgb565) {
     struct Tables {
@@ -63,6 +91,55 @@ double missedFramePressure(double interval, double target) {
         target < 1)
         return 0;
     return interval > target * 1.12 ? interval : 0;
+}
+
+std::vector<SDL_Rect> TextureDamage::update(int w, int h, const std::vector<uint32_t> &pixels) {
+    if (w <= 0 || h <= 0 || pixels.size() != size_t(w) * h)
+        return {};
+    std::vector<SDL_Rect> rectangles;
+    if (width != w || height != h || previous.size() != pixels.size()) {
+        rectangles.push_back({0, 0, w, h});
+    } else {
+        for (int y = 0; y < h; ++y) {
+            const auto *a = pixels.data() + size_t(y) * w;
+            const auto *b = previous.data() + size_t(y) * w;
+            if (!std::memcmp(a, b, size_t(w) * sizeof(uint32_t)))
+                continue;
+            int left = 0, right = w;
+            while (left < right && a[left] == b[left])
+                ++left;
+            while (right > left && a[right - 1] == b[right - 1])
+                --right;
+            if (!rectangles.empty()) {
+                auto &r = rectangles.back();
+                int x = std::min(left, r.x), end = std::max(right, r.x + r.w);
+                if (r.y + r.h == y &&
+                    int64_t(end - x) * (r.h + 1) <= int64_t(r.w) * r.h + (right - left) * 2) {
+                    r.x = x;
+                    r.w = end - x;
+                    ++r.h;
+                    continue;
+                }
+            }
+            rectangles.push_back({left, y, right - left, 1});
+        }
+        // Driver calls cost more than copying a modest bounding rectangle,
+        // especially on mobile GLES and D3D streaming textures.
+        if (rectangles.size() > 8) {
+            int x = w, y = h, right = 0, bottom = 0;
+            for (auto r : rectangles) {
+                x = std::min(x, r.x);
+                y = std::min(y, r.y);
+                right = std::max(right, r.x + r.w);
+                bottom = std::max(bottom, r.y + r.h);
+            }
+            rectangles.assign(1, {x, y, right - x, bottom - y});
+        }
+    }
+    previous = pixels;
+    width = w;
+    height = h;
+    return rectangles;
 }
 double FrameDeadline::remaining(double now, double hz) {
     if (!std::isfinite(now) || !std::isfinite(hz) || hz < 1 || hz > 1000)

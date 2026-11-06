@@ -13,6 +13,24 @@ static void check(bool value, const char *message) {
     if (!value)
         throw std::runtime_error(message);
 }
+static void composeVerified(World &world, const Core &core, Settings &settings, int width,
+                            int height) {
+    World fresh = world;
+    Settings referenceSettings = settings;
+    fresh.retainTerrain = false;
+    fresh.compose(core, referenceSettings, width, height);
+    world.compose(core, settings, width, height);
+    check(world.expanded == fresh.expanded && world.canvas.pixels == fresh.canvas.pixels,
+          "Retained terrain matches a complete fresh render including current layers and native "
+          "pixels");
+    if (world.expanded) {
+        uint64_t reused = world.terrainReuses;
+        world.compose(core, settings, width, height);
+        check(world.terrainReuses > reused && world.canvas.pixels == fresh.canvas.pixels,
+              "An unchanged render exercises the cache without changing any pixel");
+    }
+}
+
 template <class T> static void put(T &data, size_t p, unsigned value) {
     data[p] = uint8_t(value);
     data[p + 1] = uint8_t(value >> 8);
@@ -214,19 +232,19 @@ int main() {
             Settings settings;
             settings.view = 4;
             World world;
-            world.compose(c, settings, 1280, 720);
+            composeVerified(world, c, settings, 1280, 720);
             check(world.sampleTerrainForTest(c, 0, 48) == 0xff00ff00,
                   "High-priority layer two terrain appears above low-priority layer one");
             for (int corner = 0; corner < 4; ++corner)
                 put(rom, offset(0x0d8010) + corner * 2, 0x0400);
             ++c.imageVersion;
-            world.compose(c, settings, 1280, 720);
+            composeVerified(world, c, settings, 1280, 720);
             check(world.sampleTerrainForTest(c, 0, 48) == 0xffff0000,
                   "Equal-priority terrain keeps layer one above layer two");
             put(r, 0x1e, 113);
             put(r, 0x20, 51);
             ++c.imageVersion;
-            world.compose(c, settings, 1280, 720);
+            composeVerified(world, c, settings, 1280, 720);
             bool same = true;
             auto &canvas = world.canvas;
             for (int yy = 0; yy < canvas.height; yy += 7)
@@ -238,6 +256,25 @@ int main() {
                 }
             check(same,
                   "Optimized full-map spans match reference pixels with unaligned terrain planes");
+            c.native.assign(size_t(c.width) * c.height, 0xff185da7);
+            ++c.imageVersion;
+            composeVerified(world, c, settings, 1280, 720);
+            put(r, 0x1a, 64);
+            put(r, 0x1c, 32);
+            put(r, 0x1e, 177);
+            put(r, 0x20, 83);
+            ++c.imageVersion;
+            composeVerified(world, c, settings, 1280, 720);
+            check(world.scene.cameraX == 64 && world.scene.cameraY == 33,
+                  "A moving native camera rebuilds the retained hole before it reveals terrain");
+            c.width = 512;
+            c.native.assign(size_t(c.width) * c.height, 0xffa65e18);
+            ++c.imageVersion;
+            composeVerified(world, c, settings, 1280, 720);
+            c.width = 256;
+            c.native.clear();
+            ++c.imageVersion;
+            composeVerified(world, c, settings, 1280, 720);
             c.cart.family = Family::AllStarsWorld;
             rom.resize(0x190000);
             for (size_t p = 0x3ea8; p < 0x3eb0; ++p)
@@ -281,14 +318,14 @@ int main() {
             World world;
             Settings settings;
             settings.view = 4;
-            world.compose(c, settings, 1280, 720);
+            composeVerified(world, c, settings, 1280, 720);
             check(world.expanded && world.sampleTerrainForTest(c, 0, 0) == 0xffff0000 &&
                       world.sampleTerrainForTest(c, 256, 0) == 0xff00ff00 &&
                       world.sampleTerrainForTest(c, 512, 0) == 0xff0000ff &&
                       world.sampleTerrainForTest(c, 768, 0) == 0xffffffff,
                   "World renders coordinate-specific pipe colours from all four ROM variants");
             v.ram[0x1925] = 9;
-            world.compose(c, settings, 1280, 720);
+            composeVerified(world, c, settings, 1280, 720);
             check(!world.expanded, "World arenas without a Map16 layout retain native framing");
         }
         SDL_Init(SDL_INIT_AUDIO);
