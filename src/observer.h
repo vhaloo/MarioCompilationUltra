@@ -9,6 +9,7 @@ struct McuVideo {
     struct Object {
         int x = 0, y = 0, name = 0, palette = 0;
         bool large = false, flipX = false, flipY = false;
+        int priority = 0;
     };
     std::array<Object, 128> objects{};
     int objectBase = 0, objectSelect = 0, objectSize = 0;
@@ -22,6 +23,8 @@ struct McuVideo {
     std::array<std::array<Scroll, 4>, 240> raster{};
     bool rasterValid = false;
     int mode = 0, brightness = 0, blank = 1, mainLayers = 0;
+    bool bg3Priority = false;
+    int visibleLayers = 0;
 };
 void mcuObserve(McuVideo &, bool rendered = false);
 void mcuObserveMemory(McuVideo &);

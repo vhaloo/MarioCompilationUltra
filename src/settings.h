@@ -42,6 +42,7 @@ struct Settings {
     int watchZoom = 1000, watchCrownSensitivity = 100, watchTouchScale = 100;
     bool watchLens = true, watchCrownReverse = false;
     bool questFoveation = true;
+    int volumeMode = 0, volumeDepth = 6, volumeAngle = 18;
     int projectionEffects = 0;
     bool projectionWatch = false;
     float projectionWatchZoom = 1;

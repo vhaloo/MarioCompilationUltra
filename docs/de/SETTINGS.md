@@ -150,4 +150,8 @@ Manuelle Qualität stoppt die automatische Anpassung und behält die gewählte D
 
 Auf kompatiblen Quest-Systemen kann Dauerlast periphere Bilddetails reduzieren und die Mitte erhalten. Menüs bleiben in einer separaten scharfen Ebene. Ohne Unterstützung greift der normale Renderer. Die Qualität im realen Headset ist ungeprüft.
 
+## Pixelvolumen
+
+Optionale prozedurale 3D-Darstellung: Pixel werden zu festen Säulen; Gelände, Hintergründe und Figuren liegen auf getrennten Tiefenebenen. Relief ist flach, Voxel sind dicker. Dicke ändert die Tiefe, Winkel die Bildschirmansicht. Automatische Qualität reduziert Details unter Last. HUD und native Nahansichten behalten Originalpixel. Spezialszenen verwenden den Originalbildschirm. Dies ist eine Interpretation, keine Rekonstruktion unsichtbarer Rückseiten. Leistung auf echten Geräten ist ungetestet.
+
 [Guide](README.md) · [Watch](WATCH.md)

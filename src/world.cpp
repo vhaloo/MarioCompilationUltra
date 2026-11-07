@@ -175,7 +175,7 @@ uint32_t World::preparedTilePixel(const McuVideo &s, int bg, uint16_t a, int x, 
         y = 7 - y;
     return found->second[y * 8 + x];
 }
-uint32_t World::bgPixel(const McuVideo &s, int bg, int x, int y, bool prepared) const {
+uint32_t World::bgPixel(const McuVideo &s, int bg, int x, int y, bool prepared, bool *high) const {
     auto &l = s.layers[bg];
     int tileSize = l.tile16 ? 16 : 8;
     int columns = (l.size & 1) ? 64 : 32, rows = (l.size & 2) ? 64 : 32;
@@ -185,6 +185,8 @@ uint32_t World::bgPixel(const McuVideo &s, int bg, int x, int y, bool prepared) 
     int screen = (ty / 32) * ((l.size & 1) ? 2 : 1) + tx / 32;
     int p = (l.map + screen * 2048 + ((ty & 31) * 32 + (tx & 31)) * 2) & 65535;
     uint16_t a = s.vram[p] | s.vram[(p + 1) & 65535] << 8;
+    if (high)
+        *high = (a & 0x2000) != 0;
     if (tileSize == 16) {
         int dx = (x & 8) ? 1 : 0, dy = (y & 8) ? 1 : 0;
         if (a & 0x4000)
@@ -195,6 +197,43 @@ uint32_t World::bgPixel(const McuVideo &s, int bg, int x, int y, bool prepared) 
         a = (a & 0xfc00) | t;
     }
     return prepared ? preparedTilePixel(s, bg, a, x, y) : tilePixel(s, bg, a, x, y);
+}
+uint32_t World::volumeLayer(const Core &c, int bg, int x, int y, bool &high) const {
+    high = false;
+    if (bg < 0 || bg > 3 || y < 0 || y >= int(c.height))
+        return 0;
+    auto &s = c.snapshot;
+    int sx = x + (s.rasterValid ? s.raster[y][bg].x : s.layers[bg].x);
+    int sy = y + (s.rasterValid ? s.raster[y][bg].y : s.layers[bg].y + 1);
+    return bgPixel(s, bg, sx, sy, false, &high);
+}
+uint32_t World::volumeTerrain(const Core &c, int layer, int x, int y, bool &high) const {
+    high = false;
+    if (layer < 0 || layer > 1)
+        return 0;
+    if (!complete.ready)
+        return layer == 0 ? terrain(c, scene, x, y) : 0;
+    int id = layer ? complete.secondaryCell(x, y) : complete.cell(c, x, y);
+    if (id < 0)
+        return 0;
+    int sx = layer ? x - complete.secondaryX : x, sy = layer ? y - complete.secondaryY : y;
+    if (scene.kind == 4) {
+        int axis = scene.vertical ? sy : sx;
+        if (id >= 0x133 && id <= 0x13a && axis >= 0)
+            id = 512 + ((axis / 256) & 3) * 8 + id - 0x133;
+        const auto &blocks = layer ? secondaryPixels : blockPixels;
+        if (id >= int(blocks.size()) || id >= int(blockAttributes.size()))
+            return 0;
+        high = (blockAttributes[id][((sx & 8) ? 2 : 0) + ((sy & 8) ? 1 : 0)] & 0x2000) != 0;
+        return blocks[id][(sy & 15) * 16 + (sx & 15)];
+    }
+    if (layer)
+        return 0;
+    std::array<uint16_t, 4> a{};
+    if (complete.attributes(c, id, a))
+        high = (a[((sx & 8) ? 2 : 0) + ((sy & 8) ? 1 : 0)] & 0x2000) != 0;
+    const auto *p = completeBlock(c, id);
+    return p ? (*p)[(sy & 15) * 16 + (sx & 15)] : 0;
 }
 uint32_t World::backdrop(const Core &c, const Scene &s, int x, int y) const {
     auto &v = c.snapshot;

@@ -150,4 +150,8 @@ La calidad manual desactiva la adaptación y mantiene el detalle elegido. Calida
 
 En Quest compatibles, la carga sostenida puede reducir el detalle periférico y conservar el centro. Los menús usan una capa nítida separada. Hay alternativa automática si no es compatible. La calidad en casco físico sigue sin probarse.
 
+## Volumen de píxeles
+
+3D procedural opcional: los píxeles se convierten en columnas sólidas, con terreno, fondos y personajes en planos separados. El relieve es poco profundo; los vóxeles son más gruesos. El grosor cambia la profundidad y el ángulo cambia la vista en pantalla. La calidad automática reduce el detalle bajo carga. HUD y primeros planos conservan los píxeles originales. Las escenas especiales vuelven a la pantalla original. Es una interpretación, no una reconstrucción de caras ocultas. Rendimiento físico sin probar.
+
 [Guide](README.md) · [Watch](WATCH.md)

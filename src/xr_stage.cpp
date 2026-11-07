@@ -356,6 +356,8 @@ struct XrStageRenderer::Impl {
     bool backdropAllocated = false;
     uint64_t remoteHash = 0, insetHash = 0;
     Mesh remoteMesh, insetFurniture, insetScreen, cube;
+    Mesh volumeMesh, volumeHud;
+    uint64_t volumeVersion = ~uint64_t(0);
     int imageUniform = -1, crtUniform = -1, maskUniform = -1, rasterUniform = -1,
         intensityUniform = -1, glassUniform = -1, brightnessUniform = -1, srgbUniform = -1,
         flipUniform = -1, holeUniform = -1, clipUniform = -1, efficientUniform = -1;
@@ -896,6 +898,47 @@ struct XrStageRenderer::Impl {
         glUniform1i(flipUniform, s.questFlip);
         glUniform1i(efficientUniform, s.questShader == 0);
         GLuint nativeImage = native(content), expanded = demoTexture;
+        bool volumetric = content.volume && content.volume->ready;
+        if (volumetric && volumeVersion != content.volume->version()) {
+            Vertices voxels, hud;
+            const auto &scene = *content.volume;
+            const auto &camera = scene.camera;
+            float unit = 1 / std::max(1.f, camera.width);
+            auto pt = [&](VoxelPoint p) {
+                return V3{(p.x - camera.x - camera.width / 2) * unit,
+                          -(p.y - camera.y - camera.height / 2) * unit, p.z * unit};
+            };
+            static const V3 normals[] = {{0, 0, 1}, {0, 0, -1}, {-1, 0, 0},
+                                         {1, 0, 0}, {0, 1, 0},  {0, -1, 0}};
+            for (const auto &f : scene.mesh.faces) {
+                Color col{((f.color >> 16) & 255) / 255.f, ((f.color >> 8) & 255) / 255.f,
+                          (f.color & 255) / 255.f, ((f.color >> 24) & 255) / 255.f};
+                quad(voxels, Matrix::identity(), pt(f.points[0]), pt(f.points[1]), pt(f.points[2]),
+                     pt(f.points[3]), normals[f.axis], col, .85f);
+            }
+            for (auto strip :
+                 {std::pair<int, int>{0, scene.hudTop},
+                  std::pair<int, int>{content.nativeHeight - scene.hudBottom, scene.hudBottom}}) {
+                if (strip.second <= 0)
+                    continue;
+                float x0 = content.scene.cameraX, x1 = x0 + content.nativeWidth;
+                float y0 = content.scene.cameraY + strip.first, y1 = y0 + strip.second;
+                float front = (s.volumeDepth + 2) * 7.f;
+                size_t start = hud.size();
+                quad(hud, Matrix::identity(), pt({x0, y0, front}), pt({x1, y0, front}),
+                     pt({x1, y1, front}), pt({x0, y1, front}), {0, 0, 1}, {1, 1, 1, 1});
+                float v0 = float(strip.first) / content.nativeHeight,
+                      v1 = float(strip.first + strip.second) / content.nativeHeight;
+                const float uv[6][2] = {{0, v0}, {1, v0}, {1, v1}, {0, v0}, {1, v1}, {0, v1}};
+                for (int j = 0; j < 6; ++j) {
+                    hud[start + j].u = uv[j][0];
+                    hud[start + j].v = uv[j][1];
+                }
+            }
+            volumeMesh.upload(voxels);
+            volumeHud.upload(hud);
+            volumeVersion = scene.version();
+        }
         GLuint backdropImage =
             !ar && mode == 5 && s.questWorldBackdrop ? backdrop(content) : demoTexture;
         bool bound = false;
@@ -987,7 +1030,28 @@ struct XrStageRenderer::Impl {
             }
             // The surrounding expanded level follows the native camera. The CRT
             // face always keeps the unmodified cartridge viewport and aspect.
-            if (mode == 5 && s.questSurround && content.loaded && content.scene.valid && bound) {
+            if (volumetric) {
+                float width = (mode == 4 ? s.questCabinetWidth : s.questWidth) * .01f;
+                V3 position = mode == 4 ? V3{0, s.questCabinetHeight * .01f + .02f, 0}
+                                        : V3{0, 1.3f + s.questHeight * .01f, .025f};
+                Matrix volumeModel =
+                    product(poseMatrix(origin, s.questScale * .01f),
+                            placement(position, {width, width, width}, mode == 4 ? -pi / 2 : 0));
+                draw(volumeMesh, volumeModel, 0);
+                draw(volumeHud, volumeModel, 1, nativeImage);
+            }
+            if (!volumetric && mode < 4 && content.loaded) {
+                float width = s.questWidth * .01f;
+                float aspect = content.scene.valid
+                                   ? float(content.coverageWidth / content.coverageHeight)
+                                   : float(content.nativeWidth) / std::max(1, content.nativeHeight);
+                draw(plain,
+                     product(root, placement({0, 1.3f + s.questHeight * .01f, .025f},
+                                             {width, width / std::max(.1f, aspect), 1})),
+                     1, bound ? expanded : nativeImage);
+            }
+            if (!volumetric && mode == 5 && s.questSurround && content.loaded &&
+                content.scene.valid && bound) {
                 float unit = s.questTvWidth * .01f / std::max(1, content.nativeWidth),
                       h = s.questTvWidth * .01f * content.nativeHeight /
                           std::max(1, content.nativeWidth),
@@ -1007,7 +1071,7 @@ struct XrStageRenderer::Impl {
                      3, expanded);
             }
             glUniform1i(clipUniform, 0);
-            if (mode >= 4) {
+            if (mode >= 4 && !volumetric) {
                 draw(furniture, root, 0);
                 draw(screen, product(root, screenLocal), mode == 5 ? 2 : 1,
                      mode == 5 ? nativeImage : expanded);
@@ -1053,7 +1117,7 @@ struct XrStageRenderer::Impl {
                                                            {.075f, .075f, .055f})),
                                  0);
             }
-            if (mode == 4) {
+            if (mode == 4 && !volumetric) {
                 float w = s.questCabinetWidth * .01f, d = w / std::clamp(ratio, .25f, 2.f),
                       center = s.questCabinetHeight * .01f +
                                std::sin(s.questCabinetTilt * pi / 180) * d / 2;
@@ -1132,6 +1196,8 @@ struct XrStageRenderer::Impl {
             glDeleteProgram(program);
         if (framebuffer)
             glDeleteFramebuffers(1, &framebuffer);
+        volumeMesh.clear();
+        volumeHud.clear();
         if (nativeTexture)
             glDeleteTextures(1, &nativeTexture);
         if (demoTexture)

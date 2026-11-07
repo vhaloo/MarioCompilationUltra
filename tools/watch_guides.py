@@ -20,7 +20,7 @@ def main():
     keys += [k for k in en if 'experimental' in k.lower() and 'watch' in k.lower() or k.startswith('Install updates over')]
     labels=dict(zip([t['id'] for t in topics],['Collection','View','Camera & scenery','Watch zoom','Round-screen fisheye','Crown sensitivity','Filter','Aspect ratio','Automatic quality','Performance reserve','React to device heat','VSync','VR shader','Screen','Backdrop','Blur','Edges','Player locator','Preview placed enemies','Notifications','Language','Controls','Touch controls','Rewind','Save states','Volume','Pause when unfocused','questmode','questdistance','questanchor','questtouch','questinsetcrt','questenvironment','questfoveation','Illustrated setting help']))
     labels.update(Filter='Image filter',Refresh='Vertical sync',Edges='Soft panorama edges',Hints='Display status',Save='Saves & sound')
-    labels.update(Manual='Manual quality',Foveation='questfoveation')
+    labels.update(Manual='Manual quality',Foveation='questfoveation',Volume='Pixel volume')
     keys += [k for k in en if k.startswith('Updating a signed APK') or k.startswith('Physical watch controls')]
     for language in languages:
         code=language['code'];tr=json.loads((R/f'assets/locales/{code}.json').read_text(encoding='utf8'))

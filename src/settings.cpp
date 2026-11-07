@@ -21,6 +21,9 @@ void Settings::recommendedPicture() {
     inset = true;
 }
 void Settings::clamp() {
+    volumeMode = std::clamp(volumeMode, 0, 2);
+    volumeDepth = std::clamp(volumeDepth, 1, 16);
+    volumeAngle = std::clamp(volumeAngle, -30, 30);
     performanceReserve = std::clamp(performanceReserve, 15, 45);
     performanceMode = std::clamp(performanceMode, 0, 1);
     watchZoom = std::clamp(watchZoom, 0, 1000);
@@ -160,6 +163,9 @@ void Settings::load(Library &l) {
         B(questFoveation);
         I(performanceReserve);
         I(performanceMode);
+        I(volumeMode);
+        I(volumeDepth);
+        I(volumeAngle);
         I(watchZoom);
         I(watchTouchScale);
         I(watchCrownSensitivity);
@@ -303,6 +309,9 @@ void Settings::save(const Library &l) const {
     S(questFoveation);
     S(performanceReserve);
     S(performanceMode);
+    S(volumeMode);
+    S(volumeDepth);
+    S(volumeAngle);
     S(watchZoom);
     S(watchTouchScale);
     S(watchCrownSensitivity);

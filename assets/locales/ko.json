@@ -530,5 +530,12 @@
   "Before": "이전",
   "After": "이후",
   "Manual quality disables the automatic governor and keeps your chosen detail ceiling. Select Automatic quality to restore adaptation, or Extra smooth for a larger performance reserve.": "수동 화질은 자동 조절을 끄고 선택한 세부 수준을 유지합니다. 자동 화질로 조절을 다시 켜거나 매우 부드러움으로 성능 여유를 늘릴 수 있습니다.",
-  "On compatible Quest runtimes, sustained load can reduce peripheral eye-image detail while retaining the center. Menus use a separate sharp layer. Unsupported devices fall back automatically. Physical headset quality remains untested.": "호환 Quest에서는 부하가 지속되면 중앙을 유지하며 주변부 세부를 줄일 수 있습니다. 메뉴는 별도의 선명한 레이어입니다. 미지원 기기에서는 일반 렌더링으로 전환됩니다. 실제 헤드셋 화질은 아직 검증하지 않았습니다."
+  "On compatible Quest runtimes, sustained load can reduce peripheral eye-image detail while retaining the center. Menus use a separate sharp layer. Unsupported devices fall back automatically. Physical headset quality remains untested.": "호환 Quest에서는 부하가 지속되면 중앙을 유지하며 주변부 세부를 줄일 수 있습니다. 메뉴는 별도의 선명한 레이어입니다. 미지원 기기에서는 일반 렌더링으로 전환됩니다. 실제 헤드셋 화질은 아직 검증하지 않았습니다.",
+  "Pixel volume": "픽셀 입체화",
+  "Original 2D": "원본 2D",
+  "Pixel relief": "픽셀 부조",
+  "Voxels": "복셀",
+  "Voxel thickness": "복셀 두께",
+  "Volume angle": "입체 각도",
+  "Optional procedural 3D: pixels become solid columns, with terrain, backgrounds and sprites on separate depth bands. Relief is shallow; voxels are thicker. Thickness changes depth, angle changes the desktop view. Automatic quality reduces grid and raster detail under load. HUD and native close-ups keep original pixels. Special scenes fall back to the original screen. This is an interpretation, not a reconstruction of unseen object backs. Physical-device performance remains untested.": "선택 가능한 절차적 3D 표시입니다. 픽셀을 입체 기둥으로 만들고 지형, 배경, 캐릭터를 서로 다른 깊이에 배치합니다. 부조는 얕고 복셀은 더 두껍습니다. 두께는 깊이, 각도는 화면 시점을 바꿉니다. 자동 품질은 부하가 높으면 세부 표현을 줄입니다. HUD와 원본 카메라 확대 화면은 원본 픽셀을 유지합니다. 특수 장면은 원본 화면으로 돌아갑니다. 보이지 않는 뒷면을 복원하는 기능은 아닙니다. 실제 기기 성능은 검증되지 않았습니다."
 }

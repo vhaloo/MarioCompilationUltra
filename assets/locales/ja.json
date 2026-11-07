@@ -530,5 +530,12 @@
   "Before": "変更前",
   "After": "変更後",
   "Manual quality disables the automatic governor and keeps your chosen detail ceiling. Select Automatic quality to restore adaptation, or Extra smooth for a larger performance reserve.": "手動画質では自動調整を止め、選んだ詳細度を維持します。自動画質で調整を再開でき、滑らかさ優先では処理時間の余裕を増やします。",
-  "On compatible Quest runtimes, sustained load can reduce peripheral eye-image detail while retaining the center. Menus use a separate sharp layer. Unsupported devices fall back automatically. Physical headset quality remains untested.": "対応するQuestでは負荷が続くと周辺部の詳細度を下げ、中央を保ちます。メニューは別の鮮明なレイヤーです。未対応時は通常描画に戻ります。実機ヘッドセットでの画質は未検証です。"
+  "On compatible Quest runtimes, sustained load can reduce peripheral eye-image detail while retaining the center. Menus use a separate sharp layer. Unsupported devices fall back automatically. Physical headset quality remains untested.": "対応するQuestでは負荷が続くと周辺部の詳細度を下げ、中央を保ちます。メニューは別の鮮明なレイヤーです。未対応時は通常描画に戻ります。実機ヘッドセットでの画質は未検証です。",
+  "Pixel volume": "ピクセルの立体化",
+  "Original 2D": "元の2D",
+  "Pixel relief": "ピクセルの浮き彫り",
+  "Voxels": "ボクセル",
+  "Voxel thickness": "ボクセルの厚さ",
+  "Volume angle": "立体の角度",
+  "Optional procedural 3D: pixels become solid columns, with terrain, backgrounds and sprites on separate depth bands. Relief is shallow; voxels are thicker. Thickness changes depth, angle changes the desktop view. Automatic quality reduces grid and raster detail under load. HUD and native close-ups keep original pixels. Special scenes fall back to the original screen. This is an interpretation, not a reconstruction of unseen object backs. Physical-device performance remains untested.": "任意のプロシージャル3D表示です。ピクセルを柱に変換し、地形、背景、キャラクターを別々の奥行きに配置します。浮き彫りは薄く、ボクセルは厚くなります。厚さは奥行き、角度は画面上の視点を変更します。自動画質は負荷に応じて細部を減らします。HUDと元のカメラの拡大表示は元のピクセルを保持します。特殊な場面は元の画面に戻ります。見えない裏面を復元するものではありません。実機での性能は未検証です。"
 }

@@ -3,6 +3,7 @@ import argparse,json,re
 from pathlib import Path
 R=Path(__file__).resolve().parents[1]
 def topic(key):
+    if key in {'Pixel volume','Voxel thickness','Volume angle'}:return 'Volume'
     k=key.lower()
     exact={'View':'View','Quality':'Quality','Display':'Screen','VR shader':'Shader','Automatic resolution':'Quality',
         'Automatic quality':'Quality','Performance reserve':'Headroom','Extra smooth':'Headroom',

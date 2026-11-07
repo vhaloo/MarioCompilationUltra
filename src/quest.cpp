@@ -511,7 +511,7 @@ struct QuestPresentation::Impl {
         screen.requestedHeight = desiredHeight;
     }
     int mode() const { return app.settings.questMode; }
-    bool stereo() const { return mode() >= 4; }
+    bool stereo() const { return mode() >= 4 || app.settings.volumeMode != 0; }
     bool fixed() const { return mode() != 0; }
     bool companion() const {
         return app.menu; // Always keep options at a separate, reachable physical size.
@@ -1338,6 +1338,8 @@ struct QuestPresentation::Impl {
             (stereo() || spatial.visible || spatial.nativeVisible) && (!stereo() || wallTracked)) {
             SDL_RenderFlush(app.renderer);
             XrStageContent content;
+            content.volume =
+                app.settings.volumeMode && app.volumeScene.ready ? &app.volumeScene : nullptr;
             content.loaded = app.core.loaded;
             content.expanded = gameScreen.valid && gameScreen.mode == mode() && app.core.loaded
                                    ? gameScreen.canvas

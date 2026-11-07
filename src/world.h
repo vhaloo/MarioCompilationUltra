@@ -49,7 +49,8 @@ class World {
     bool wholeLevel = false, needScenery = false;
     uint32_t tilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
     uint32_t preparedTilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
-    uint32_t bgPixel(const McuVideo &, int bg, int x, int y, bool prepared = false) const;
+    uint32_t bgPixel(const McuVideo &, int bg, int x, int y, bool prepared = false,
+                     bool *high = nullptr) const;
     uint32_t terrain(const Core &, const Scene &, int x, int y) const;
     const std::array<uint32_t, 256> *completeBlock(const Core &, int id) const;
     uint32_t backdrop(const Core &, const Scene &, int x, int y) const;
@@ -78,6 +79,8 @@ class World {
     Scene inspect(const Core &, bool completeView = false) const;
     void compose(const Core &, Settings &, int drawableWidth, int drawableHeight,
                  float resolutionScale = 1.f);
+    uint32_t volumeLayer(const Core &, int bg, int x, int y, bool &high) const;
+    uint32_t volumeTerrain(const Core &, int layer, int x, int y, bool &high) const;
     uint32_t decodeTileForTest(const McuVideo &s, int bg, uint16_t a, int x, int y) const {
         return tilePixel(s, bg, a, x, y);
     }

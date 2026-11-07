@@ -102,6 +102,11 @@ void App::languageControl() {
 }
 void App::extrasUi() {
     if (tab == 1) {
+        choice("Pixel volume", settings.volumeMode, {"Original 2D", "Pixel relief", "Voxels"});
+        if (settings.volumeMode) {
+            slider("Voxel thickness", settings.volumeDepth, 1, 16, "%d px");
+            slider("Volume angle", settings.volumeAngle, -30, 30, "%d");
+        }
         slider("Zoom-out divisor", settings.zoomOut, 0, 3, "2^%d");
         if (button("Exact pixel 1:1"))
             settings.zoom = 1, settings.zoomOut = 0, settings.view = 2;

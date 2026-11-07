@@ -150,4 +150,8 @@ A qualidade manual desativa a adaptação e mantém o detalhe escolhido. Qualida
 
 Em Quest compatíveis, carga prolongada pode reduzir detalhes periféricos preservando o centro. Menus usam uma camada nítida separada. Sem suporte, o renderizador normal assume. A qualidade no headset físico ainda não foi testada.
 
+## Volume dos pixels
+
+3D procedural opcional: os pixels tornam-se colunas sólidas, com terreno, fundos e personagens em planos separados. O relevo é raso; os voxels são mais espessos. A espessura altera a profundidade e o ângulo altera a vista na tela. A qualidade automática reduz detalhes sob carga. HUD e ampliações mantêm os pixels originais. Cenas especiais usam a tela original. É uma interpretação, não uma reconstrução de faces ocultas. Desempenho físico não testado.
+
 [Guide](README.md) · [Watch](WATCH.md)

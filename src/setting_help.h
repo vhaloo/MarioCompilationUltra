@@ -2,6 +2,7 @@
 #include <cstddef>
 namespace mcu {
 enum class HelpPicture {
+    Volume,
     View,
     Camera,
     Zoom,

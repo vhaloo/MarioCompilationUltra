@@ -150,4 +150,8 @@ La qualità manuale disattiva l’adattamento e mantiene il dettaglio scelto. Qu
 
 Sui Quest compatibili, il carico prolungato può ridurre il dettaglio periferico mantenendo il centro. I menu hanno un livello nitido separato. I dispositivi non compatibili usano il rendering normale. La qualità nel visore fisico resta da verificare.
 
+## Volume dei pixel
+
+3D procedurale facoltativo: i pixel diventano colonne solide, con terreno, sfondi e personaggi su piani separati. Il rilievo è sottile; i voxel sono più spessi. Lo spessore cambia la profondità, l’angolo cambia la vista sullo schermo. La qualità automatica riduce i dettagli sotto carico. HUD e primi piani mantengono i pixel originali. Le scene speciali tornano allo schermo originale. È un’interpretazione, non una ricostruzione dei lati nascosti. Prestazioni fisiche non testate.
+
 [Guide](README.md) · [Watch](WATCH.md)

@@ -530,5 +530,12 @@
   "Before": "之前",
   "After": "之后",
   "Manual quality disables the automatic governor and keeps your chosen detail ceiling. Select Automatic quality to restore adaptation, or Extra smooth for a larger performance reserve.": "手动画质关闭自动调节并保持所选细节等级。选择自动画质可恢复调节，超流畅模式则保留更多性能余量。",
-  "On compatible Quest runtimes, sustained load can reduce peripheral eye-image detail while retaining the center. Menus use a separate sharp layer. Unsupported devices fall back automatically. Physical headset quality remains untested.": "在兼容的Quest运行时中，持续负载可降低眼部图像外围细节并保留中央。菜单使用独立清晰图层。不支持时自动回退到普通渲染。实体头显画质仍未测试。"
+  "On compatible Quest runtimes, sustained load can reduce peripheral eye-image detail while retaining the center. Menus use a separate sharp layer. Unsupported devices fall back automatically. Physical headset quality remains untested.": "在兼容的Quest运行时中，持续负载可降低眼部图像外围细节并保留中央。菜单使用独立清晰图层。不支持时自动回退到普通渲染。实体头显画质仍未测试。",
+  "Pixel volume": "像素体积",
+  "Original 2D": "原始2D",
+  "Pixel relief": "像素浮雕",
+  "Voxels": "体素",
+  "Voxel thickness": "体素厚度",
+  "Volume angle": "体积角度",
+  "Optional procedural 3D: pixels become solid columns, with terrain, backgrounds and sprites on separate depth bands. Relief is shallow; voxels are thicker. Thickness changes depth, angle changes the desktop view. Automatic quality reduces grid and raster detail under load. HUD and native close-ups keep original pixels. Special scenes fall back to the original screen. This is an interpretation, not a reconstruction of unseen object backs. Physical-device performance remains untested.": "可选的程序化3D显示：像素变成立体柱，地形、背景和角色位于不同深度层。浮雕较浅，体素较厚。厚度改变深度，角度改变屏幕视角。自动画质会在高负载时降低细节。HUD和原始镜头特写保留原始像素。特殊场景回退到原始画面。这是立体化解释，不会还原看不见的背面。实际设备性能尚未测试。"
 }

@@ -11,8 +11,13 @@ void icon(HelpPicture picture, ImDrawList *d, ImVec2 p, float size) {
     auto color = IM_COL32(121, 224, 194, 255), ink = IM_COL32(15, 37, 48, 255);
     d->AddRectFilled(p, p + ImVec2(size, size), ink, size * .22f);
     float x = p.x + size * .5f, y = p.y + size * .5f, r = size * .29f;
-    if (picture == HelpPicture::Lens || picture == HelpPicture::Zoom ||
-        picture == HelpPicture::Anchor) {
+    if (picture == HelpPicture::Volume) {
+        d->AddQuad({x - r, y - r * .5f}, {x, y - r}, {x + r, y - r * .5f}, {x, y}, color, 1.4f);
+        d->AddLine({x - r, y - r * .5f}, {x - r, y + r * .5f}, color, 1.4f);
+        d->AddLine({x, y}, {x, y + r}, color, 1.4f);
+        d->AddLine({x + r, y - r * .5f}, {x + r, y + r * .5f}, color, 1.4f);
+    } else if (picture == HelpPicture::Lens || picture == HelpPicture::Zoom ||
+               picture == HelpPicture::Anchor) {
         d->AddCircle({x, y}, r, color, 16, 1.4f);
         d->AddLine({x - r * .5f, y}, {x + r * .5f, y}, color, 1.4f);
         if (picture != HelpPicture::Lens)
@@ -82,7 +87,17 @@ void App::settingPicture(const char *key, float width, bool compact) {
     d->AddRectFilled(p, at(1, 1), IM_COL32(13, 27, 43, 255), 12 * uiUnit());
     for (int y = 1; y < 6; ++y)
         d->AddLine(at(.04f, y * .15f), at(.96f, y * .15f), IM_COL32(35, 58, 75, 100));
-    if (picture == HelpPicture::Quality) {
+    if (picture == HelpPicture::Volume) {
+        for (int i = 0; i < 3; ++i) {
+            float x = .18f + i * .27f, y = .32f + i * .1f;
+            d->AddQuadFilled(at(x, y), at(x + .13f, y - .13f), at(x + .24f, y),
+                             at(x + .11f, y + .13f), gold);
+            d->AddQuadFilled(at(x, y), at(x + .11f, y + .13f), at(x + .11f, y + .43f),
+                             at(x, y + .30f), blue);
+            d->AddQuadFilled(at(x + .11f, y + .13f), at(x + .24f, y), at(x + .24f, y + .30f),
+                             at(x + .11f, y + .43f), mint);
+        }
+    } else if (picture == HelpPicture::Quality) {
         for (int panel = 0; panel < 2; ++panel) {
             float x = .10f + panel * .48f;
             for (int i = 0; i < 5; ++i)

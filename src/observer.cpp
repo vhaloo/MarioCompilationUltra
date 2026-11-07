@@ -15,8 +15,8 @@ void mcuObserve(McuVideo &s, bool rendered) {
     s.objectSize = PPU.OBJSizeSelect;
     for (int i = 0; i < 128; ++i) {
         const auto &o = PPU.OBJ[i];
-        s.objects[i] = {o.HPos,      int(o.VPos),  o.Name,      o.Palette,
-                        o.Size != 0, o.HFlip != 0, o.VFlip != 0};
+        s.objects[i] = {o.HPos,      int(o.VPos),  o.Name,       o.Palette,
+                        o.Size != 0, o.HFlip != 0, o.VFlip != 0, o.Priority};
     }
     for (int i = 0; i < 4; i++) {
         auto &b = PPU.BG[i];
@@ -27,6 +27,8 @@ void mcuObserve(McuVideo &s, bool rendered) {
     s.brightness = PPU.Brightness;
     s.blank = PPU.ForcedBlanking;
     s.mainLayers = Memory.FillRAM[0x212c] | Memory.FillRAM[0x212d];
+    s.visibleLayers = Memory.FillRAM[0x212c];
+    s.bg3Priority = (Memory.FillRAM[0x2105] & 8) != 0;
     // The final PPU scroll registers can describe the status bar or a dialog.
     // Read the offsets that the emulator actually used for each emitted row.
     s.rasterValid = rendered;

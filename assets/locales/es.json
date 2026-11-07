@@ -530,5 +530,12 @@
   "Before": "Antes",
   "After": "Después",
   "Manual quality disables the automatic governor and keeps your chosen detail ceiling. Select Automatic quality to restore adaptation, or Extra smooth for a larger performance reserve.": "La calidad manual desactiva la adaptación y mantiene el detalle elegido. Calidad automática restaura la adaptación; Extra fluido deja una mayor reserva de rendimiento.",
-  "On compatible Quest runtimes, sustained load can reduce peripheral eye-image detail while retaining the center. Menus use a separate sharp layer. Unsupported devices fall back automatically. Physical headset quality remains untested.": "En Quest compatibles, la carga sostenida puede reducir el detalle periférico y conservar el centro. Los menús usan una capa nítida separada. Hay alternativa automática si no es compatible. La calidad en casco físico sigue sin probarse."
+  "On compatible Quest runtimes, sustained load can reduce peripheral eye-image detail while retaining the center. Menus use a separate sharp layer. Unsupported devices fall back automatically. Physical headset quality remains untested.": "En Quest compatibles, la carga sostenida puede reducir el detalle periférico y conservar el centro. Los menús usan una capa nítida separada. Hay alternativa automática si no es compatible. La calidad en casco físico sigue sin probarse.",
+  "Pixel volume": "Volumen de píxeles",
+  "Original 2D": "2D original",
+  "Pixel relief": "Relieve de píxeles",
+  "Voxels": "Vóxeles",
+  "Voxel thickness": "Grosor de vóxeles",
+  "Volume angle": "Ángulo del volumen",
+  "Optional procedural 3D: pixels become solid columns, with terrain, backgrounds and sprites on separate depth bands. Relief is shallow; voxels are thicker. Thickness changes depth, angle changes the desktop view. Automatic quality reduces grid and raster detail under load. HUD and native close-ups keep original pixels. Special scenes fall back to the original screen. This is an interpretation, not a reconstruction of unseen object backs. Physical-device performance remains untested.": "3D procedural opcional: los píxeles se convierten en columnas sólidas, con terreno, fondos y personajes en planos separados. El relieve es poco profundo; los vóxeles son más gruesos. El grosor cambia la profundidad y el ángulo cambia la vista en pantalla. La calidad automática reduce el detalle bajo carga. HUD y primeros planos conservan los píxeles originales. Las escenas especiales vuelven a la pantalla original. Es una interpretación, no una reconstrucción de caras ocultas. Rendimiento físico sin probar."
 }

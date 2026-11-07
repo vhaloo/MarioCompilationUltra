@@ -15,6 +15,7 @@
 #include "watch.h"
 #include "performance.h"
 #include "gpu_timer.h"
+#include "voxel_scene.h"
 namespace mcu {
 struct Options {
     bool headless = false, software = false, menu = false, realtime = true, noResume = false,
@@ -36,6 +37,10 @@ class App {
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
     SDL_Texture *nativeTex = nullptr, *worldTex = nullptr, *backgroundTex = nullptr;
+    SDL_Texture *voxelTex = nullptr;
+    int voxelWidth = 0, voxelHeight = 0;
+    VoxelScene volumeScene;
+    VoxelRasterizer volumeRaster;
     std::unique_ptr<Blitter> nativeBlitter, worldBlitter, insetBlitter;
     SDL_FRect nativeRect{}, insetRect{};
     int nw = 0, nh = 0, ww = 0, wh = 0, tab = 0, selected = 0, dialog = 0, dialogSlot = 0;

@@ -160,6 +160,9 @@ void App::watchOptions() {
     if (button("Original framing"))
         settings.watchZoom = 1000;
     tick("Round-screen fisheye", settings.watchLens);
+    choice("Pixel volume", settings.volumeMode, {"Original 2D", "Pixel relief", "Voxels"});
+    if (settings.volumeMode)
+        slider("Voxel thickness", settings.volumeDepth, 1, 16, "%d px");
     slider("Crown sensitivity", settings.watchCrownSensitivity, 25, 250, "%d%%");
     tick("Reverse crown", settings.watchCrownReverse);
     ImGui::TextWrapped("%s", tr(mobileDisplay.rotary

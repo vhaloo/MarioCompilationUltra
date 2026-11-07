@@ -6,6 +6,7 @@
 #include <string>
 #include "world.h"
 #include "spatial_controls.h"
+#include "voxel_scene.h"
 namespace mcu {
 struct XrSpatialControls {
     XrPosef pose{{0, 0, 0, 1}, {0, 0, 0}}, nativePose{{0, 0, 0, 1}, {0, 0, 0}};
@@ -23,6 +24,7 @@ struct XrSpatialControls {
 // The room scene has its own stereo projection. The options panel stays a sharp
 // compositor quad, independent of the size of the game or its furniture.
 struct XrStageContent {
+    const VoxelScene *volume = nullptr;
     SDL_Texture *expanded = nullptr;
     const std::vector<uint32_t> *native = nullptr;
     const std::vector<uint32_t> *backdrop = nullptr;
