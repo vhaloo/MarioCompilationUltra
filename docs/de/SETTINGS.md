@@ -152,6 +152,6 @@ Auf kompatiblen Quest-Systemen kann Dauerlast periphere Bilddetails reduzieren u
 
 ## Pixelvolumen
 
-Optionale prozedurale 3D-Darstellung: Pixel werden zu festen Säulen; Gelände, Hintergründe und Figuren liegen auf getrennten Tiefenebenen. Relief ist flach, Voxel sind dicker. Dicke ändert die Tiefe, Winkel die Bildschirmansicht. Automatische Qualität reduziert Details unter Last. HUD und native Nahansichten behalten Originalpixel. Spezialszenen verwenden den Originalbildschirm. Dies ist eine Interpretation, keine Rekonstruktion unsichtbarer Rückseiten. Leistung auf echten Geräten ist ungetestet.
+Optionale prozedurale 3D-Darstellung: Pixel werden zu festen Säulen; Gelände, Hintergründe und Figuren liegen auf getrennten Tiefenebenen. Relief ist flach, Voxel sind dicker. Dicke ändert die Tiefe, Winkel die Bildschirmansicht. Automatische Qualität reduziert Details unter Last. HUD und native Nahansichten behalten Originalpixel. Spezialszenen verwenden den Originalbildschirm. Dies ist eine Interpretation, keine Rekonstruktion unsichtbarer Rückseiten. Leistung auf echten Geräten ist ungetestet. Abgerundete Formen erzeugen gestufte 3D-Körper aus der Transparenz der Figuren. Ohne diese Option bleibt die Extrusion gleichmäßig. Die Neigung ändert die Höhe der Bildschirmansicht. Ursprüngliche Positionen und Spielphysik bleiben erhalten. Der Ebenenabstand trennt Tiefenebenen, ohne ihre Reihenfolge zu ändern.
 
 [Guide](README.md) · [Watch](WATCH.md)

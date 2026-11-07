@@ -205,7 +205,7 @@ uint32_t World::volumeLayer(const Core &c, int bg, int x, int y, bool &high) con
     auto &s = c.snapshot;
     int sx = x + (s.rasterValid ? s.raster[y][bg].x : s.layers[bg].x);
     int sy = y + (s.rasterValid ? s.raster[y][bg].y : s.layers[bg].y + 1);
-    return bgPixel(s, bg, sx, sy, false, &high);
+    return bgPixel(s, bg, sx, sy, graphicsVersion == c.imageVersion, &high);
 }
 uint32_t World::volumeTerrain(const Core &c, int layer, int x, int y, bool &high) const {
     high = false;
@@ -298,10 +298,12 @@ uint32_t World::terrain(const Core &c, const Scene &s, int x, int y) const {
         // standalone addresses lifts its terrain by sixteen complete tile rows.
         int base = c.cart.family == Family::AllStarsWorld ? 0xc700 : 0xc800;
         int t = r[base + idx] | r[base + 0x10000 + idx] << 8;
-        if (t >= 512)
+        if (t >= 512 || t >= int(blockPixels.size()))
             return 0;
         if (t >= 0x133 && t <= 0x13a)
             t = 512 + (((s.vertical ? y : x) / 256) & 3) * 8 + t - 0x133;
+        if (t >= int(blockPixels.size()))
+            return 0;
         return blockPixels[t][(y & 15) * 16 + (x & 15)];
     }
     if (s.fullMap && complete.ready) {
@@ -387,14 +389,15 @@ void World::remember(const Core &c, const Scene &s) {
         maxY = minY + 224;
     }
 }
-void World::prepareGraphics(const Core &c, const Scene &s) {
+void World::prepareGraphics(const Core &c, const Scene &s, bool terrain) {
     if (!s.valid) {
         scenery.clear();
         return;
     }
-    if (graphicsVersion == c.imageVersion)
+    if (graphicsVersion == c.imageVersion && (!terrain || terrainPrepared))
         return;
     graphicsVersion = c.imageVersion;
+    terrainPrepared = terrain;
     auto &v = c.snapshot;
     std::array<int, 10> key{{v.mode, v.brightness, v.layers[0].tiles, v.layers[1].tiles,
                              v.layers[2].tiles, v.layers[3].tiles, int(c.cart.checksum), s.kind,
@@ -408,11 +411,15 @@ void World::prepareGraphics(const Core &c, const Scene &s) {
             tiles.clear();
         completeBlocks.clear();
         completeIndex.assign(65536, -1);
+        blockPixels.clear();
+        secondaryPixels.clear();
         graphicsVram.assign(v.vram.begin(), v.vram.end());
         graphicsPalette = v.palette;
         graphicsKey = key;
         graphicsCached = true;
     }
+    if (!terrain)
+        return;
     sceneryW = int(c.width);
     sceneryH = int(c.height);
     if (needScenery) {
@@ -484,7 +491,9 @@ void World::prepareGraphics(const Core &c, const Scene &s) {
             }
     }
 }
-void World::compose(const Core &c, Settings &s, int dw, int dh, float resolutionScale) {
+void World::compose(const Core &c, Settings &s, int dw, int dh, float resolutionScale,
+                    bool raster) {
+    canvasRasterized = false;
     if (wholeLevel != (s.view == 4))
         graphicsVersion = ~uint64_t(0);
     wholeLevel = s.view == 4;
@@ -507,8 +516,9 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
     needScenery = sceneryRequested;
     // Original framing still remembers observed terrain for later map views,
     // but does not decode a complete Map16 set that cannot be displayed.
-    if (s.view != 0 || !scene.fullMap)
-        prepareGraphics(c, scene);
+    bool terrain = s.view != 0 || !scene.fullMap;
+    if (terrain || !raster)
+        prepareGraphics(c, scene, terrain);
     remember(c, scene);
     if (scene.valid && !scene.fullMap) {
         scene.width = std::max(scene.width, maxX);
@@ -545,7 +555,7 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
         canvas = {};
         return;
     }
-    auto sc = scene;
+    const auto &sc = scene;
     int w = std::clamp(dw, 1, 16384), h = std::clamp(dh, 1, 8192);
     float pixelAspect = s.view == 2 ? 1.f : displayPixelAspect(s.aspect, c.width, c.height);
     float aspect = float(w) / (h * pixelAspect);
@@ -641,6 +651,16 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
             canvas.height = std::max(1, int(canvas.height * scale));
         }
     }
+    if (raster)
+        rasterCanvas(c, s);
+    else
+        canvas.pixels.clear();
+}
+void World::rasterCanvas(const Core &c, const Settings &s) {
+    if (!expanded || canvasRasterized)
+        return;
+    canvasRasterized = true;
+    const auto &sc = scene;
     std::array<double, 28> renderKey{{double(canvas.width),
                                       double(canvas.height),
                                       canvas.x,

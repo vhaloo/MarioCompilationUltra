@@ -1,6 +1,7 @@
 #pragma once
 #include "world.h"
 #include <map>
+#include "voxel.h"
 
 namespace mcu {
 enum class PreviewKind { Enemy, Boss, MovingObject, ScriptOrigin };
@@ -25,6 +26,8 @@ class ObjectPreviews {
     size_t spritesDrawn = 0, outlinesDrawn = 0;
     void update(const Core &, const Scene &, int cadence = 1);
     void paint(Canvas &, const Scene &, const Settings &);
+    std::vector<VoxelPlane> volumePlanes(const Scene &, const Settings &, const VoxelCamera &,
+                                         int step, float z) const;
     void reset() {
         room = -1;
         version = ~uint64_t(0);

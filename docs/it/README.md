@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.7.0
+# Mario Compilation Ultra 0.8.0
 
 Raccolta SNES locale con interfaccia adattabile al PC e viste estese sperimentali. Snes9x emula le cartucce, incluso Super FX. Il progetto non dichiara di aver decompilato tutti i giochi.
 
-[Download e avvio dal desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.7.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download e avvio dal desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.8.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download e avvio dal desktop
 
@@ -47,9 +47,17 @@ Mappa completa (Ctrl+5) mostra tutto il terreno dell’area caricata dal primo f
 
 I profili di memoria e la selezione automatica All-Stars riguardano le edizioni USA elencate. Un’edizione riconosciuta senza profilo verificato usa l’inquadratura originale. Tradurre l’interfaccia non traduce storia o grafica della cartuccia commerciale. Non si dichiara una nuova decompilazione nativa dei cinque giochi.
 
+## Volume dei pixel
+
+![Volume dei pixel](../voxel-preview.png)
+
+3D procedurale facoltativo: i pixel diventano colonne solide, con terreno, sfondi e personaggi su piani separati. Il rilievo è sottile; i voxel sono più spessi. Lo spessore cambia la profondità, l’angolo cambia la vista sullo schermo. La qualità automatica riduce i dettagli sotto carico. HUD e primi piani mantengono i pixel originali. Le scene speciali tornano allo schermo originale. È un’interpretazione, non una ricostruzione dei lati nascosti. Prestazioni fisiche non testate. Le forme arrotondate generano corpi 3D a gradini dalla trasparenza dei personaggi; disattivandole, l’estrusione è uniforme. L’inclinazione cambia l’elevazione della vista sullo schermo. Posizioni e fisica originali restano invariate. La distanza separa i livelli in profondità senza cambiarne l’ordine.
+
+[Volume dei pixel](VOXELS.md) · [HTML](voxels.html)
+
 ## Risoluzione automatica
 
-La versione 0.7 adatta risoluzione dello scenario, frequenza decorativa e shader VR con riserva di prestazioni. Gioco e menu restano nitidi. Quest riserva almeno il 35% del tempo per fotogramma selezionato; il dettaglio periferico ha un’alternativa. Gli obiettivi richiedono prove fisiche.
+La versione 0.8 adatta risoluzione dello scenario, griglia voxel, frequenza decorativa e shader VR alle prestazioni disponibili. Il primo piano mantiene i pixel originali; i menu restano nitidi. Quest punta ad almeno il 35% di riserva per fotogramma. Sono obiettivi della regolazione automatica, non risultati garantiti sui dispositivi fisici.
 
 [Performance / GPU](../PERFORMANCE.md)
 
@@ -63,15 +71,15 @@ La versione 0.7 adatta risoluzione dello scenario, frequenza decorativa e shader
 
 ## Telefoni e tablet Android
 
-[Telefoni e tablet Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Android-public.apk)
+[Telefoni e tablet Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Android-public.apk)
 
 ## Vista orologio
 
-[Vista orologio](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Wear-public.apk) · [Impostazioni illustrate](SETTINGS.md)
+[Vista orologio](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [Impostazioni illustrate](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Comandi
 
@@ -141,9 +149,9 @@ Scegli di nuovo la cartuccia se il file è stato spostato o l’unità scollegat
 
 ![Quest VR / AR](screenshots/6.png)
 
-## Pacchetti e verifica · 0.7.0
+## Pacchetti e verifica · 0.8.0
 
-La verifica 0.7 copre otto suite pubbliche, impostazioni illustrate in dieci lingue, sei giochi locali e confronti PC. Telefono, tablet e Wear OS usano emulatori. Le prestazioni fisiche di orologio, Android, Mac e Quest restano da verificare; vedi il rapporto.
+La versione 0.8 aggiunge rilievo procedurale e voxel. Nove suite pubbliche verificano geometria originale, profondità, trasparenza, impostazioni e funzioni esistenti. Sei giochi locali sono verificati separatamente; le loro immagini restano private. Telefono, tablet e Wear OS usano emulatori. Il gioco su Mac e Android, orologio e Quest fisici resta sperimentale; vedi il rapporto attuale.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

@@ -13,6 +13,7 @@ enum SpatialAction {
     PagePerformance,
     PageSections,
     PageNudge,
+    PageVolume,
     MoveGame = 30,
     MoveNative,
     MoveRemote,
@@ -42,6 +43,14 @@ enum SpatialAction {
     CycleTvModel,
     ToggleCoplanar,
     ToggleHints,
+    VolumeFlat = 70,
+    VolumeRelief,
+    VolumeVoxels,
+    VolumeThinner,
+    VolumeThicker,
+    VolumeCloserLayers,
+    VolumeFartherLayers,
+    VolumeRounded,
     Refresh72 = 80,
     Refresh90,
     Refresh120,
@@ -80,6 +89,7 @@ struct SpatialButton {
     bool hold = false;
 };
 constexpr float spatialWidth = 1.12f, spatialHeight = .84f;
+constexpr int spatialPageCount = PageVolume - PageModes + 1;
 std::vector<SpatialButton> spatialButtons(int page);
 int spatialHit(const std::vector<SpatialButton> &buttons, float x, float y);
 struct SpatialAxis {

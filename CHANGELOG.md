@@ -1,5 +1,13 @@
 # Releases
 
+## 0.8.0 — 2026-11-06
+
+- Optional **Pixel relief** and **Voxels** in all six game profiles and all five views. Reconstruct visible terrain, backgrounds and sprites at their original coordinates, with depth bands, adjustable thickness and layer spacing, and stepped bodies formed from sprite silhouettes.
+- Keep the original simulation, cartridge progress and 2D default. Native close-ups, HUD glyphs and the SMB3 status panel stay sharp. Unsupported special scenes retain the original screen.
+- Cache world-aligned geometry, remove hidden faces and reduce detail within a bounded grid. Prepare the map once; rasterize the flat terrain only when it will be shown. Keep the watch's original-camera endpoint.
+- Submit actual XYZ geometry to both Quest eyes with compact color vertices, depth testing, translucent previews and a lightweight palette shader. The spatial remote adds a Volume page. Physical headset gameplay and performance remain experimental.
+- Illustrated volume controls, captures and offline guides in all ten languages, English first. Nine public suites exercise original fixtures; the six-game runtime and performance evidence is documented separately.
+
 ## 0.7.0 — 2026-11-06
 
 - Shared adaptive quality policy with a configurable performance reserve, thermal limits and slow recovery. Quest keeps at least 35% of its frame budget in reserve; automatic CRT selection requires sustained measured GPU headroom.

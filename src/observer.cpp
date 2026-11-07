@@ -29,6 +29,8 @@ void mcuObserve(McuVideo &s, bool rendered) {
     s.mainLayers = Memory.FillRAM[0x212c] | Memory.FillRAM[0x212d];
     s.visibleLayers = Memory.FillRAM[0x212c];
     s.bg3Priority = (Memory.FillRAM[0x2105] & 8) != 0;
+    s.firstObject = PPU.FirstSprite;
+    s.objectInterlace = (Memory.FillRAM[0x2133] & 2) != 0;
     // The final PPU scroll registers can describe the status bar or a dialog.
     // Read the offsets that the emulator actually used for each emitted row.
     s.rasterValid = rendered;

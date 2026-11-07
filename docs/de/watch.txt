@@ -1,4 +1,4 @@
-Mario Compilation Ultra 0.7.0 · Uhransicht
+Mario Compilation Ultra 0.8.0 · Uhransicht
 
 Drehe Krone oder Lünette zum Zoomen. Im Menü scrollen sie; Touch-Tasten + und - funktionieren ebenfalls.
 
@@ -14,11 +14,11 @@ Ein persönliches Paket enthält deine lokalen Module. Öffentliche Pakete benö
 
 Physische Uhrenbedienung und Dauerleistung bleiben ungetestet. Diese Ausgabe ist experimentell.
 
-Ein signiertes APK-Update erhält App-Daten. Deinstallation oder Datenlöschung entfernt lokale Module und Spielstände.
-
 Physische Uhrenbedienung und Dauerleistung bleiben ungetestet. Diese Ausgabe ist experimentell.
+
+Ein signiertes APK-Update erhält App-Daten. Deinstallation oder Datenlöschung entfernt lokale Module und Spielstände.
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.7.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.8.0-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

@@ -1,4 +1,4 @@
-Mario Compilation Ultra 0.7.0 · Vista del reloj
+Mario Compilation Ultra 0.8.0 · Vista del reloj
 
 Gira la corona o bisel para cambiar el zoom. En los menús desplaza el contenido; también funcionan + y - táctiles.
 
@@ -14,11 +14,11 @@ Transfiere cartuchos a CartridgeInbox y elige Comprobar cartuchos transferidos o
 
 Los controles físicos y el rendimiento prolongado en reloj siguen sin probarse. Esta edición es experimental.
 
-Actualizar un APK firmado conserva los datos. Desinstalar o borrar datos elimina cartuchos y partidas locales.
-
 Los controles físicos y el rendimiento prolongado en reloj siguen sin probarse. Esta edición es experimental.
+
+Actualizar un APK firmado conserva los datos. Desinstalar o borrar datos elimina cartuchos y partidas locales.
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.7.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.8.0-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

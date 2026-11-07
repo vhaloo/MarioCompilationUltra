@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.7.0
+# Mario Compilation Ultra 0.8.0
 
 本地SNES合集，提供可调整的电脑界面和实验性扩展视图。Snes9x负责模拟卡带，包括Super FX。本项目并未声称已反编译所有游戏。
 
-[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.7.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.8.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 下载与桌面启动
 
@@ -47,9 +47,17 @@ sh ./Install-Linux.sh
 
 扩展内存配置与All-Stars自动选择针对所列美版。已识别但没有已验证配置的版本使用原始画面。界面翻译不会翻译商业卡带的剧情或图像。项目并不声称实现了全部五款游戏的新原生反编译版本。
 
+## 像素体积
+
+![像素体积](../voxel-preview.png)
+
+可选的程序化3D显示：像素变成立体柱，地形、背景和角色位于不同深度层。浮雕较浅，体素较厚。厚度改变深度，角度改变屏幕视角。自动画质会在高负载时降低细节。HUD和原始镜头特写保留原始像素。特殊场景回退到原始画面。这是立体化解释，不会还原看不见的背面。实际设备性能尚未测试。 圆润形状根据角色的透明区域生成阶梯状3D实体；关闭后厚度均匀。倾斜会改变屏幕视角的仰角。原始位置和游戏物理保持不变。 层间距拉开各深度层，同时保持叠放顺序。
+
+[像素体积](VOXELS.md) · [HTML](voxels.html)
+
 ## 自动分辨率
 
-0.7根据性能余量调整场景分辨率、装饰更新频率和VR着色器。游戏原始像素与菜单保持清晰。Quest至少预留所选帧预算的35%，可选外围细节支持回退。目标仍需实体设备验证。
+0.8根据可用性能调整场景分辨率、体素网格、装饰更新频率和VR着色器。近景保留原始游戏像素，菜单保持清晰。Quest以至少35%的帧时间余量为目标。这是自动质量控制的目标，不保证实体设备上的实际结果。
 
 [Performance / GPU](../PERFORMANCE.md)
 
@@ -63,15 +71,15 @@ sh ./Install-Linux.sh
 
 ## Android 手机和平板电脑
 
-[Android 手机和平板电脑](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Android-public.apk)
+[Android 手机和平板电脑](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Android-public.apk)
 
 ## 手表视图
 
-[手表视图](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Wear-public.apk) · [图解设置](SETTINGS.md)
+[手表视图](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [图解设置](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 操作
 
@@ -141,9 +149,9 @@ View/Back：设置 · LT：倒带 · RT：Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 软件包与验证 · 0.7.0
+## 软件包与验证 · 0.8.0
 
-0.7验证覆盖八套公开测试、十种语言图解设置、六款本地游戏与PC对比。手机、平板和Wear OS采用模拟器测试。实体手表、Android、Mac和Quest性能仍未验证，详见报告。
+0.8新增程序化浮雕与体素。九套公开测试覆盖原创几何、深度、透明度、设置和已有功能。六款本地游戏另行验证，其画面保持私密。手机、平板和Wear OS采用模拟器测试。Mac及实体Android、手表、Quest游戏体验仍属实验性，详见当前报告。
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

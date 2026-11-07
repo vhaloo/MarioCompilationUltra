@@ -1,4 +1,4 @@
-Mario Compilation Ultra 0.7.0 · 時計の表示
+Mario Compilation Ultra 0.8.0 · 時計の表示
 
 リューズやベゼルを回すとズーム、メニューではスクロールします。タッチの+と-も使えます。
 
@@ -14,11 +14,11 @@ CartridgeInboxに転送し、転送したカートリッジを確認するかア
 
 実機時計の操作感と長時間性能は未検証です。このエディションは実験版です。
 
-署名済みAPKの更新はアプリデータを保ちます。アンインストールやデータ消去ではローカルのカートリッジとセーブが消えます。
-
 実機時計の操作感と長時間性能は未検証です。このエディションは実験版です。
+
+署名済みAPKの更新はアプリデータを保ちます。アンインストールやデータ消去ではローカルのカートリッジとセーブが消えます。
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.7.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.8.0-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

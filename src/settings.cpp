@@ -6,6 +6,12 @@
 #include <sstream>
 namespace mcu {
 void Settings::recommendedPicture() {
+    volumeMode = 0;
+    volumeDepth = 6;
+    volumeSpacing = 2;
+    volumeAngle = 18;
+    volumeTilt = -12;
+    volumeRound = true;
     cameraMode = 0;
     view = 1;
     zoom = 0;
@@ -23,7 +29,9 @@ void Settings::recommendedPicture() {
 void Settings::clamp() {
     volumeMode = std::clamp(volumeMode, 0, 2);
     volumeDepth = std::clamp(volumeDepth, 1, 16);
+    volumeSpacing = std::clamp(volumeSpacing, 1, 12);
     volumeAngle = std::clamp(volumeAngle, -30, 30);
+    volumeTilt = std::clamp(volumeTilt, -30, 30);
     performanceReserve = std::clamp(performanceReserve, 15, 45);
     performanceMode = std::clamp(performanceMode, 0, 1);
     watchZoom = std::clamp(watchZoom, 0, 1000);
@@ -165,7 +173,10 @@ void Settings::load(Library &l) {
         I(performanceMode);
         I(volumeMode);
         I(volumeDepth);
+        I(volumeSpacing);
         I(volumeAngle);
+        I(volumeTilt);
+        B(volumeRound);
         I(watchZoom);
         I(watchTouchScale);
         I(watchCrownSensitivity);
@@ -311,7 +322,10 @@ void Settings::save(const Library &l) const {
     S(performanceMode);
     S(volumeMode);
     S(volumeDepth);
+    S(volumeSpacing);
     S(volumeAngle);
+    S(volumeTilt);
+    S(volumeRound);
     S(watchZoom);
     S(watchTouchScale);
     S(watchCrownSensitivity);

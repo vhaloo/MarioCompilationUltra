@@ -560,6 +560,8 @@ struct QuestPresentation::Impl {
         return {w, w * gameScreen.height / std::max(1, gameScreen.width)};
     }
     XrPosef worldPose() const {
+        if (stereo() && app.settings.volumeMode && mode() == 0)
+            return transform(head, {{0, 0, 0, 1}, {0, -1.3f, -app.settings.questDistance * .01f}});
         if (stereo())
             return wallBase;
         if (!fixed()) {
@@ -1335,7 +1337,8 @@ struct QuestPresentation::Impl {
             target.mode = mode();
         }
         if (frame.shouldRender && haveHead &&
-            (stereo() || spatial.visible || spatial.nativeVisible) && (!stereo() || wallTracked)) {
+            (stereo() || spatial.visible || spatial.nativeVisible) &&
+            (!stereo() || (app.settings.volumeMode && mode() == 0) || wallTracked)) {
             SDL_RenderFlush(app.renderer);
             XrStageContent content;
             content.volume =

@@ -288,6 +288,86 @@ void ObjectPreviews::learn(const Core &c, const Scene &s, size_t budget) {
         }
     }
 }
+std::vector<VoxelPlane> ObjectPreviews::volumePlanes(const Scene &s, const Settings &settings,
+                                                     const VoxelCamera &camera, int step,
+                                                     float z) const {
+    std::vector<VoxelPlane> planes;
+    step = std::max(1, step);
+    for (size_t index = 0; index < objects.size(); ++index) {
+        const auto &m = objects[index];
+        if (m.active || (m.x >= s.cameraX - 32 && m.x < s.cameraX + 256 && m.y >= s.cameraY - 48 &&
+                         m.y < s.cameraY + 224))
+            continue;
+        bool visible = m.kind == PreviewKind::Boss ? settings.bossPreview
+                       : m.kind == PreviewKind::MovingObject || m.kind == PreviewKind::ScriptOrigin
+                           ? settings.objectPreview
+                           : settings.enemyPreview;
+        if (!visible)
+            continue;
+        auto image = images.find(m.id);
+        bool known = image != images.end();
+        int w = known                                 ? 64
+                : m.kind == PreviewKind::MovingObject ? 32
+                                                      : 16,
+            h = known                         ? 64
+                : m.kind == PreviewKind::Boss ? 32
+                                              : 16;
+        int wx = m.x - (known ? 16 : 0), wy = m.y - (known ? 24 : 0);
+        if (wx + w < camera.x || wy + h < camera.y || wx > camera.x + camera.width ||
+            wy > camera.y + camera.height)
+            continue;
+        int ox = voxelGridOrigin(wx, step), oy = voxelGridOrigin(wy, step),
+            pw = (wx + w - ox + step - 1) / step, ph = (wy + h - oy + step - 1) / step;
+        uint32_t color = m.kind == PreviewKind::Boss           ? 0xffef7474
+                         : m.kind == PreviewKind::MovingObject ? 0xff7dd7dc
+                         : m.kind == PreviewKind::ScriptOrigin ? 0xffc99bea
+                                                               : 0xfff2c06b;
+        VoxelPlane plane{ox,
+                         oy,
+                         pw,
+                         ph,
+                         step,
+                         z,
+                         float(std::min(4, settings.volumeDepth)),
+                         1000 + index,
+                         std::vector<uint32_t>(size_t(pw) * ph),
+                         {}};
+        auto alpha = [&](uint32_t p) {
+            return (p & 0xffffffu) | (((p >> 24) * unsigned(settings.enemyOpacity) / 100) << 24);
+        };
+        for (int y = 0; y < ph; ++y)
+            for (int x = 0; x < pw; ++x) {
+                int px = ox + x * step - wx, py = oy + y * step - wy;
+                if (px < 0 || py < 0 || px >= w || py >= h)
+                    continue;
+                auto p = known ? image->second.pixels[py * 64 + px]
+                         : (px < 2 || py < 2 || px >= w - 2 || py >= h - 2) ? color
+                                                                            : 0;
+                if (p)
+                    plane.pixels[size_t(y) * pw + x] = alpha(p);
+            }
+        if (known && settings.volumeMode == 2 && settings.volumeRound)
+            plane.depths =
+                roundedVoxelDepths(plane.pixels, pw, ph, std::min(4, settings.volumeDepth), step);
+        planes.push_back(std::move(plane));
+        if (settings.spawnLabels) {
+            static constexpr unsigned glyphs[]{0x7b6f, 0x2492, 0x73e7, 0x73cf, 0x5bc9, 0x79cf,
+                                               0x79ef, 0x7249, 0x7bef, 0x7bcf, 0x7bed, 0x6bae,
+                                               0x7927, 0x6b6e, 0x79e7, 0x79e4};
+            VoxelPlane label{
+                wx, wy - 7, 12, 5, 1, z + 1, 1, 100000 + index, std::vector<uint32_t>(60), {}};
+            for (int digit = 0; digit < 3; ++digit) {
+                unsigned glyph = glyphs[(m.id >> ((2 - digit) * 4)) & 15];
+                for (int y = 0; y < 5; ++y)
+                    for (int x = 0; x < 3; ++x)
+                        if (glyph & (1u << (14 - y * 3 - x)))
+                            label.pixels[y * 12 + digit * 4 + x] = alpha(color);
+            }
+            planes.push_back(std::move(label));
+        }
+    }
+    return planes;
+}
 void ObjectPreviews::paint(Canvas &c, const Scene &s, const Settings &settings) {
     spritesDrawn = outlinesDrawn = 0;
     if (c.width <= 0 || c.height <= 0 || c.worldWidth <= 0 || c.worldHeight <= 0)

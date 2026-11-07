@@ -66,7 +66,7 @@ int main() {
               "Native CRT and world use one pixel-to-plane mapping");
         check(coplanarViewport(0, 0, nan, 10, 0, 0, 256, 224).width == 0,
               "Non-finite projection bounds fail closed");
-        for (int page = 0; page < 7; ++page) {
+        for (int page = 0; page < spatialPageCount; ++page) {
             auto buttons = spatialButtons(page);
             check(!buttons.empty(), "Every spatial remote page exists");
             for (size_t i = 0; i < buttons.size(); ++i) {

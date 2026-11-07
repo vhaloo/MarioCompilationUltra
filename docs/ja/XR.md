@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.7.0 · Quest VR / AR
+# Mario Compilation Ultra 0.8.0 · Quest VR / AR
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -6,7 +6,7 @@
 
 全体マップの壁、床、アーケードテーブル、CRT、曲面ギャラリー。実験的なXRプレビューです。両グリップで拡大縮小します。
 
-実験的XR版です。インストール後にQuest 3で0.4のコレクションが見えることを利用者が確認し、フレーム送信を記録しました。0.5は別途ビルド・検査します。追跡、快適さ、パススルー、室内配置、継続プレイは実機検証が必要です。
+実験的XR版です。インストール後にQuest 3で0.4のコレクションが見えることを利用者が確認し、フレーム送信を記録しました。0.8は別途ビルド・検査します。追跡、快適さ、パススルー、室内配置、継続プレイは実機検証が必要です。
 
 後日テストする際は開発者モードを有効にし、SideQuestまたはadb install -rで公開ARM64 APKをインストールしてください。提供元不明からMario Compilation Ultra XRを開き、システム選択画面でカートリッジまたはZIPを選んでプレイします。All-Stars + WorldとYoshi’s Islandは別々に読み込みます。公開APKにROMや進行データはありません。
 
@@ -24,12 +24,12 @@
 
 PCのクイック操作：右スティック押し込み中、十字左右でズーム、上で1:1、下で全体マップ、Aで固定、Bで元カメラ、Xで撮影、Yでプレイヤー追従。離すと通常のSNES操作に戻ります。F1またはメニューのYヘルプで図解を開きます。
 
-0.7は背景解像度、装飾更新頻度、VRシェーダーを処理時間の余裕に合わせて調整します。ゲーム本体とメニューは鮮明なままです。Questは選択したフレーム時間の35%以上を確保し、周辺描画の最適化には代替手段があります。実機検証は未完了です。
+0.8は背景解像度、ボクセル格子、装飾更新頻度、VRシェーダーを利用できる性能に合わせて調整します。拡大画面では元のゲーム画像を確認でき、メニューも鮮明です。Questはフレーム時間の35%以上の余裕を目標にします。これは自動調整の目標であり、実機での結果を保証しません。
 
 SNES: D-pad · A · B · X · Y · L · R · Start · Select
 
 Touch: A → SNES B · B → SNES Y · X → SNES A · RT → SNES X · R3 → Start · LT → Rewind · Y → 設定画面を移動
 
-[HTML](xr.html) · [Guide](README.md) · [Build](../BUILD.md) · [Parity](../PARITY.md) · [Validation](../TEST_REPORT.md)
+[ピクセルの立体化](VOXELS.md) · [HTML](xr.html) · [Guide](README.md) · [Build](../BUILD.md) · [Parity](../PARITY.md) · [Validation](../TEST_REPORT.md)
 
 [Meta developer mode](https://developers.meta.com/vr/documentation/android-apps/enable-developer-mode/) · [Meta refresh API](https://developers.meta.com/vr/documentation/native/android/mobile-display-refresh-rate/) · [Meta passthrough](https://developers.meta.com/vr/documentation/native/android/mobile-passthrough/)

@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.7.0 · Uhransicht
+# Mario Compilation Ultra 0.8.0 · Uhransicht
 
 [English](../en/WATCH.md) · [Français](../fr/WATCH.md) · [Español](../es/WATCH.md) · [日本語](../ja/WATCH.md) · [Deutsch](../de/WATCH.md) · [Italiano](../it/WATCH.md) · [Português](../pt/WATCH.md) · [Русский](../ru/WATCH.md) · [简体中文](../zh/WATCH.md) · [한국어](../ko/WATCH.md)
 
@@ -18,15 +18,15 @@ Ein persönliches Paket enthält deine lokalen Module. Öffentliche Pakete benö
 
 Physische Uhrenbedienung und Dauerleistung bleiben ungetestet. Diese Ausgabe ist experimentell.
 
-Ein signiertes APK-Update erhält App-Daten. Deinstallation oder Datenlöschung entfernt lokale Module und Spielstände.
-
 Physische Uhrenbedienung und Dauerleistung bleiben ungetestet. Diese Ausgabe ist experimentell.
+
+Ein signiertes APK-Update erhält App-Daten. Deinstallation oder Datenlöschung entfernt lokale Module und Spielstände.
 
 ```text
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.7.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.8.0-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 ```
 
-[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Wear-public.apk) · [HTML](watch.html) · [Illustrierte Einstellungen](SETTINGS.md) · [Guide](README.md)
+[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [HTML](watch.html) · [Illustrierte Einstellungen](SETTINGS.md) · [Guide](README.md)

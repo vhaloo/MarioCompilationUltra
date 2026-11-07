@@ -33,6 +33,7 @@ class World {
     mutable std::vector<std::array<uint32_t, 256>> completeBlocks;
     int sceneryW = 0, sceneryH = 0;
     uint64_t graphicsVersion = ~uint64_t(0);
+    bool terrainPrepared = false;
     uint64_t graphicsRevision = 0, observedRevision = 0;
     std::vector<uint32_t> retainedPixels;
     std::array<double, 28> retainedKey{};
@@ -55,14 +56,14 @@ class World {
     const std::array<uint32_t, 256> *completeBlock(const Core &, int id) const;
     uint32_t backdrop(const Core &, const Scene &, int x, int y) const;
     void remember(const Core &, const Scene &);
-    void prepareGraphics(const Core &, const Scene &);
+    void prepareGraphics(const Core &, const Scene &, bool terrain = true);
 
   public:
     Canvas canvas;
     Scene scene;
     CompleteMap complete;
     std::vector<uint32_t> backdropPixels;
-    bool expanded = false, retainTerrain = true;
+    bool expanded = false, retainTerrain = true, canvasRasterized = false;
     uint64_t terrainBuilds = 0, terrainReuses = 0;
     size_t knownTiles() const { return cache.size(); }
     void reset() {
@@ -78,7 +79,8 @@ class World {
     }
     Scene inspect(const Core &, bool completeView = false) const;
     void compose(const Core &, Settings &, int drawableWidth, int drawableHeight,
-                 float resolutionScale = 1.f);
+                 float resolutionScale = 1.f, bool raster = true);
+    void rasterCanvas(const Core &, const Settings &);
     uint32_t volumeLayer(const Core &, int bg, int x, int y, bool &high) const;
     uint32_t volumeTerrain(const Core &, int layer, int x, int y, bool &high) const;
     uint32_t decodeTileForTest(const McuVideo &s, int bg, uint16_t a, int x, int y) const {

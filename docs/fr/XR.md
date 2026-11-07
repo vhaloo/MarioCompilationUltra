@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.7.0 · Quest VR / AR
+# Mario Compilation Ultra 0.8.0 · Quest VR / AR
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -6,7 +6,7 @@
 
 Murs de niveau entier, sol, table arcade, CRT et galerie incurvée. Aperçu XR expérimental ; deux poignées pour redimensionner.
 
-Aperçu XR expérimental. L’utilisateur a confirmé la collection 0.4 visible dans son Quest 3 après installation ; la soumission des images a été enregistrée. La version 0.5 est compilée et contrôlée séparément. Suivi, confort, passthrough, placement dans la pièce et jeu prolongé demandent encore des essais physiques.
+Aperçu XR expérimental. L’utilisateur a confirmé la collection 0.4 visible dans son Quest 3 après installation ; la soumission des images a été enregistrée. La version 0.8 est compilée et contrôlée séparément. Suivi, confort, passthrough, placement dans la pièce et jeu prolongé demandent encore des essais physiques.
 
 Pour ton essai ultérieur, active le mode développeur et installe l’APK ARM64 public avec SideQuest ou adb install -r. Ouvre Mario Compilation Ultra XR dans Sources inconnues, choisis une cartouche ou un ZIP avec le sélecteur système, puis Jouer. Importe All-Stars + World et Yoshi’s Island séparément. L’APK public ne contient ni ROM ni progression.
 
@@ -24,12 +24,12 @@ La table arcade affiche la zone chargée. La physique et l’activation des obje
 
 Commandes rapides sur ordinateur : maintiens le clic du stick droit, puis croix gauche/droite pour le zoom, haut pour 1:1, bas pour la carte entière, A pour figer, B pour la caméra originale, X pour une capture, Y pour suivre le joueur. Relâcher rend les commandes SNES normales. F1 ou l’aide Y du menu ouvre une explication illustrée.
 
-La version 0.7 adapte la résolution des décors, la cadence décorative et le shader VR avec une réserve de performance. Pixels du jeu et menus restent nets. Quest réserve au moins 35 % du budget à la fréquence choisie ; le détail périphérique facultatif a un rendu de secours. Ces objectifs restent à vérifier sur appareil physique.
+La version 0.8 adapte la résolution des décors, la grille de voxels, la cadence décorative et le shader VR aux performances disponibles. Le gros plan conserve les pixels du jeu d’origine ; les menus restent nets. Quest vise au moins 35 % de réserve par image. Ce sont des objectifs du réglage automatique, pas des résultats garantis sur appareil physique.
 
 SNES: D-pad · A · B · X · Y · L · R · Start · Select
 
 Touch: A → SNES B · B → SNES Y · X → SNES A · RT → SNES X · R3 → Start · LT → Rewind · Y → Déplacer les options
 
-[HTML](xr.html) · [Guide](README.md) · [Build](../BUILD.md) · [Parity](../PARITY.md) · [Validation](../TEST_REPORT.md)
+[Volume des pixels](VOXELS.md) · [HTML](xr.html) · [Guide](README.md) · [Build](../BUILD.md) · [Parity](../PARITY.md) · [Validation](../TEST_REPORT.md)
 
 [Meta developer mode](https://developers.meta.com/vr/documentation/android-apps/enable-developer-mode/) · [Meta refresh API](https://developers.meta.com/vr/documentation/native/android/mobile-display-refresh-rate/) · [Meta passthrough](https://developers.meta.com/vr/documentation/native/android/mobile-passthrough/)

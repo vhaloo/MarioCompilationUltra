@@ -17,16 +17,17 @@ uint16_t questDirectionButtons(float x, float y, float deadzone) {
 }
 std::vector<SpatialButton> spatialButtons(int page) {
     std::vector<SpatialButton> out;
-    const char *tabs[]{"remote_modes",       "remote_place",    "remote_play", "remote_picture",
-                       "remote_performance", "remote_sections", "remote_nudge"};
-    for (int i = 0; i < 7; ++i)
-        out.push_back({PageModes + i, tabs[i], -.465f + i * .155f, .27f, .145f, .065f});
+    const char *tabs[spatialPageCount]{"remote_modes",   "remote_place",       "remote_play",
+                                       "remote_picture", "remote_performance", "remote_sections",
+                                       "remote_nudge",   "remote_volume"};
+    for (int i = 0; i < spatialPageCount; ++i)
+        out.push_back({PageModes + i, tabs[i], -.4725f + i * .135f, .27f, .130f, .073f});
     auto grid = [&](int action, const char *key, bool hold = false) {
-        int n = int(out.size()) - 7;
+        int n = int(out.size()) - spatialPageCount;
         out.push_back(
             {action, key, -.35f + (n % 3) * .35f, .135f - (n / 3) * .13f, .32f, .105f, hold});
     };
-    switch (std::clamp(page, 0, 6)) {
+    switch (std::clamp(page, 0, spatialPageCount - 1)) {
     case 0:
         for (int n = 1; n < 7; ++n) {
             const char *m[]{"questscreenmode", "questwallfit", "questmural", "questflooratlas",
@@ -115,6 +116,17 @@ std::vector<SpatialButton> spatialButtons(int page) {
         grid(PitchDown, "remote_tilt_down", true);
         grid(Recover, "remote_recover");
         grid(Advanced, "remote_advanced");
+        break;
+    case 7:
+        grid(VolumeFlat, "Original 2D");
+        grid(VolumeRelief, "Pixel relief");
+        grid(VolumeVoxels, "Voxels");
+        grid(VolumeThinner, "Thickness −");
+        grid(VolumeThicker, "Thickness +");
+        grid(VolumeRounded, "Rounded voxel shapes");
+        grid(VolumeCloserLayers, "Spacing −");
+        grid(VolumeFartherLayers, "Spacing +");
+        grid(SectionFirst + 1, "Screen");
         break;
     }
     return out;

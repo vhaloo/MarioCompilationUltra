@@ -38,7 +38,10 @@ class App {
     SDL_Renderer *renderer = nullptr;
     SDL_Texture *nativeTex = nullptr, *worldTex = nullptr, *backgroundTex = nullptr;
     SDL_Texture *voxelTex = nullptr;
+    SDL_Texture *volumeHudTex = nullptr;
     int voxelWidth = 0, voxelHeight = 0;
+    int volumeHudWidth = 0, volumeHudHeight = 0;
+    uint64_t voxelRasterVersion = ~uint64_t(0), volumeHudVersion = ~uint64_t(0);
     VoxelScene volumeScene;
     VoxelRasterizer volumeRaster;
     std::unique_ptr<Blitter> nativeBlitter, worldBlitter, insetBlitter;
@@ -85,7 +88,8 @@ class App {
     TextureDamage nativeDamage, worldDamage;
     uint64_t canvasVersion = 0, nativeContentVersion = 0, worldContentVersion = 0;
     uint64_t nativeVersion = ~uint64_t(0), backdropVersion = ~uint64_t(0);
-    std::array<double, 22> compositionKey{};
+    std::array<double, 23> compositionKey{};
+    bool volumeDrawn = false;
     std::array<int, 3> backdropKey{};
     void resetMetrics();
     void invalidateGraphics(bool deviceReset);

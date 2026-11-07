@@ -31,7 +31,8 @@ def main():
    shader=create(0x8b31 if name=='vertexSource' else 0x8b30);raw=C.c_char_p(src.encode());setSource(shader,1,C.byref(raw),None);compileShader(shader);ok=I();getiv(shader,0x8b81,C.byref(ok));buf=C.create_string_buffer(8192);log(shader,len(buf),None,buf);assert ok.value,(name,buf.value.decode());compiled.append(shader)
   q=gl('glCreateProgram',U)();attach=gl('glAttachShader',None,U,U)
   for shader in compiled:attach(q,shader);gl('glDeleteShader',None,U)(shader)
-  gl('glLinkProgram',None,U)(q);ok=I();gl('glGetProgramiv',None,U,U,C.POINTER(I))(q,0x8b82,C.byref(ok));assert ok.value
+  gl('glLinkProgram',None,U)(q);ok=I();gl('glGetProgramiv',None,U,U,C.POINTER(I))(q,0x8b82,C.byref(ok))
+  buf=C.create_string_buffer(8192);gl('glGetProgramInfoLog',None,U,I,C.POINTER(I),C.c_char_p)(q,len(buf),None,buf);assert ok.value,buf.value.decode()
   return q
  current=program(root/'src/xr_stage.cpp');baseline=program(a.baseline) if a.baseline else current
  gl('glViewport',None,I,I,I,I)(0,0,width,height)
@@ -53,7 +54,7 @@ def main():
  def setup(program,kind,crt,mask,srgb,efficient):
   use(program);at=lambda n:uniform(program,n.encode())
   for n,v in dict(image=0,kind=kind,crt=crt,maskMode=mask,srgbTarget=srgb,flipImage=0,clipNative=1,efficientShader=efficient).items():u1i(at(n),v)
-  for n,v in dict(intensity=.8,glassStrength=.35,surroundBrightness=.9).items():u1f(at(n),v)
+  for n,v in dict(intensity=.8,glassStrength=.35,surroundBrightness=.9,voxelCurveAngle=0,voxelDepthScale=1).items():u1f(at(n),v)
   u2(at('raster'),256,224);u3(at('eye'),0,1,3);u4(at('nativeHole'),.3,.2,.15,.2)
   for n in ['vp','model']:matrix(at(n),1,0,identity)
  draw=gl('glDrawArrays',None,U,I,I);clear=gl('glClear',None,U);finish=gl('glFinish',None);read=gl('glReadPixels',None,I,I,I,I,U,U,P)
@@ -68,6 +69,41 @@ def main():
      setup(baseline,kind,crt,mask,srgb,0);ref=capture();setup(current,kind,crt,mask,srgb,1);got=capture();delta=max(high for low,high in ImageChops.difference(ref,got).getextrema());maximum=max(maximum,delta);assert delta<=2,(kind,crt,mask,srgb,delta)
      records.append(dict(kind=kind,crt=crt,mask=mask,srgb=srgb,max_channel_difference=delta))
      if kind==2 and crt==2 and mask==1 and not srgb:ref.save(a.out/'reference-original-pixels.png');got.save(a.out/'efficient-original-pixels.png')
+ # Cached voxel lighting must bypass the CRT/specular path while preserving
+ # the source face color. This is real GLES evidence, not headset evidence.
+ for srgb in [0,1]:
+  setup(current,7,0,0,srgb,1);got=capture();expected=tuple(round((v**2.2 if srgb else v)*255) for v in [.42,.62,.83])
+  actual=got.getpixel((width//2,height//2))[:3];assert max(abs(x-y) for x,y in zip(actual,expected))<=1,(actual,expected)
+  records.append(dict(kind=7,srgb=srgb,cached_face_color=True))
+ # Transparent HUD texels must reveal the environment rather than a sky strip.
+ masked=bytearray(pixels)
+ for y in range(224):
+  for x in range(128):masked[(y*256+x)*4:(y*256+x)*4+4]=bytes([0,0,0,0])
+ raw_mask=(C.c_ubyte*len(masked)).from_buffer(masked);gl('glTexSubImage2D',None,U,I,I,I,I,I,U,U,P)(0xde1,0,0,0,256,224,0x1908,0x1401,raw_mask)
+ setup(current,1,0,0,0,1);hud=capture();left=hud.getpixel((width//4,height//2));assert all(abs(x-y)<=1 for x,y in zip(left[:3],[8,10,18])),left
+ assert hud.getpixel((width*3//4,height//2))[3]==255
+ records.append(dict(kind=1,transparent_hud=True))
+ gl('glTexSubImage2D',None,U,I,I,I,I,I,U,U,P)(0xde1,0,0,0,256,224,0x1908,0x1401,image)
+ # Same 16-byte XYZ/RGBA8 layout as the headset geometry stream. Check the
+ # normalized color and that real vertex curvature moves an edge on the GPU.
+ class Packed(C.Structure):
+  _fields_=[('position',F*3),('rgba',C.c_ubyte*4)]
+ assert C.sizeof(Packed)==16
+ packed=(Packed*6)(*(Packed((x,y,.1),(32,128,224,128)) for x,y in [(-.8,-.65),(.8,-.65),(.8,.65),(-.8,-.65),(.8,.65),(-.8,.65)]))
+ packed_vao=U();packed_buffer=U()
+ gl('glGenVertexArrays',None,I,C.POINTER(U))(1,C.byref(packed_vao));gl('glBindVertexArray',None,U)(packed_vao)
+ gl('glGenBuffers',None,I,C.POINTER(U))(1,C.byref(packed_buffer));gl('glBindBuffer',None,U,U)(0x8892,packed_buffer)
+ gl('glBufferData',None,U,C.c_ssize_t,P,U)(0x8892,C.sizeof(packed),packed,0x88e0)
+ for location,components,typ,normalized,offset in [(0,3,0x1406,0,0),(3,4,0x1401,1,12)]:
+  gl('glEnableVertexAttribArray',None,U)(location);gl('glVertexAttribPointer',None,U,I,U,U,I,P)(location,components,typ,normalized,16,P(offset))
+ setup(current,7,0,0,0,1);flat=capture();center=(width//2,height//2);edge=(int(width*.85),height//2)
+ assert all(abs(x-y)<=1 for x,y in zip(flat.getpixel(center)[:3],[16,64,112])) and flat.getpixel(edge)==flat.getpixel(center)
+ records.append(dict(kind=7,packed_vertex_bytes=16,normalized_rgba=True))
+ u1f(uniform(current,b'voxelCurveAngle'),2);u1f(uniform(current,b'voxelDepthScale'),.7);curved=capture()
+ assert curved.getpixel(center)==flat.getpixel(center) and all(abs(x-y)<=1 for x,y in zip(curved.getpixel(edge)[:3],[8,10,18]))
+ assert gl('glGetError',U)()==0
+ records.append(dict(kind=7,curved_vertex_projection=True))
+ gl('glBindVertexArray',None,U)(vao)
  times={'baseline':[],'efficient':[]}
  for _ in range(5):
   for label,program,efficient in [('baseline',baseline,0),('efficient',current,1)]:

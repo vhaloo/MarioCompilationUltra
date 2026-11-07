@@ -1,4 +1,4 @@
-Mario Compilation Ultra 0.7.0 · Vista orologio
+Mario Compilation Ultra 0.8.0 · Vista orologio
 
 Ruota la corona o ghiera per lo zoom. Nei menu scorre il contenuto; funzionano anche + e - tattili.
 
@@ -14,11 +14,11 @@ Trasferisci le cartucce in CartridgeInbox, poi scegli Controlla cartucce trasfer
 
 I comandi fisici dell’orologio e le prestazioni prolungate restano da verificare. Questa edizione è sperimentale.
 
-Aggiornare un APK firmato conserva i dati. Disinstallare o cancellare i dati elimina cartucce e salvataggi locali.
-
 I comandi fisici dell’orologio e le prestazioni prolungate restano da verificare. Questa edizione è sperimentale.
+
+Aggiornare un APK firmato conserva i dati. Disinstallare o cancellare i dati elimina cartucce e salvataggi locali.
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.7.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.8.0-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

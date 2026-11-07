@@ -45,6 +45,12 @@ Presentation commands include `view`, `zoom`, `quality`, `background`, `freeze`,
 
 Picture commands include `filter 0|1|2` (nearest/crisp/smooth), `aspect 0|1`
 (square/TV), `softEdges 0|1`, `scanlines 0..80` and `picture recommended`.
+
+Volume commands: `volume 0|1|2` (original 2D / relief / voxels),
+`volumeDepth 1..16`, `volumeSpacing 1..12`, `volumeAngle -30..30`,
+`volumeTilt -30..30`, and `volumeRound 0|1`. The `mcu_voxel_tests` binary can
+export the original procedural example as a BMP by taking an output path.
+See [spatial design and references](VOXEL_RESEARCH.md) for the rendering contract.
 `metrics reset` starts an independent measurement window; `report PATH` writes
 its simulation/presentation counts, rate and 95th-percentile frame intervals.
 These counts measure work inside that window even when cartridges change or
@@ -95,6 +101,9 @@ To reproduce the published screenshots, run the smoke command above, then
 280 original PNG captures. The documentation crops only the unused surround
 of the 1920×1080 images; no application pixels are fabricated or retouched.
 Window sizes of 640×360 use scrolling to retain access to every page.
+`python tools/smoke_watch.py --exe build/MarioCompilationUltra --out build/watch-smoke --docs`
+reproduces the watch, quality and volume help screenshots. Run
+`python tools/volume_guides.py` to regenerate the ten volume guides.
 
 ## Standalone Android / Quest preview
 

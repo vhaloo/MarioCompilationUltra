@@ -152,6 +152,6 @@ Sur un Quest compatible, une charge durable peut réduire les détails périphé
 
 ## Volume des pixels
 
-3D procédurale facultative : les pixels deviennent des colonnes solides, avec terrain, décors et personnages sur des plans distincts. Le relief est léger ; les voxels sont plus épais. L’épaisseur règle la profondeur et l’angle règle la vue sur écran. La qualité automatique réduit le détail sous charge. HUD et gros plans gardent les pixels originaux. Les scènes spéciales reviennent à l’écran original. Il s’agit d’une interprétation, pas d’une reconstruction des faces cachées. Les performances physiques restent non testées.
+3D procédurale facultative : les pixels deviennent des colonnes solides, avec terrain, décors et personnages sur des plans distincts. Le relief est léger ; les voxels sont plus épais. L’épaisseur règle la profondeur et l’angle règle la vue sur écran. La qualité automatique réduit le détail sous charge. HUD et gros plans gardent les pixels originaux. Les scènes spéciales reviennent à l’écran original. Il s’agit d’une interprétation, pas d’une reconstruction des faces cachées. Les performances physiques restent non testées. Les formes arrondies génèrent des corps en gradins à partir de la transparence des personnages ; désactivées, l’extrusion reste uniforme. L’inclinaison règle l’élévation de la vue sur écran. Les positions et la physique du jeu restent inchangées. L’écartement sépare les couches en profondeur sans changer leur ordre.
 
 [Guide](README.md) · [Watch](WATCH.md)

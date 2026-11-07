@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.7.0
+# Mario Compilation Ultra 0.8.0
 
 PC에 맞게 조정할 수 있는 인터페이스와 실험적인 확장 화면을 제공하는 로컬 SNES 모음입니다. Super FX를 포함한 카트리지 동작은 Snes9x가 에뮬레이션합니다. 모든 게임을 역컴파일했다고 주장하지 않습니다.
 
-[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.7.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.8.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 다운로드와 바탕 화면에서 실행
 
@@ -47,9 +47,17 @@ sh ./Install-Linux.sh
 
 확장 메모리 프로필과 All-Stars 자동 선택은 목록의 미국판을 대상으로 합니다. 인식되지만 검증된 프로필이 없는 판은 원본 화면을 사용합니다. 인터페이스 번역은 상용 카트리지의 이야기나 그래픽을 번역하지 않습니다. 다섯 게임 전체를 새로 네이티브 역컴파일했다고 주장하지 않습니다.
 
+## 픽셀 입체화
+
+![픽셀 입체화](../voxel-preview.png)
+
+선택 가능한 절차적 3D 표시입니다. 픽셀을 입체 기둥으로 만들고 지형, 배경, 캐릭터를 서로 다른 깊이에 배치합니다. 부조는 얕고 복셀은 더 두껍습니다. 두께는 깊이, 각도는 화면 시점을 바꿉니다. 자동 품질은 부하가 높으면 세부 표현을 줄입니다. HUD와 원본 카메라 확대 화면은 원본 픽셀을 유지합니다. 특수 장면은 원본 화면으로 돌아갑니다. 보이지 않는 뒷면을 복원하는 기능은 아닙니다. 실제 기기 성능은 검증되지 않았습니다. 둥근 형태는 캐릭터의 투명 영역을 바탕으로 계단식 3D 몸체를 만듭니다. 끄면 두께가 균일해집니다. 기울기는 화면 시점의 높이를 바꿉니다. 원래 위치와 게임 물리는 바뀌지 않습니다. 레이어 간격은 순서를 유지하며 깊이 층을 분리합니다.
+
+[픽셀 입체화](VOXELS.md) · [HTML](voxels.html)
+
 ## 자동 해상도
 
-0.7은 성능 여유에 맞춰 배경 해상도, 장식 갱신 주기와 VR 셰이더를 조절합니다. 게임 픽셀과 메뉴는 선명하게 유지합니다. Quest는 선택한 프레임 시간의 최소 35%를 남기며 주변부 세부에는 대체 경로가 있습니다. 실제 기기 검증이 필요합니다.
+0.8은 사용 가능한 성능에 맞춰 배경 해상도, 복셀 격자, 장식 갱신 주기와 VR 셰이더를 조절합니다. 확대 화면에서 원본 게임 픽셀을 확인할 수 있으며 메뉴는 선명합니다. Quest는 프레임 시간의 최소 35% 여유를 목표로 합니다. 이는 자동 품질 제어의 목표이며 실제 기기 결과를 보장하지 않습니다.
 
 [Performance / GPU](../PERFORMANCE.md)
 
@@ -63,15 +71,15 @@ sh ./Install-Linux.sh
 
 ## Android 휴대전화와 태블릿
 
-[Android 휴대전화와 태블릿](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Android-public.apk)
+[Android 휴대전화와 태블릿](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Android-public.apk)
 
 ## 시계 보기
 
-[시계 보기](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Wear-public.apk) · [그림으로 보는 설정](SETTINGS.md)
+[시계 보기](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [그림으로 보는 설정](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 조작
 
@@ -141,9 +149,9 @@ View/Back: 설정 · LT: 되감기 · RT: Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 패키지와 검증 · 0.7.0
+## 패키지와 검증 · 0.8.0
 
-0.7 검증은 공개 테스트 8종, 10개 언어 그림 설정, 로컬 게임 6종과 PC 비교를 포함합니다. 휴대전화, 태블릿과 Wear OS는 에뮬레이터로 검사합니다. 실제 시계, Android, Mac과 Quest 성능은 아직 검증하지 않았습니다. 자세한 보고서를 확인하세요.
+0.8은 절차적 부조와 복셀을 추가합니다. 공개 테스트 9종이 자체 형상, 깊이, 투명도, 설정과 기존 기능을 검사합니다. 로컬 게임 6종은 별도로 검사하며 게임 이미지는 비공개로 유지합니다. 휴대전화, 태블릿과 Wear OS는 에뮬레이터를 사용합니다. Mac 및 실제 Android, 시계와 Quest 게임 실행은 실험용입니다. 최신 보고서를 확인하세요.
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

@@ -1,4 +1,4 @@
-# Sonic feature parity — Mario 0.7.0
+# Sonic feature parity — Mario 0.8.0
 
 This comparison uses the Sonic collection's 0.6 XR implementation and a frozen
 snapshot of its ongoing 0.7 development on 2026-10-29. Mario retains its own
@@ -48,4 +48,14 @@ cadence and automatic VR shading, with optional peripheral foveation.
 All settings use semantic icons and explanatory original illustrations with
 hover/focus, question-button and touch access, in ten languages.
 The table above describes feature scope inherited from 0.5; current evidence
-and hardware limits are in the [0.7 report](TEST_REPORT.md).
+and hardware limits for that release are in the [0.7 report](TEST_REPORT_0.7.0.md).
+
+## 0.8 additions
+
+Pixel relief, a deeper voxel style, independent thickness and layer spacing,
+and a Volume page on the Quest spatial remote apply the shared presentation
+ideas to the six SNES profiles. Mario reads SNES tile and object priority from
+its existing observer. Its portable renderer uses a bounded CPU depth buffer;
+Quest uses a compact, per-eye GPU geometry stream. The watch's closest zoom
+returns to the original screen. The current build does not export game scenes
+as 3D model files. See the [volume guide](en/VOXELS.md) and [current tests](TEST_REPORT.md).

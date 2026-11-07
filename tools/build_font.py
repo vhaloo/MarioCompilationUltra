@@ -19,6 +19,7 @@ def codepoints():
     text += (ROOT / 'docs/guide-texts.json').read_text(encoding='utf8')
     text += (ROOT / 'tools/xr_guides.py').read_text(encoding='utf8')
     text += (ROOT / 'docs/mobile-texts.json').read_text(encoding='utf8')
+    text += (ROOT / 'docs/volume-texts.json').read_text(encoding='utf8')
     return set(map(ord, text)) | set(range(32, 0x250)) | set(range(0x400, 0x530)) | set(range(0x2000, 0x2070))
 def main():
     parser = argparse.ArgumentParser()
@@ -36,6 +37,7 @@ def main():
         catalog_chars.update(map(ord, (ROOT / 'docs/guide-texts.json').read_text(encoding='utf8')))
         catalog_chars.update(map(ord, (ROOT / 'tools/xr_guides.py').read_text(encoding='utf8')))
         catalog_chars.update(map(ord, (ROOT / 'docs/mobile-texts.json').read_text(encoding='utf8')))
+        catalog_chars.update(map(ord, (ROOT / 'docs/volume-texts.json').read_text(encoding='utf8')))
         missing = catalog_chars - set(font.getBestCmap()) - {10, 13}
         assert not missing, f'Missing localized glyphs: {sorted(missing)}'
         print(f'Ten-language font coverage verified: {len(font.getBestCmap())} codepoints')

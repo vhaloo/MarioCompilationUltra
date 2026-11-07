@@ -25,6 +25,8 @@ struct McuVideo {
     int mode = 0, brightness = 0, blank = 1, mainLayers = 0;
     bool bg3Priority = false;
     int visibleLayers = 0;
+    int firstObject = 0;
+    bool objectInterlace = false;
 };
 void mcuObserve(McuVideo &, bool rendered = false);
 void mcuObserveMemory(McuVideo &);

@@ -25,9 +25,12 @@ static void composeVerified(World &world, const Core &core, Settings &settings, 
           "pixels");
     if (world.expanded) {
         uint64_t reused = world.terrainReuses;
-        world.compose(core, settings, width, height);
+        world.compose(core, settings, width, height, 1.f, false);
+        check(!world.canvasRasterized && world.canvas.pixels.empty() && world.expanded,
+              "Volume preparation keeps coverage and skips the unused flat image");
+        world.rasterCanvas(core, settings);
         check(world.terrainReuses > reused && world.canvas.pixels == fresh.canvas.pixels,
-              "An unchanged render exercises the cache without changing any pixel");
+              "Lazy flat fallback reuses terrain without changing any pixel");
     }
 }
 

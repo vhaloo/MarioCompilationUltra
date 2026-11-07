@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.7.0 · 手表视图
+# Mario Compilation Ultra 0.8.0 · 手表视图
 
 [English](../en/WATCH.md) · [Français](../fr/WATCH.md) · [Español](../es/WATCH.md) · [日本語](../ja/WATCH.md) · [Deutsch](../de/WATCH.md) · [Italiano](../it/WATCH.md) · [Português](../pt/WATCH.md) · [Русский](../ru/WATCH.md) · [简体中文](../zh/WATCH.md) · [한국어](../ko/WATCH.md)
 
@@ -18,15 +18,15 @@
 
 实体手表的操作与持续性能尚未验证，本版本为实验版。
 
-更新已签名APK会保留数据，卸载或清除应用数据会移除本地卡带和存档。
-
 实体手表的操作与持续性能尚未验证，本版本为实验版。
+
+更新已签名APK会保留数据，卸载或清除应用数据会移除本地卡带和存档。
 
 ```text
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.7.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.8.0-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 ```
 
-[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Wear-public.apk) · [HTML](watch.html) · [图解设置](SETTINGS.md) · [Guide](README.md)
+[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [HTML](watch.html) · [图解设置](SETTINGS.md) · [Guide](README.md)

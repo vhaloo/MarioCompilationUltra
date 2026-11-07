@@ -253,6 +253,8 @@ App::~App() {
             SDL_DestroyTexture(worldTex);
         if (voxelTex)
             SDL_DestroyTexture(voxelTex);
+        if (volumeHudTex)
+            SDL_DestroyTexture(volumeHudTex);
         if (backgroundTex)
             SDL_DestroyTexture(backgroundTex);
         if (ImGui::GetCurrentContext()) {
@@ -358,12 +360,15 @@ void App::invalidateGraphics(bool deviceReset) {
     insetBlitter->invalidate(deviceReset);
     if (deviceReset) {
         SDL_SetRenderTarget(renderer, nullptr);
-        for (auto texture :
-             {nativeTex, worldTex, backgroundTex, frameTarget, sceneTarget, watchTarget, voxelTex})
+        for (auto texture : {nativeTex, worldTex, backgroundTex, frameTarget, sceneTarget,
+                             watchTarget, voxelTex, volumeHudTex})
             if (texture)
                 SDL_DestroyTexture(texture);
         nativeTex = worldTex = backgroundTex = frameTarget = sceneTarget = watchTarget = nullptr;
         voxelTex = nullptr;
+        volumeHudTex = nullptr;
+        volumeHudWidth = volumeHudHeight = 0;
+        voxelRasterVersion = volumeHudVersion = ~uint64_t(0);
         voxelWidth = voxelHeight = 0;
         volumeScene.clear();
         nativeDamage.clear();
@@ -793,10 +798,11 @@ void App::background() {
     SDL_RenderCopy(renderer, backgroundTex, nullptr, nullptr);
 }
 void App::drawGame() {
+    volumeDrawn = false;
     if (!core.loaded)
         return;
     uint64_t began = SDL_GetPerformanceCounter();
-    std::array<double, 22> key{{double(drawableWidth),
+    std::array<double, 23> key{{double(drawableWidth),
                                 double(drawableHeight),
                                 double(settings.view),
                                 double(settings.zoom),
@@ -817,19 +823,21 @@ void App::drawGame() {
                                 double(settings.objectPreview),
                                 double(settings.spawnLabels),
                                 double(settings.projectionWatch),
-                                settings.projectionWatchZoom}};
+                                settings.projectionWatchZoom,
+                                double(settings.volumeMode != 0)}};
     bool rebuild = lastCompose != core.imageVersion || compositionKey != key;
     if (rebuild) {
         world.retainTerrain = !options.coldScene;
         world.compose(core, settings, drawableWidth, drawableHeight,
 #ifdef MCU_QUEST
-                      1.f
+                      1.f,
 #else
-                      resolutionScale()
+                      resolutionScale(),
 #endif
-        );
+                      settings.volumeMode == 0);
         previews.update(core, world.scene, effectCadence());
-        previews.paint(world.canvas, world.scene, settings);
+        if (world.canvasRasterized)
+            previews.paint(world.canvas, world.scene, settings);
         lastCompose = core.imageVersion;
         compositionKey = key;
         ++sceneRebuilds;
@@ -853,7 +861,7 @@ void App::drawGame() {
     bool volumeRendered = false;
     if (settings.volumeMode &&
         volumeScene.update(core, world, settings,
-                           settings.adaptiveResolution ? resolution.level() : 0)) {
+                           settings.adaptiveResolution ? resolution.level() : 0, &previews)) {
         size_t budget = size_t(settings.quality == 2   ? 786432
                                : settings.quality == 1 ? 393216
                                                        : 196608);
@@ -868,7 +876,10 @@ void App::drawGame() {
 #endif
         if (skipRaster)
             volumeRendered = true;
-        if (!skipRaster && volumeRaster.render(volumeScene.mesh, volumeScene.camera, vw, vh)) {
+        bool rasterChanged = !voxelTex || vw != voxelWidth || vh != voxelHeight ||
+                             voxelRasterVersion != volumeScene.version();
+        if (!skipRaster &&
+            (!rasterChanged || volumeRaster.render(volumeScene.mesh, volumeScene.camera, vw, vh))) {
             if (!voxelTex || vw != voxelWidth || vh != voxelHeight) {
                 if (voxelTex)
                     SDL_DestroyTexture(voxelTex);
@@ -881,8 +892,15 @@ void App::drawGame() {
                     SDL_SetTextureScaleMode(voxelTex, SDL_ScaleModeNearest);
                 }
             }
-            if (voxelTex &&
+            bool uploaded = !rasterChanged;
+            if (voxelTex && rasterChanged &&
                 SDL_UpdateTexture(voxelTex, nullptr, volumeRaster.pixels.data(), vw * 4) == 0) {
+                uploaded = true;
+                voxelRasterVersion = volumeScene.version();
+                ++textureUploads;
+                textureUploadBytes += uint64_t(vw) * vh * 4;
+            }
+            if (voxelTex && uploaded) {
                 SDL_RenderCopy(renderer, voxelTex, nullptr, nullptr);
                 volumeRendered = true;
             }
@@ -896,6 +914,13 @@ void App::drawGame() {
         }
     }
     if (world.expanded && !volumeRendered) {
+        if (!world.canvasRasterized) {
+            // Unsupported scenes or a failed volume allocation still have an
+            // authoritative original canvas, built only when needed.
+            world.rasterCanvas(core, settings);
+            previews.paint(world.canvas, world.scene, settings);
+            rebuild = true;
+        }
         if (rebuild || !worldTex) {
             uint64_t before = textureUploads;
             updateTexture(worldTex, ww, wh, world.canvas.width, world.canvas.height,
@@ -926,6 +951,7 @@ void App::drawGame() {
                           core.height * scale};
         }
     }
+    volumeDrawn = volumeRendered;
     // Draw the authoritative framebuffer again at full source resolution. Atlas
     // quality budgets and panorama sampling must never downsample the live game.
     if (!deferNative && !volumeRendered)
@@ -933,16 +959,30 @@ void App::drawGame() {
                             settings.view == 2 ? 0 : settings.filter, nativeContentVersion);
     float rowHeight = nativeRect.h / core.height;
     if (volumeRendered) {
-        for (auto rows : {std::pair<int, int>{0, volumeScene.hudTop},
-                          std::pair<int, int>{int(core.height) - volumeScene.hudBottom,
-                                              volumeScene.hudBottom}}) {
-            if (rows.second <= 0)
-                continue;
-            SDL_Rect source{0, rows.first, int(core.width), rows.second};
-            SDL_FRect dest{nativeRect.x, nativeRect.y + rows.first * rowHeight, nativeRect.w,
-                           rows.second * rowHeight};
-            SDL_RenderCopyF(renderer, nativeTex, &source, &dest);
+        if (!volumeHudTex || volumeHudWidth != int(core.width) ||
+            volumeHudHeight != int(core.height)) {
+            if (volumeHudTex)
+                SDL_DestroyTexture(volumeHudTex);
+            volumeHudWidth = core.width;
+            volumeHudHeight = core.height;
+            volumeHudTex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
+                                             SDL_TEXTUREACCESS_STREAMING, core.width, core.height);
+            if (volumeHudTex) {
+                SDL_SetTextureBlendMode(volumeHudTex, SDL_BLENDMODE_BLEND);
+                SDL_SetTextureScaleMode(volumeHudTex, SDL_ScaleModeNearest);
+            }
+            volumeHudVersion = ~uint64_t(0);
         }
+        if (volumeHudTex && volumeHudVersion != volumeScene.version() &&
+            SDL_UpdateTexture(volumeHudTex, nullptr, volumeScene.hudPixels.data(),
+                              core.width * 4) == 0) {
+            volumeHudVersion = volumeScene.version();
+            ++textureUploads;
+            textureUploadBytes += uint64_t(core.width) * core.height * 4;
+        }
+        auto hudRect = fitImage(drawableWidth, drawableHeight, core.width, core.height, 1.f);
+        if (volumeHudTex)
+            SDL_RenderCopyF(renderer, volumeHudTex, nullptr, &hudRect);
     }
     if (settings.scanlines && rowHeight >= 2.f && !volumeRendered) {
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -1148,6 +1188,17 @@ void App::optionsUi() {
                      "Le jeu garde son rythme SNES d'origine. Les vues modifient son affichage."));
         combo("View", "Vue", settings.view,
               {"Original framing", "Panorama", "Pixel world", "Stage atlas", "Full level map"});
+        choice("Pixel volume", settings.volumeMode, {"Original 2D", "Pixel relief", "Voxels"});
+        if (settings.volumeMode) {
+            this->slider("Voxel thickness", settings.volumeDepth, 1, 16, "%d px");
+            this->slider("Layer spacing", settings.volumeSpacing, 1, 12, "%d px");
+#ifndef MCU_QUEST
+            this->slider("Volume angle", settings.volumeAngle, -30, 30);
+            this->slider("Volume tilt", settings.volumeTilt, -30, 30);
+#endif
+            if (settings.volumeMode == 2)
+                tick("Rounded voxel shapes", settings.volumeRound);
+        }
         ImGui::TextColored({.55f, .9f, .75f, 1}, "%s", tr("Find your balance"));
         bool presetRow = ImGui::GetContentRegionAvail().x > 720 * uiUnit();
         if (button("Automatic quality")) {
@@ -1738,6 +1789,8 @@ void App::render() {
         settings.desktopPresentation = 0;
         settings.projectionWatch = true;
         settings.projectionWatchZoom = watchZoomCurrent;
+        if (watchZoomCurrent >= .9995f)
+            settings.volumeMode = 0; // The crown endpoint is always the original camera.
     }
     bool cleanProjection = settings.projectionCleanScene || watchFrame;
     SDL_SetRenderDrawColor(
@@ -1910,16 +1963,31 @@ void App::render() {
         auto &cv = world.canvas;
         auto *d = ImGui::GetForegroundDrawList();
         ImVec2 size{float(gameViewport.w), float(gameViewport.h)};
-        auto xy = [&](float x, float y) {
+        bool volumeActive = volumeDrawn && voxelWidth > 0 && voxelHeight > 0;
+        VoxelProjection volumeProjection(volumeScene.camera, std::max(1, voxelWidth),
+                                         std::max(1, voxelHeight));
+        auto xy = [&](float x, float y, float z = 0.f) {
+            if (volumeActive) {
+                auto p = volumeProjection.project({x, y, z});
+                return ImVec2(gameViewport.x + p.x * size.x / voxelWidth,
+                              gameViewport.y + p.y * size.y / voxelHeight);
+            }
             return ImVec2(gameViewport.x + (x - cv.x) * size.x / cv.worldWidth,
                           gameViewport.y + (y - cv.y) * size.y / cv.worldHeight);
         };
-        if (settings.guide)
+        if (settings.guide && volumeActive)
+            d->AddQuad(xy(float(sc.cameraX), float(sc.cameraY)),
+                       xy(float(sc.cameraX + core.width), float(sc.cameraY)),
+                       xy(float(sc.cameraX + core.width), float(sc.cameraY + core.height)),
+                       xy(float(sc.cameraX), float(sc.cameraY + core.height)),
+                       IM_COL32(250, 244, 178, 170), 1);
+        else if (settings.guide)
             d->AddRect(xy(float(sc.cameraX), float(sc.cameraY)),
                        xy(float(sc.cameraX + 256), float(sc.cameraY + core.height)),
                        IM_COL32(250, 244, 178, 170), 0, 0, 1);
         if (settings.locator || settings.view == 4) {
-            auto p = xy(float(sc.playerX + 8), float(sc.playerY));
+            auto p = xy(float(sc.playerX + 8), float(sc.playerY),
+                        volumeActive ? volumeScene.playerZ : 0.f);
             d->AddTriangleFilled({p.x - 6, p.y - 15}, {p.x + 6, p.y - 15}, {p.x, p.y - 5},
                                  IM_COL32(255, 249, 184, 245));
         }
@@ -2174,12 +2242,14 @@ void App::report(const fs::path &p, double elapsed) const {
       << insetRect.h << "]"
       << ",\n\"renderer\":" << jsonString(rendererInfo.name ? rendererInfo.name : "unknown")
       << ",\n\"volume_mode\":" << settings.volumeMode
-      << ",\n\"volume_ready\":" << (settings.volumeMode && volumeScene.ready ? "true" : "false")
-      << ",\n\"volume_faces\":"
-      << (settings.volumeMode && volumeScene.ready ? volumeScene.mesh.faces.size() : 0)
+      << ",\n\"volume_ready\":" << (core.loaded && volumeDrawn ? "true" : "false")
+      << ",\n\"volume_spacing\":" << settings.volumeSpacing
+      << ",\n\"volume_faces\":" << (core.loaded && volumeDrawn ? volumeScene.mesh.faces.size() : 0)
       << ",\n\"volume_grid\":" << volumeScene.grid
       << ",\n\"volume_occupied\":" << volumeScene.mesh.occupied
       << ",\n\"volume_chunks_reused\":" << volumeScene.mesh.reusedChunks
+      << ",\n\"volume_cache_bytes\":" << volumeScene.meshCacheBytes
+      << ",\n\"volume_preview_planes\":" << volumeScene.previewPlanes
       << ",\n\"vsync_requested\":" << (settings.vsync ? "true" : "false") << ",\n\"canvas_size\":["
       << world.canvas.width << ',' << world.canvas.height << "],\n\"canvas_world\":["
       << world.canvas.x << ',' << world.canvas.y << ',' << world.canvas.worldWidth << ','
@@ -2248,8 +2318,14 @@ void App::scriptCommand(const std::string &cmd, const std::string &value) {
         settings.volumeMode = std::clamp(std::stoi(value), 0, 2);
     else if (cmd == "volumeDepth")
         settings.volumeDepth = std::clamp(std::stoi(value), 1, 16);
+    else if (cmd == "volumeSpacing")
+        settings.volumeSpacing = std::clamp(std::stoi(value), 1, 12);
     else if (cmd == "volumeAngle")
         settings.volumeAngle = std::clamp(std::stoi(value), -30, 30);
+    else if (cmd == "volumeTilt")
+        settings.volumeTilt = std::clamp(std::stoi(value), -30, 30);
+    else if (cmd == "volumeRound")
+        settings.volumeRound = std::stoi(value) != 0;
     else if (cmd == "buttons")
         core.buttons[0] = uint16_t(std::stoul(value, nullptr, 0));
     else if (cmd == "view")

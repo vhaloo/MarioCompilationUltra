@@ -152,6 +152,6 @@ En Quest compatibles, la carga sostenida puede reducir el detalle periférico y 
 
 ## Volumen de píxeles
 
-3D procedural opcional: los píxeles se convierten en columnas sólidas, con terreno, fondos y personajes en planos separados. El relieve es poco profundo; los vóxeles son más gruesos. El grosor cambia la profundidad y el ángulo cambia la vista en pantalla. La calidad automática reduce el detalle bajo carga. HUD y primeros planos conservan los píxeles originales. Las escenas especiales vuelven a la pantalla original. Es una interpretación, no una reconstrucción de caras ocultas. Rendimiento físico sin probar.
+3D procedural opcional: los píxeles se convierten en columnas sólidas, con terreno, fondos y personajes en planos separados. El relieve es poco profundo; los vóxeles son más gruesos. El grosor cambia la profundidad y el ángulo cambia la vista en pantalla. La calidad automática reduce el detalle bajo carga. HUD y primeros planos conservan los píxeles originales. Las escenas especiales vuelven a la pantalla original. Es una interpretación, no una reconstrucción de caras ocultas. Rendimiento físico sin probar. Las formas redondeadas generan cuerpos 3D escalonados a partir de la transparencia de los personajes; al desactivarlas, la extrusión es uniforme. La inclinación cambia la elevación de la vista en pantalla. Las posiciones y la física originales no cambian. La separación aleja las capas sin cambiar su orden.
 
 [Guide](README.md) · [Watch](WATCH.md)

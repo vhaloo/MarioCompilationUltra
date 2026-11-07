@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.7.0 · 시계 보기
+# Mario Compilation Ultra 0.8.0 · 시계 보기
 
 [English](../en/WATCH.md) · [Français](../fr/WATCH.md) · [Español](../es/WATCH.md) · [日本語](../ja/WATCH.md) · [Deutsch](../de/WATCH.md) · [Italiano](../it/WATCH.md) · [Português](../pt/WATCH.md) · [Русский](../ru/WATCH.md) · [简体中文](../zh/WATCH.md) · [한국어](../ko/WATCH.md)
 
@@ -18,15 +18,15 @@ CartridgeInbox로 전송한 뒤 전송한 카트리지 확인을 누르거나 �
 
 실제 시계 조작감과 장시간 성능은 아직 검증하지 않았습니다. 이 버전은 실험용입니다.
 
-서명된 APK 업데이트는 데이터를 보존합니다. 앱 삭제나 데이터 지우기는 로컬 카트리지와 저장을 제거합니다.
-
 실제 시계 조작감과 장시간 성능은 아직 검증하지 않았습니다. 이 버전은 실험용입니다.
+
+서명된 APK 업데이트는 데이터를 보존합니다. 앱 삭제나 데이터 지우기는 로컬 카트리지와 저장을 제거합니다.
 
 ```text
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.7.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.8.0-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 ```
 
-[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Wear-public.apk) · [HTML](watch.html) · [그림으로 보는 설정](SETTINGS.md) · [Guide](README.md)
+[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [HTML](watch.html) · [그림으로 보는 설정](SETTINGS.md) · [Guide](README.md)

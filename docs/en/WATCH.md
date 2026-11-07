@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.7.0 · Watch view
+# Mario Compilation Ultra 0.8.0 · Watch view
 
 [English](../en/WATCH.md) · [Français](../fr/WATCH.md) · [Español](../es/WATCH.md) · [日本語](../ja/WATCH.md) · [Deutsch](../de/WATCH.md) · [Italiano](../it/WATCH.md) · [Português](../pt/WATCH.md) · [Русский](../ru/WATCH.md) · [简体中文](../zh/WATCH.md) · [한국어](../ko/WATCH.md)
 
@@ -18,15 +18,15 @@ Transfer cartridges to CartridgeInbox, then choose Check transferred cartridges 
 
 Physical watch controls and sustained hardware performance remain untested. This edition is experimental.
 
-Updating a signed APK preserves app data. Uninstalling or clearing app data removes local cartridges and saves.
-
 Physical watch controls and sustained hardware performance remain untested. This edition is experimental.
+
+Updating a signed APK preserves app data. Uninstalling or clearing app data removes local cartridges and saves.
 
 ```text
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.7.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.8.0-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 ```
 
-[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Wear-public.apk) · [HTML](watch.html) · [Illustrated settings](SETTINGS.md) · [Guide](README.md)
+[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [HTML](watch.html) · [Illustrated settings](SETTINGS.md) · [Guide](README.md)

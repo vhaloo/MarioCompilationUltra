@@ -22,6 +22,9 @@ struct VoxelPlane {
     uint64_t identity = 0;
     // ARGB; alpha, never brightness, decides whether a pixel is occupied.
     std::vector<uint32_t> pixels;
+    // Optional symmetric column depths, in world pixels. Empty means a flat
+    // extrusion whose front remains at z. A sculpted column is centered on z.
+    std::vector<uint16_t> depths;
 };
 struct VoxelMesh {
     std::vector<VoxelFace> faces;
@@ -30,9 +33,9 @@ struct VoxelMesh {
 };
 class VoxelMesher {
     struct Entry {
-        std::vector<uint32_t> pixels;
+        std::vector<uint64_t> pixels;
         std::vector<VoxelFace> faces;
-        std::array<double, 8> geometry{};
+        std::array<double, 9> geometry{};
         uint64_t touched = 0;
         size_t occupied = 0;
     };
@@ -49,10 +52,21 @@ class VoxelMesher {
 struct VoxelCamera {
     float x = 0, y = 0, width = 256, height = 224, yaw = 18, pitch = -12, fitDepth = 0;
 };
+class VoxelProjection {
+    float centerX = 0, centerY = 0, sineYaw = 0, cosineYaw = 1, sinePitch = 0, cosinePitch = 1;
+    float scaleX = 1, scaleY = 1, offsetX = 0, offsetY = 0;
+
+  public:
+    VoxelProjection(const VoxelCamera &, int width, int height);
+    VoxelPoint project(VoxelPoint) const;
+    VoxelPoint unproject(float screenX, float screenY, float worldZ = 0) const;
+    float facing(VoxelPoint normal) const;
+};
 // Portable depth-buffer renderer. The same real XYZ faces can be submitted to
 // the OpenXR renderer without flattening them into a texture.
 class VoxelRasterizer {
     std::vector<float> depth;
+    std::vector<std::pair<float, size_t>> translucent;
 
   public:
     std::vector<uint32_t> pixels;
@@ -60,4 +74,7 @@ class VoxelRasterizer {
 };
 int voxelGridStep(double worldWidth, double worldHeight, size_t sampleBudget);
 int voxelGridOrigin(int coordinate, int step);
+VoxelPoint curveVoxelPoint(VoxelPoint, float angleRadians, float depthScale = 1);
+std::vector<uint16_t> roundedVoxelDepths(const std::vector<uint32_t> &, int width, int height,
+                                         int maximum, int step = 1);
 } // namespace mcu

@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.7.0
+# Mario Compilation Ultra 0.8.0
 
 PC向けの使いやすい画面と実験的な拡張表示を備えたローカルSNESコレクションです。Super FXを含むカートリッジの動作はSnes9xが再現します。全作品を逆コンパイルしたものではありません。
 
-[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.7.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.8.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## ダウンロードとデスクトップからの起動
 
@@ -47,9 +47,17 @@ sh ./Install-Linux.sh
 
 拡張メモリプロファイルとAll-Starsの自動選択は一覧の米国版向けです。認識できても検証済みプロファイルのない版は元の表示を使います。画面メニューの翻訳は市販カートリッジの物語や画像を翻訳しません。5作品すべての新しいネイティブ逆コンパイルを実現したとは主張しません。
 
+## ピクセルの立体化
+
+![ピクセルの立体化](../voxel-preview.png)
+
+任意のプロシージャル3D表示です。ピクセルを柱に変換し、地形、背景、キャラクターを別々の奥行きに配置します。浮き彫りは薄く、ボクセルは厚くなります。厚さは奥行き、角度は画面上の視点を変更します。自動画質は負荷に応じて細部を減らします。HUDと元のカメラの拡大表示は元のピクセルを保持します。特殊な場面は元の画面に戻ります。見えない裏面を復元するものではありません。実機での性能は未検証です。 丸みのある形状は、キャラクターの透明部分から段階的な3D形状を生成します。無効にすると厚さが均一になります。傾きは画面上の視点の高さを変更します。元の位置とゲームの物理は変わりません。 レイヤー間隔は重なり順を保ったまま奥行きの間隔を変えます。
+
+[ピクセルの立体化](VOXELS.md) · [HTML](voxels.html)
+
 ## 自動解像度
 
-0.7は背景解像度、装飾更新頻度、VRシェーダーを処理時間の余裕に合わせて調整します。ゲーム本体とメニューは鮮明なままです。Questは選択したフレーム時間の35%以上を確保し、周辺描画の最適化には代替手段があります。実機検証は未完了です。
+0.8は背景解像度、ボクセル格子、装飾更新頻度、VRシェーダーを利用できる性能に合わせて調整します。拡大画面では元のゲーム画像を確認でき、メニューも鮮明です。Questはフレーム時間の35%以上の余裕を目標にします。これは自動調整の目標であり、実機での結果を保証しません。
 
 [Performance / GPU](../PERFORMANCE.md)
 
@@ -63,15 +71,15 @@ sh ./Install-Linux.sh
 
 ## Androidスマートフォンとタブレット
 
-[Androidスマートフォンとタブレット](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Android-public.apk)
+[Androidスマートフォンとタブレット](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Android-public.apk)
 
 ## 時計の表示
 
-[時計の表示](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Wear-public.apk) · [図解設定ガイド](SETTINGS.md)
+[時計の表示](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [図解設定ガイド](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.7.0/MarioCompilationUltra-0.7.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 操作
 
@@ -141,9 +149,9 @@ View/Back: 設定 · LT: 巻き戻し · RT: Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 配布パッケージと検証 · 0.7.0
+## 配布パッケージと検証 · 0.8.0
 
-0.7の検証は8つの公開テスト、10言語の図解設定、ローカルの6ゲーム、PC比較を含みます。スマートフォン、タブレット、Wear OSはエミュレーターを使用します。時計、Android、Mac、Quest実機の性能は未検証です。詳細はレポートを参照してください。
+0.8は手続き型のレリーフとボクセルを追加します。9つの公開テストが独自の形状、奥行き、透明度、設定、既存機能を検証します。ローカルの6ゲームは別に検査し、画像は非公開です。スマートフォン、タブレット、Wear OSはエミュレーターを使います。Mac、Android、時計、Quest実機のゲーム動作は実験的です。最新レポートを参照してください。
 
 [CTest / CI](https://github.com/vhaloo/MarioCompilationUltra/actions) · [Report](../TEST_REPORT.md) · [Build](../BUILD.md) · [Source / research](../RESEARCH.md)
 

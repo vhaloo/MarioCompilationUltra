@@ -12,12 +12,14 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--exe', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
+    parser.add_argument('--gallery-only', action='store_true', help='capture the 1080p documentation gallery')
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     languages = json.loads((ROOT / 'assets/locales/languages.json').read_text(encoding='utf8'))
     reports = []
     environment = dict(os.environ, SDL_VIDEODRIVER='dummy', SDL_AUDIODRIVER='dummy')
-    for width, height in [(640, 360), (1280, 720), (1920, 1080), (7680, 1440)]:
+    sizes = [(1920, 1080)] if args.gallery_only else [(640, 360), (1280, 720), (1920, 1080), (7680, 1440)]
+    for width, height in sizes:
         data = args.out / f'{width}x{height}'
         data.mkdir(exist_ok=True)
         steps = []
@@ -49,7 +51,8 @@ def main():
         assert len(set(digests[4::7])) == 10, 'The translated controls pages must differ'
         reports.append(dict(size=[width, height], languages=10, menu_pages=70, missing_glyphs=0, passed=True))
         print(f'{width}x{height}: 70 real menu captures verified', flush=True)
-    (args.out / 'summary.json').write_text(json.dumps(dict(result='passed', captures=280, cases=reports), indent=2), encoding='utf8')
-    print('280 ROM-free menu captures validated')
+    captures = sum(r['menu_pages'] for r in reports)
+    (args.out / 'summary.json').write_text(json.dumps(dict(result='passed', captures=captures, cases=reports), indent=2), encoding='utf8')
+    print(f'{captures} ROM-free menu captures validated')
 if __name__ == '__main__':
     main()

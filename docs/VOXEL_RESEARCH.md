@@ -36,11 +36,14 @@ qualification; automatic 3D cannot reconstruct unseen authored object backs.
 rectangles merge by color; internal side faces disappear across chunk borders.
 Cache identity checks geometry as well as pixel content. A face-budget failure
 returns no partial mesh and retries a coarser power-of-two world-aligned grid.
-The cache is bounded. Camera rotation and raster size do not rebuild voxels.
+The cache is bounded. Angle changes reuse unchanged chunk geometry. A screen
+resize only changes the mesh if it changes world coverage or the sample grid.
 
-Desktop/handheld use a bounded software depth buffer, with adaptive grid and
-raster resolution. OpenXR consumes the XYZ mesh directly per eye; it does not
-extrude a flattened wall texture. Unsupported scenes keep a flat original
-screen. Volume modes are optional and original 2D stays the default.
+Desktop and handheld use a bounded software depth buffer, with adaptive grid
+and raster resolution. In the volume path the flat terrain image is deferred
+until fallback is needed. OpenXR consumes the XYZ mesh directly per eye, with
+16-byte position/color vertices, separate HUD and a simple palette shader.
+Unsupported scenes keep the original screen. Volume modes are optional and
+original 2D stays the default.
 
 Validation results and physical-device limits must accompany a release.

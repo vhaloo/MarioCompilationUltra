@@ -1,4 +1,4 @@
-Mario Compilation Ultra 0.7.0 · Vue montre
+Mario Compilation Ultra 0.8.0 · Vue montre
 
 Tourne la couronne ou la lunette pour zoomer. Dans les menus, elle fait défiler ; les boutons tactiles + et - fonctionnent aussi.
 
@@ -14,11 +14,11 @@ Transfère les cartouches dans CartridgeInbox, puis choisis Vérifier les cartou
 
 Les commandes physiques et les performances prolongées sur montre restent à tester. Cette édition est expérimentale.
 
-Mettre à jour un APK signé conserve les données. Désinstaller ou effacer les données retire les cartouches et sauvegardes locales.
-
 Les commandes physiques et les performances prolongées sur montre restent à tester. Cette édition est expérimentale.
+
+Mettre à jour un APK signé conserve les données. Désinstaller ou effacer les données retire les cartouches et sauvegardes locales.
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.7.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.8.0-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

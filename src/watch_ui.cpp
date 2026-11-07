@@ -152,6 +152,13 @@ void App::watchOptions() {
     if (tab != 1)
         return;
     ImGui::TextColored({.5f, .87f, .74f, 1}, "%s", tr("Watch view"));
+    choice("Pixel volume", settings.volumeMode, {"Original 2D", "Pixel relief", "Voxels"});
+    if (settings.volumeMode) {
+        slider("Voxel thickness", settings.volumeDepth, 1, 16, "%d px");
+        slider("Layer spacing", settings.volumeSpacing, 1, 12, "%d px");
+        if (settings.volumeMode == 2)
+            tick("Rounded voxel shapes", settings.volumeRound);
+    }
     int percentage = settings.watchZoom / 10;
     if (slider("Watch zoom", percentage, 0, 100, "%d%%"))
         settings.watchZoom = percentage * 10;
@@ -160,9 +167,6 @@ void App::watchOptions() {
     if (button("Original framing"))
         settings.watchZoom = 1000;
     tick("Round-screen fisheye", settings.watchLens);
-    choice("Pixel volume", settings.volumeMode, {"Original 2D", "Pixel relief", "Voxels"});
-    if (settings.volumeMode)
-        slider("Voxel thickness", settings.volumeDepth, 1, 16, "%d px");
     slider("Crown sensitivity", settings.watchCrownSensitivity, 25, 250, "%d%%");
     tick("Reverse crown", settings.watchCrownReverse);
     ImGui::TextWrapped("%s", tr(mobileDisplay.rotary

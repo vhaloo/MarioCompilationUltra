@@ -152,6 +152,6 @@ Em Quest compatíveis, carga prolongada pode reduzir detalhes periféricos prese
 
 ## Volume dos pixels
 
-3D procedural opcional: os pixels tornam-se colunas sólidas, com terreno, fundos e personagens em planos separados. O relevo é raso; os voxels são mais espessos. A espessura altera a profundidade e o ângulo altera a vista na tela. A qualidade automática reduz detalhes sob carga. HUD e ampliações mantêm os pixels originais. Cenas especiais usam a tela original. É uma interpretação, não uma reconstrução de faces ocultas. Desempenho físico não testado.
+3D procedural opcional: os pixels tornam-se colunas sólidas, com terreno, fundos e personagens em planos separados. O relevo é raso; os voxels são mais espessos. A espessura altera a profundidade e o ângulo altera a vista na tela. A qualidade automática reduz detalhes sob carga. HUD e ampliações mantêm os pixels originais. Cenas especiais usam a tela original. É uma interpretação, não uma reconstrução de faces ocultas. Desempenho físico não testado. As formas arredondadas geram corpos 3D em degraus a partir da transparência dos personagens; desativá-las mantém a extrusão uniforme. A inclinação altera a elevação da vista na tela. As posições e a física originais não mudam. O espaçamento separa as camadas em profundidade mantendo a ordem.
 
 [Guide](README.md) · [Watch](WATCH.md)

@@ -26,14 +26,18 @@ def main():
         results.append(dict(round=not square,captures=60,passed=True))
     for index,language in enumerate(languages):
         data=a.out/language['code'];data.mkdir(exist_ok=True)
-        capture=data/'help.bmp';script=data/'help.timeline'
-        script.write_text(f'0 language {index}\n0 tab 1\n2 guide Automatic quality\n2 menu 1\n5 capture {capture.resolve().as_posix()}\n',encoding='utf8')
-        run=subprocess.run([str(a.exe.resolve()),'--headless','--software','--menu','--size','1280x720','--frames','6','--data-dir',str(data.resolve()),'--script',str(script.resolve())],env=env,capture_output=True,timeout=60)
+        capture=data/'help.bmp';volume=data/'volume-help.bmp';script=data/'help.timeline'
+        script.write_text(f'0 language {index}\n0 tab 1\n2 guide Automatic quality\n2 menu 1\n5 capture {capture.resolve().as_posix()}\n6 volume 2\n7 guide Layer spacing\n10 capture {volume.resolve().as_posix()}\n',encoding='utf8')
+        run=subprocess.run([str(a.exe.resolve()),'--headless','--software','--menu','--size','1280x720','--frames','11','--data-dir',str(data.resolve()),'--script',str(script.resolve())],env=env,capture_output=True,timeout=60)
         assert run.returncode==0,run.stderr[-2500:]
         with Image.open(capture) as im:
             im.save(data/'help.png')
             if a.docs:im.save(R/'docs'/language['code']/'screenshots/settings-help.png')
-        capture.unlink()
-    (a.out/'summary.json').write_text(json.dumps(dict(result='passed',cases=results,help_captures=10,hardware=False),indent=2),encoding='utf8')
-    print('120 watch-menu captures and ten illustrated setting cards passed')
+        with Image.open(volume) as im, Image.open(data/'help.png') as quality:
+            assert im.tobytes() != quality.tobytes()
+            im.save(data/'volume-help.png')
+            if a.docs:im.save(R/'docs'/language['code']/'screenshots/volume-help.png')
+        capture.unlink();volume.unlink()
+    (a.out/'summary.json').write_text(json.dumps(dict(result='passed',cases=results,help_captures=10,volume_help_captures=10,hardware=False),indent=2),encoding='utf8')
+    print('120 watch-menu captures and twenty illustrated setting cards passed')
 if __name__=='__main__':main()

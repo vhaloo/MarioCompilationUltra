@@ -126,7 +126,7 @@ SpatialHit hitPlane(const SpatialPointer &p, XrPosef pose, float scale, float z 
     return {true, h.x, h.y, h.z, t};
 }
 void changeDeckPage(int page) {
-    deckPage = std::clamp(page, 0, 6);
+    deckPage = std::clamp(page, 0, spatialPageCount - 1);
     deckButtons = spatialButtons(deckPage);
     capturedButton = {{-1, -1}};
     spatial.hover = spatial.pressed = {{-1, -1}};
@@ -134,7 +134,7 @@ void changeDeckPage(int page) {
 }
 void spatialAction(int action, float dt) {
     auto &s = app.settings;
-    if (action >= PageModes && action <= PageNudge) {
+    if (action >= PageModes && action <= PageVolume) {
         changeDeckPage(action - PageModes);
         return;
     }
@@ -294,6 +294,23 @@ void spatialAction(int action, float dt) {
         break;
     case ToggleHints:
         s.questControlHints = !s.questControlHints;
+        break;
+    case VolumeFlat:
+    case VolumeRelief:
+    case VolumeVoxels:
+        s.volumeMode = action - VolumeFlat;
+        break;
+    case VolumeThinner:
+    case VolumeThicker:
+        s.volumeDepth = std::clamp(s.volumeDepth + (action == VolumeThicker ? 1 : -1), 1, 16);
+        break;
+    case VolumeCloserLayers:
+    case VolumeFartherLayers:
+        s.volumeSpacing =
+            std::clamp(s.volumeSpacing + (action == VolumeFartherLayers ? 1 : -1), 1, 12);
+        break;
+    case VolumeRounded:
+        s.volumeRound = !s.volumeRound;
         break;
     case CycleCrt:
         s.questCrt = (s.questCrt + 1) % 4;
@@ -541,9 +558,9 @@ void menuPointer() {
             continue;
         auto pose = panelPose();
         auto size = physicalSize();
-        float w = companion()
-                      ? app.settings.questMenuDistance * .014f * app.settings.questOptionsScale * .01f
-                      : size.width,
+        float w = companion() ? app.settings.questMenuDistance * .014f *
+                                    app.settings.questOptionsScale * .01f
+                              : size.width,
               h = companion() ? w * 9 / 16 : size.height;
         auto at = hitPlane(p, pose, 1);
         bool click = p.press;
@@ -567,7 +584,7 @@ void menuPointer() {
 }
 bool spatialActive(int action) const {
     auto &s = app.settings;
-    if (action >= PageModes && action <= PageNudge)
+    if (action >= PageModes && action <= PageVolume)
         return action - PageModes == deckPage;
     if (action >= ModeFirst && action < ModeFirst + 7)
         return mode() == action - ModeFirst;
@@ -604,6 +621,12 @@ bool spatialActive(int action) const {
         return s.questCrtCoplanar;
     case ToggleHints:
         return s.questControlHints;
+    case VolumeFlat:
+    case VolumeRelief:
+    case VolumeVoxels:
+        return s.volumeMode == action - VolumeFlat;
+    case VolumeRounded:
+        return s.volumeRound;
     case Refresh72:
         return s.questRefresh == 72;
     case Refresh90:
@@ -627,10 +650,10 @@ void renderDeckLabels() {
         return;
     auto &s = app.settings;
     uint64_t hash = 1469598103934665603ull;
-    for (int n :
-         {deckPage, moveTarget, app.settings.language, mode(), s.questScale, s.questRefresh,
-          s.questRemoteScale, s.questInsetWidth, int(s.questTransparent), int(s.questPassthrough),
-          int(s.questWallLocked), int(autoJoystick), int(app.menu)}) {
+    for (int n : {deckPage, moveTarget, app.settings.language, mode(), s.questScale, s.questRefresh,
+                  s.questRemoteScale, s.questInsetWidth, int(s.questTransparent),
+                  int(s.questPassthrough), int(s.questWallLocked), int(autoJoystick), int(app.menu),
+                  s.volumeDepth, s.volumeSpacing}) {
         hash ^= uint32_t(n);
         hash *= 1099511628211ull;
     }
@@ -683,6 +706,10 @@ void renderDeckLabels() {
                             : moveTarget == 2 ? "remote_remote"
                                               : "remote_options",
                             app.settings.language);
+    if (deckPage == PageVolume - PageModes)
+        status = std::string(tr("Voxel thickness", s.language)) + " " +
+                 std::to_string(s.volumeDepth) + " px  |  " + tr("Layer spacing", s.language) +
+                 " " + std::to_string(s.volumeSpacing) + " px";
     text(status.c_str(), 50, 28, 924, 50, 25);
     for (auto b : deckButtons) {
         float bw = b.width / spatialWidth * 1024, bh = b.height / spatialHeight * 768;

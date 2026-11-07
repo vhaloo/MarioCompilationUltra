@@ -1,6 +1,10 @@
 #include "voxel.h"
 #include "settings.h"
+#include "voxel_scene.h"
+#include "object_previews.h"
 #include <algorithm>
+#include <cmath>
+#include <memory>
 #include <iostream>
 #include <stdexcept>
 #include <limits>
@@ -59,6 +63,28 @@ int main(int argc, char **argv) {
                 "Depth, not submission order, determines occlusion");
         require(std::all_of(pixels.begin(), pixels.end(), [](auto v) { return v == 0xffc15337u; }),
                 "Foreground layer wins every pixel");
+        VoxelPlane glass = near;
+        std::fill(glass.pixels.begin(), glass.pixels.end(), 0x80ff0000u);
+        VoxelPlane blue = far;
+        std::fill(blue.pixels.begin(), blue.pixels.end(), 0xff0000ffu);
+        auto transparency = mesher.build({glass, blue});
+        require(raster.render(transparency, {0, 0, 4, 4, 0, 0}, 40, 40),
+                "Translucent preview raster succeeds");
+        require(std::all_of(raster.pixels.begin(), raster.pixels.end(),
+                            [](auto p) { return p == 0xff80007fu; }),
+                "Preview opacity blends over opaque terrain without diagonal double-blending");
+        auto reversed = mesher.build({blue, glass});
+        auto transparentPixels = raster.pixels;
+        require(raster.render(reversed, {0, 0, 4, 4, 0, 0}, 40, 40) &&
+                    raster.pixels == transparentPixels,
+                "Translucent and opaque submission order is irrelevant");
+        std::fill(glass.pixels.begin(), glass.pixels.end(), 0x0cffffffu);
+        std::fill(blue.pixels.begin(), blue.pixels.end(), 0x0cffffffu);
+        auto faint = mesher.build({glass, blue});
+        require(raster.render(faint, {0, 0, 4, 4, 0, 0}, 40, 40), "Faint previews render");
+        require(std::all_of(raster.pixels.begin(), raster.pixels.end(),
+                            [](auto p) { return p == 0x17ffffffu; }),
+                "Low-alpha overlaps cannot overflow color channels");
         require(voxelGridOrigin(-1, 8) == -8 && voxelGridOrigin(-8, 8) == -8 &&
                     voxelGridOrigin(9, 8) == 8,
                 "Stable negative-coordinate alignment");
@@ -83,6 +109,152 @@ int main(int argc, char **argv) {
         require(!raster.render(mesh, {0, 0, 1, 1, 0, 0}, 8192, 8192),
                 "Raster allocation is bounded");
         Settings s;
+        {
+            auto flat = curveVoxelPoint({.3f, .4f, .2f}, 0);
+            require(flat.x == .3f && flat.y == .4f && flat.z == .2f,
+                    "Flat room geometry stays unchanged");
+            auto left = curveVoxelPoint({-.5f, .2f, 0}, 1.5707963f),
+                 right = curveVoxelPoint({.5f, .2f, 0}, 1.5707963f);
+            require(std::abs(left.x + right.x) < .00001f && std::abs(left.z - right.z) < .00001f &&
+                        left.y == .2f,
+                    "Curved voxel walls keep symmetric positions and exact height");
+            auto front = curveVoxelPoint({0, 0, .2f}, 1.5707963f, .5f);
+            require(std::abs(front.z - .1f) < .00001f,
+                    "Curved depth scaling preserves layer order");
+        }
+        {
+            Settings options;
+            options.volumeMode = 2;
+            auto core = std::make_unique<Core>(options);
+            core->loaded = true;
+            core->native.assign(256 * 224, 0xff102030u);
+            auto &v = core->snapshot;
+            v.mode = 1;
+            v.brightness = 15;
+            v.visibleLayers = v.mainLayers = 4;
+            v.layers[2].tiles = 0x4000;
+            for (int i = 0; i < 16; i += 2)
+                v.vram[0x4000 + i] = 255;
+            auto world = std::make_unique<World>();
+            world->scene.valid = true;
+            world->scene.kind = 2;
+            VoxelScene scene;
+            bool smb2 = scene.update(*core, *world, options) && scene.mesh.occupied > 0 &&
+                        std::none_of(scene.hudPixels.begin(), scene.hudPixels.end(),
+                                     [](auto p) { return p != 0; });
+            world->scene.kind = 3;
+            bool smb3 = scene.update(*core, *world, options) && scene.hudPixels[191 * 256] == 0 &&
+                        scene.hudPixels[192 * 256] == 0xff102030u;
+            core->loaded = false; // Synthetic observation: no running libretro cartridge.
+            require(smb2, "SMB2 scenery never fills the health indicator rectangle");
+            require(smb3, "SMB3 status strip preserves its native pixels on a separate plane");
+        }
+        {
+            ObjectPreviews previews;
+            Scene room;
+            room.cameraX = 0;
+            room.cameraY = 0;
+            previews.objects.push_back({400, 64, 7, false, PreviewKind::Enemy});
+            Settings options;
+            auto planes = previews.volumePlanes(room, options, {0, 0, 768, 224, 0, 0}, 2, 8);
+            require(planes.size() == 1 && planes[0].x == 400 && planes[0].y == 64,
+                    "Offscreen previews use real level coordinates");
+            require(std::any_of(planes[0].pixels.begin(), planes[0].pixels.end(),
+                                [](auto p) { return (p >> 24) == 89; }),
+                    "Preview opacity survives voxel extraction");
+            options.enemyPreview = false;
+            require(previews.volumePlanes(room, options, {0, 0, 768, 224, 0, 0}, 2, 8).empty(),
+                    "Preview visibility settings apply in voxel mode");
+            options.enemyPreview = true;
+            options.spawnLabels = true;
+            require(previews.volumePlanes(room, options, {0, 0, 768, 224, 0, 0}, 2, 8).size() == 2,
+                    "Original placement labels become geometry");
+            previews.objects[0].active = true;
+            require(previews.volumePlanes(room, options, {0, 0, 768, 224, 0, 0}, 2, 8).empty(),
+                    "Active enemies are never duplicated as previews");
+        }
+        {
+            Settings options;
+            options.volumeMode = 2;
+            auto core = std::make_unique<Core>(options);
+            core->loaded = true;
+            core->snapshot.mode = 1;
+            core->native.assign(256 * 224, 0xff102030u);
+            auto world = std::make_unique<World>();
+            world->scene.valid = true;
+            world->scene.fullMap = true;
+            world->scene.kind = 4;
+            world->scene.cameraX = 1;
+            world->scene.cameraY = 1;
+            VoxelScene scene;
+            bool safe = scene.update(*core, *world, options, 5);
+            core->loaded = false;
+            require(safe && scene.mesh.complete, "Coarse native framing at odd coordinates never "
+                                                 "reads unprepared offscreen terrain");
+            require(world->sampleTerrainForTest(*core, 0, 0) == 0,
+                    "Unprepared terrain lookup is safely transparent");
+        }
+        VoxelPlane solid{0, 0, 16, 16, 1, 0, 6, 90, std::vector<uint32_t>(256, 0xff000000u), {}};
+        require(mesher.build({solid}).faces.size() == 6, "Uniform extrusion merges to six faces");
+        solid.depths = roundedVoxelDepths(solid.pixels, 16, 16, 6);
+        require(solid.depths[0] == 1 && solid.depths[17] == 3 && solid.depths[8 * 16 + 8] == 6,
+                "Silhouette distance controls procedural voxel depth");
+        auto rounded = mesher.build({solid});
+        require(rounded.complete && rounded.occupied == 256,
+                "Rounded volumes retain all source pixels");
+        require(raster.render(rounded, {0, 0, 16, 16, 0, 0}, 16, 16) &&
+                    raster.pixels == solid.pixels,
+                "Rounded front projection preserves opaque black");
+        for (const auto &f : rounded.faces)
+            for (const auto &v : f.points)
+                require(v.z == std::floor(v.z), "Voxel depth stays on an integer world grid");
+        auto shapedAgain = mesher.build({solid});
+        require(shapedAgain.reusedChunks == 1, "Sculpted meshes retained");
+        solid.depths[0] = 2;
+        require(mesher.build({solid}).builtChunks == 1,
+                "Depth edits invalidate geometry even when colors do not change");
+        solid.depths.pop_back();
+        require(!mesher.build({solid}).complete, "Malformed procedural depth field rejected");
+        auto video = std::make_unique<McuVideo>();
+        video->brightness = 15;
+        video->palette[129] = 0;
+        McuVideo::Object object;
+        video->vram[0] = 128;
+        require(voxelSpritePixel(*video, object, 0, 0) == 0xff000000u &&
+                    voxelSpritePixel(*video, object, 1, 0) == 0,
+                "Sprite palette zero color is opaque; pixel index zero is transparent");
+        object.flipX = true;
+        object.flipY = true;
+        require(voxelSpritePixel(*video, object, 7, 7) == 0xff000000u,
+                "Sprite flips preserve pixel registration");
+        object = {};
+        object.name = 256;
+        video->vram[0] = 0;
+        video->vram[8192] = 128;
+        require(voxelSpritePixel(*video, object, 0, 0) == 0xff000000u,
+                "OBJ tile bank contributes its 8192-byte address offset");
+        auto size = voxelSpriteSize(6, false);
+        require(size.width == 16 && size.height == 32, "Rectangular small OBJ dimensions");
+        size = voxelSpriteSize(6, true);
+        require(size.width == 32 && size.height == 64, "Rectangular large OBJ dimensions");
+        video->objectSize = 6;
+        object = {};
+        video->vram[1024] = 128;
+        object.flipY = true;
+        require(voxelSpritePixel(*video, object, 0, 31) == 0xff000000u,
+                "Rectangular OBJ vertical flip matches original width-based line wiring");
+        for (int yaw : {-30, -18, 0, 18, 30})
+            for (int tilt : {-30, 0, 30}) {
+                VoxelProjection projection({-40, -70, 512, 432, float(yaw), float(tilt), 64}, 1280,
+                                           720);
+                for (auto p : {VoxelPoint{-32, -64, 8}, VoxelPoint{300, 250, -16}}) {
+                    auto screen = projection.project(p),
+                         back = projection.unproject(screen.x, screen.y, p.z);
+                    require(std::abs(back.x - p.x) < .001f && std::abs(back.y - p.y) < .001f,
+                            "Screen overlays and camera input share the exact invertible world "
+                            "projection");
+                }
+            }
         s.volumeMode = 9;
         s.volumeDepth = 99;
         s.volumeAngle = -99;

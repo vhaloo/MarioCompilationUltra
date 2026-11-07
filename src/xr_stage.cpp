@@ -223,11 +223,22 @@ layout(location=2) in vec2 uv;
 layout(location=3) in vec4 color;
 layout(location=4) in float finish;
 uniform mat4 vp,model;
+uniform highp int kind;
 out vec3 worldPosition,worldNormal;
 out vec2 texcoord;
 out vec4 tint;
 out float roughness;
-void main(){vec4 p=model*vec4(position,1);worldPosition=p.xyz;worldNormal=normalize(mat3(model)*normal);texcoord=uv;tint=color;roughness=finish;gl_Position=vp*p;}
+uniform float voxelCurveAngle,voxelDepthScale;
+void main(){
+ vec3 pos=position,n=normal;
+ if(voxelCurveAngle>.00001){
+  float theta=pos.x*voxelCurveAngle,radius=1.0/voxelCurveAngle;
+  float sn=sin(theta),cs=cos(theta),z=pos.z*voxelDepthScale;
+  pos=vec3(sn*(radius-z),pos.y,radius-cs*(radius-z));
+  n=vec3(cs*n.x-sn*n.z,n.y,sn*n.x+cs*n.z);
+ }
+ vec4 p=model*vec4(pos,1);worldPosition=p.xyz;worldNormal=kind==7?vec3(0,0,1):normalize(mat3(model)*n);texcoord=uv;tint=color;roughness=finish;gl_Position=vp*p;
+}
 )GLSL";
 const char *fragmentSource = R"GLSL(#version 300 es
 precision highp float;
@@ -237,7 +248,8 @@ in vec4 tint;
 in float roughness;
 uniform sampler2D image;
 uniform vec3 eye;
-uniform int kind,crt,maskMode;
+uniform highp int kind;
+uniform int crt,maskMode;
 uniform vec2 raster;
 uniform vec4 nativeHole;
 uniform bool clipNative;
@@ -282,6 +294,10 @@ void main(){
   vec2 cell=worldPosition.xz*.8;vec2 grid=abs(fract(cell-.5)-.5)/max(fwidth(cell),vec2(.001));
   float line=1.0-min(min(grid.x,grid.y),1.0);float fade=exp(-length(worldPosition.xz-eye.xz)*.055);
   c=vec3(.014,.022,.036)+vec3(.025,.095,.12)*line*fade;
+ }else if(kind==7){
+  // Voxel face lighting is cached with geometry; preserve its palette and
+  // avoid per-fragment CRT, specular and rim work on standalone headsets.
+  c=tint.rgb;
  }else{
   vec3 n=normalize(worldNormal);vec3 v=normalize(eye-worldPosition);float facing=max(dot(n,v),0.0);
   vec3 l=normalize(vec3(-.45,.85,.65));float diffuse=max(dot(n,l),0.0);
@@ -300,7 +316,7 @@ void main(){
 struct Mesh {
     GLuint vao = 0, buffer = 0;
     GLsizei count = 0;
-    void upload(const Vertices &vertices) {
+    void upload(const Vertices &vertices, bool streaming = false) {
         if (!vao) {
             glGenVertexArrays(1, &vao);
             glGenBuffers(1, &buffer);
@@ -308,7 +324,7 @@ struct Mesh {
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(),
-                     GL_STATIC_DRAW);
+                     streaming ? GL_STREAM_DRAW : GL_STATIC_DRAW);
         const int sizes[]{3, 3, 2, 4, 1};
         const size_t offsets[]{offsetof(Vertex, position), offsetof(Vertex, normal),
                                offsetof(Vertex, u), offsetof(Vertex, color),
@@ -319,6 +335,51 @@ struct Mesh {
                                   reinterpret_cast<void *>(offsets[i]));
         }
         count = GLsizei(vertices.size());
+    }
+    void draw() const {
+        if (count) {
+            glBindVertexArray(vao);
+            glDrawArrays(GL_TRIANGLES, 0, count);
+        }
+    }
+    void clear() {
+        if (buffer)
+            glDeleteBuffers(1, &buffer);
+        if (vao)
+            glDeleteVertexArrays(1, &vao);
+        buffer = vao = 0;
+        count = 0;
+    }
+};
+// Voxel faces already have palette lighting. Stream only position and RGBA;
+// ordinary scene meshes keep their normals, UVs and material parameters.
+struct VolumeVertex {
+    V3 position;
+    std::array<uint8_t, 4> color;
+};
+static_assert(sizeof(VolumeVertex) == 16);
+using VolumeVertices = std::vector<VolumeVertex>;
+struct VolumeStream {
+    GLuint vao = 0, buffer = 0;
+    GLsizei count = 0;
+    void upload(const VolumeVertices &vertices) {
+        count = GLsizei(vertices.size());
+        if (!count)
+            return;
+        if (!vao) {
+            glGenVertexArrays(1, &vao);
+            glGenBuffers(1, &buffer);
+            glBindVertexArray(vao);
+            glBindBuffer(GL_ARRAY_BUFFER, buffer);
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VolumeVertex), nullptr);
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(VolumeVertex),
+                                  reinterpret_cast<void *>(offsetof(VolumeVertex, color)));
+        } else
+            glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(VolumeVertex), vertices.data(),
+                     GL_STREAM_DRAW);
     }
     void draw() const {
         if (count) {
@@ -356,8 +417,14 @@ struct XrStageRenderer::Impl {
     bool backdropAllocated = false;
     uint64_t remoteHash = 0, insetHash = 0;
     Mesh remoteMesh, insetFurniture, insetScreen, cube;
-    Mesh volumeMesh, volumeHud;
-    uint64_t volumeVersion = ~uint64_t(0);
+    Mesh volumeHud;
+    VolumeStream volumeMesh, volumeAlpha;
+    std::vector<std::array<VolumeVertex, 6>> volumeAlphaQuads;
+    std::vector<std::pair<float, size_t>> volumeAlphaOrder;
+    VolumeVertices volumeVertices, volumeAlphaVertices;
+    GLuint volumeHudImage = 0;
+    int volumeHudW = 0, volumeHudH = 0;
+    std::array<uint64_t, 7> volumeLayout{};
     int imageUniform = -1, crtUniform = -1, maskUniform = -1, rasterUniform = -1,
         intensityUniform = -1, glassUniform = -1, brightnessUniform = -1, srgbUniform = -1,
         flipUniform = -1, holeUniform = -1, clipUniform = -1, efficientUniform = -1;
@@ -372,6 +439,12 @@ struct XrStageRenderer::Impl {
     Mesh furniture, screen, glass, plain, surroundings;
     Matrix screenLocal = Matrix::identity(), glassLocal = Matrix::identity();
     int vp = -1, model = -1, kind = -1, eyePosition = -1;
+    int voxelCurveUniform = -1, voxelDepthUniform = -1;
+    static float physicalVoxelWidth(const Settings &s, int mode, const VoxelCamera &camera) {
+        return mode == 4   ? s.questCabinetWidth * .01f
+               : mode == 6 ? s.questWallHeight * .01f * camera.width / std::max(1.f, camera.height)
+                           : s.questWidth * .01f;
+    }
     void initialise(XrInstance instance, XrSystemId system, XrSession xrSession, int detail,
                     bool enableFoveation) {
         GlState restore;
@@ -419,6 +492,8 @@ struct XrStageRenderer::Impl {
         }
         vp = glGetUniformLocation(program, "vp");
         model = glGetUniformLocation(program, "model");
+        voxelCurveUniform = glGetUniformLocation(program, "voxelCurveAngle");
+        voxelDepthUniform = glGetUniformLocation(program, "voxelDepthScale");
         kind = glGetUniformLocation(program, "kind");
         eyePosition = glGetUniformLocation(program, "eye");
         imageUniform = glGetUniformLocation(program, "image");
@@ -823,7 +898,8 @@ struct XrStageRenderer::Impl {
         screen.upload(p);
         glass.upload(g);
     }
-    void draw(const Mesh &mesh, const Matrix &m, int shaderKind, GLuint texture = 0) {
+    template <class Stream>
+    void draw(const Stream &mesh, const Matrix &m, int shaderKind, GLuint texture = 0) {
         glUniformMatrix4fv(model, 1, GL_FALSE, m.v);
         glUniform1i(kind, shaderKind);
         glBindTexture(GL_TEXTURE_2D, texture ? texture : demoTexture);
@@ -877,6 +953,8 @@ struct XrStageRenderer::Impl {
             }
         }
         glUseProgram(program);
+        glUniform1f(voxelCurveUniform, 0);
+        glUniform1f(voxelDepthUniform, 1);
         glActiveTexture(GL_TEXTURE0);
         glUniform1i(imageUniform, 0);
         glDisable(GL_SCISSOR_TEST);
@@ -899,8 +977,14 @@ struct XrStageRenderer::Impl {
         glUniform1i(efficientUniform, s.questShader == 0);
         GLuint nativeImage = native(content), expanded = demoTexture;
         bool volumetric = content.volume && content.volume->ready;
-        if (volumetric && volumeVersion != content.volume->version()) {
-            Vertices voxels, hud;
+        std::array<uint64_t, 7> volumeKey{
+            {volumetric ? content.volume->version() : 0, uint64_t(mode), uint64_t(s.questWidth),
+             uint64_t(s.questCabinetWidth), uint64_t(content.nativeWidth),
+             uint64_t(content.nativeHeight), uint64_t(s.questWallHeight)}};
+        if (volumetric && volumeLayout != volumeKey) {
+            Vertices hud;
+            volumeVertices.clear();
+            volumeAlphaQuads.clear();
             const auto &scene = *content.volume;
             const auto &camera = scene.camera;
             float unit = 1 / std::max(1.f, camera.width);
@@ -908,36 +992,70 @@ struct XrStageRenderer::Impl {
                 return V3{(p.x - camera.x - camera.width / 2) * unit,
                           -(p.y - camera.y - camera.height / 2) * unit, p.z * unit};
             };
-            static const V3 normals[] = {{0, 0, 1}, {0, 0, -1}, {-1, 0, 0},
-                                         {1, 0, 0}, {0, 1, 0},  {0, -1, 0}};
             for (const auto &f : scene.mesh.faces) {
-                Color col{((f.color >> 16) & 255) / 255.f, ((f.color >> 8) & 255) / 255.f,
-                          (f.color & 255) / 255.f, ((f.color >> 24) & 255) / 255.f};
-                quad(voxels, Matrix::identity(), pt(f.points[0]), pt(f.points[1]), pt(f.points[2]),
-                     pt(f.points[3]), normals[f.axis], col, .85f);
-            }
-            for (auto strip :
-                 {std::pair<int, int>{0, scene.hudTop},
-                  std::pair<int, int>{content.nativeHeight - scene.hudBottom, scene.hudBottom}}) {
-                if (strip.second <= 0)
+                std::array<uint8_t, 4> col{uint8_t(f.color >> 16), uint8_t(f.color >> 8),
+                                           uint8_t(f.color), uint8_t(f.color >> 24)};
+                if (!col[3])
                     continue;
-                float x0 = content.scene.cameraX, x1 = x0 + content.nativeWidth;
-                float y0 = content.scene.cameraY + strip.first, y1 = y0 + strip.second;
-                float front = (s.volumeDepth + 2) * 7.f;
+                // Y is inverted once when entering the room. Reverse winding
+                // so face normals and hardware back-face culling still agree.
+                auto a = pt(f.points[0]), b = pt(f.points[3]), c = pt(f.points[2]),
+                     d = pt(f.points[1]);
+                const std::array<VolumeVertex, 6> vertices{
+                    {{a, col}, {b, col}, {c, col}, {a, col}, {c, col}, {d, col}}};
+                if (col[3] == 255)
+                    volumeVertices.insert(volumeVertices.end(), vertices.begin(), vertices.end());
+                else
+                    volumeAlphaQuads.push_back(vertices);
+            }
+            float physicalWidth = std::max(.5f, physicalVoxelWidth(s, mode, camera));
+            float hudScale = std::min(1.f, 1.2f / physicalWidth);
+            for (auto strip : scene.hudAreas) {
+                if (strip.w <= 0 || strip.h <= 0)
+                    continue;
+                float x0 = (float(strip.x) / content.nativeWidth - .5f) * hudScale;
+                float x1 = x0 + float(strip.w) / content.nativeWidth * hudScale;
+                float hh = float(strip.h) / content.nativeWidth * hudScale;
+                float y0 = strip.y == 0 ? camera.height / camera.width * .5f + .025f + hh
+                           : strip.y + strip.h == content.nativeHeight
+                               ? -camera.height / camera.width * .5f - .025f
+                               : .15f;
+                float y1 = y0 - hh, front = camera.fitDepth * unit + .002f;
                 size_t start = hud.size();
-                quad(hud, Matrix::identity(), pt({x0, y0, front}), pt({x1, y0, front}),
-                     pt({x1, y1, front}), pt({x0, y1, front}), {0, 0, 1}, {1, 1, 1, 1});
-                float v0 = float(strip.first) / content.nativeHeight,
-                      v1 = float(strip.first + strip.second) / content.nativeHeight;
-                const float uv[6][2] = {{0, v0}, {1, v0}, {1, v1}, {0, v0}, {1, v1}, {0, v1}};
+                quad(hud, Matrix::identity(), {x0, y0, front}, {x1, y0, front}, {x1, y1, front},
+                     {x0, y1, front}, {0, 0, 1}, {1, 1, 1, 1});
+                float u0 = float(strip.x) / content.nativeWidth,
+                      u1 = float(strip.x + strip.w) / content.nativeWidth;
+                float v0 = float(strip.y) / content.nativeHeight,
+                      v1 = float(strip.y + strip.h) / content.nativeHeight;
+                const float uv[6][2] = {{u0, v0}, {u1, v0}, {u1, v1}, {u0, v0}, {u1, v1}, {u0, v1}};
                 for (int j = 0; j < 6; ++j) {
                     hud[start + j].u = uv[j][0];
                     hud[start + j].v = uv[j][1];
                 }
             }
-            volumeMesh.upload(voxels);
+            volumeMesh.upload(volumeVertices);
             volumeHud.upload(hud);
-            volumeVersion = scene.version();
+            if (!volumeHudImage)
+                glGenTextures(1, &volumeHudImage);
+            glBindTexture(GL_TEXTURE_2D, volumeHudImage);
+            rgbaScratch.resize(scene.hudPixels.size());
+            for (size_t i = 0; i < rgbaScratch.size(); ++i) {
+                uint32_t p = scene.hudPixels[i];
+                rgbaScratch[i] = (p & 0xff00ff00) | ((p >> 16) & 255) | ((p & 255) << 16);
+            }
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+            if (volumeHudW != content.nativeWidth || volumeHudH != content.nativeHeight)
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, content.nativeWidth, content.nativeHeight,
+                             0, GL_RGBA, GL_UNSIGNED_BYTE, rgbaScratch.data());
+            else
+                glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, content.nativeWidth, content.nativeHeight,
+                                GL_RGBA, GL_UNSIGNED_BYTE, rgbaScratch.data());
+            volumeHudW = content.nativeWidth;
+            volumeHudH = content.nativeHeight;
+            textureParameters();
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            volumeLayout = volumeKey;
         }
         GLuint backdropImage =
             !ar && mode == 5 && s.questWorldBackdrop ? backdrop(content) : demoTexture;
@@ -1023,7 +1141,7 @@ struct XrStageRenderer::Impl {
                      backdropImage);
                 glDepthMask(GL_TRUE);
             }
-            if (!ar && s.questEnvironment) {
+            if (!ar && s.questEnvironment && !(volumetric && mode == 0)) {
                 auto ground =
                     product(poseMatrix(origin), placement({0, -.01f, 0}, {1000, 1000, 1}, -pi / 2));
                 draw(plain, ground, 5);
@@ -1031,14 +1149,67 @@ struct XrStageRenderer::Impl {
             // The surrounding expanded level follows the native camera. The CRT
             // face always keeps the unmodified cartridge viewport and aspect.
             if (volumetric) {
-                float width = (mode == 4 ? s.questCabinetWidth : s.questWidth) * .01f;
-                V3 position = mode == 4 ? V3{0, s.questCabinetHeight * .01f + .02f, 0}
-                                        : V3{0, 1.3f + s.questHeight * .01f, .025f};
+                const auto &camera = content.volume->camera;
+                float width = physicalVoxelWidth(s, mode, camera);
+                float lift = camera.fitDepth * width / std::max(1.f, camera.width) + .025f;
+                float tilt = mode == 4 ? s.questCabinetTilt * pi / 180 : 0;
+                float center =
+                    mode == 4 ? s.questCabinetHeight * .01f +
+                                    std::sin(tilt) * (width / std::clamp(ratio, .25f, 2.f)) * .5f
+                              : 0;
+                V3 position = mode == 3   ? V3{0, lift + s.questWallGap * .01f, 0}
+                              : mode == 4 ? V3{0, center + lift, 0}
+                                          : V3{0, 1.3f + s.questHeight * .01f, .025f};
                 Matrix volumeModel =
                     product(poseMatrix(origin, s.questScale * .01f),
-                            placement(position, {width, width, width}, mode == 4 ? -pi / 2 : 0));
-                draw(volumeMesh, volumeModel, 0);
-                draw(volumeHud, volumeModel, 1, nativeImage);
+                            placement(position, {width, width, width},
+                                      mode == 3 || mode == 4 ? -pi / 2 + tilt : 0));
+                float curveAngle =
+                    mode == 6 ? std::clamp(float(s.questCurve), 10.f, 250.f) * pi / 180 : 0;
+                float curveDepth = curveAngle > 0
+                                       ? std::min(1.f, .45f / (curveAngle * camera.fitDepth /
+                                                               std::max(1.f, camera.width)))
+                                       : 1;
+                glUniform1f(voxelCurveUniform, curveAngle);
+                glUniform1f(voxelDepthUniform, curveDepth);
+                if (mode == 4)
+                    draw(furniture, root, 0);
+                glEnable(GL_CULL_FACE);
+                glCullFace(GL_BACK);
+                glFrontFace(GL_CCW);
+                draw(volumeMesh, volumeModel, 7);
+                volumeAlphaOrder.clear();
+                volumeAlphaVertices.clear();
+                for (size_t j = 0; j < volumeAlphaQuads.size(); ++j) {
+                    const auto &q = volumeAlphaQuads[j];
+                    V3 center{(q[0].position.x + q[2].position.x) * .5f,
+                              (q[0].position.y + q[2].position.y) * .5f,
+                              (q[0].position.z + q[2].position.z) * .5f};
+                    auto warped =
+                        curveVoxelPoint({center.x, center.y, center.z}, curveAngle, curveDepth);
+                    auto p = point(volumeModel, {warped.x, warped.y, warped.z});
+                    auto e = views[i].pose.position;
+                    float distance = (p.x - e.x) * (p.x - e.x) + (p.y - e.y) * (p.y - e.y) +
+                                     (p.z - e.z) * (p.z - e.z);
+                    volumeAlphaOrder.emplace_back(distance, j);
+                }
+                std::sort(volumeAlphaOrder.begin(), volumeAlphaOrder.end(), [](auto a, auto b) {
+                    return a.first == b.first ? a.second < b.second : a.first > b.first;
+                });
+                for (auto entry : volumeAlphaOrder) {
+                    auto &q = volumeAlphaQuads[entry.second];
+                    volumeAlphaVertices.insert(volumeAlphaVertices.end(), q.begin(), q.end());
+                }
+                if (!volumeAlphaVertices.empty()) {
+                    volumeAlpha.upload(volumeAlphaVertices);
+                    glDepthMask(GL_FALSE);
+                    draw(volumeAlpha, volumeModel, 7);
+                    glDepthMask(GL_TRUE);
+                }
+                glDisable(GL_CULL_FACE);
+                draw(volumeHud, volumeModel, 1, volumeHudImage);
+                glUniform1f(voxelCurveUniform, 0);
+                glUniform1f(voxelDepthUniform, 1);
             }
             if (!volumetric && mode < 4 && content.loaded) {
                 float width = s.questWidth * .01f;
@@ -1197,7 +1368,10 @@ struct XrStageRenderer::Impl {
         if (framebuffer)
             glDeleteFramebuffers(1, &framebuffer);
         volumeMesh.clear();
+        volumeAlpha.clear();
         volumeHud.clear();
+        if (volumeHudImage)
+            glDeleteTextures(1, &volumeHudImage);
         if (nativeTexture)
             glDeleteTextures(1, &nativeTexture);
         if (demoTexture)

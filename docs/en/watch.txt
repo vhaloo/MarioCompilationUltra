@@ -1,4 +1,4 @@
-Mario Compilation Ultra 0.7.0 · Watch view
+Mario Compilation Ultra 0.8.0 · Watch view
 
 Turn the crown or bezel to zoom. In menus it scrolls; touch + and - also work.
 
@@ -14,11 +14,11 @@ Transfer cartridges to CartridgeInbox, then choose Check transferred cartridges 
 
 Physical watch controls and sustained hardware performance remain untested. This edition is experimental.
 
-Updating a signed APK preserves app data. Uninstalling or clearing app data removes local cartridges and saves.
-
 Physical watch controls and sustained hardware performance remain untested. This edition is experimental.
+
+Updating a signed APK preserves app data. Uninstalling or clearing app data removes local cartridges and saves.
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.7.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.8.0-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
