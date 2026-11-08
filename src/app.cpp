@@ -237,6 +237,7 @@ App::~App() {
         if (p)
             SDL_GameControllerClose(p);
     if (renderer) {
+        clearExampleTextures();
         gpuTimer.release();
         nativeBlitter.reset();
         worldBlitter.reset();
@@ -359,6 +360,7 @@ void App::invalidateGraphics(bool deviceReset) {
     worldBlitter->invalidate(deviceReset);
     insetBlitter->invalidate(deviceReset);
     if (deviceReset) {
+        clearExampleTextures();
         SDL_SetRenderTarget(renderer, nullptr);
         for (auto texture : {nativeTex, worldTex, backgroundTex, frameTarget, sceneTarget,
                              watchTarget, voxelTex, volumeHudTex})
@@ -485,6 +487,10 @@ void App::events() {
     fullscreen();
 }
 void App::input() {
+    auto now = SDL_GetPerformanceCounter();
+    float seconds =
+        padPoll ? float(double(now - padPoll) / SDL_GetPerformanceFrequency()) : 0.f;
+    padPoll = now;
     auto *k = SDL_GetKeyboardState(nullptr);
     uint16_t b = 0;
     auto add = [&](bool on, int bit) {
@@ -506,6 +512,7 @@ void App::input() {
     core.buttons[0] = b;
     core.buttons[1] = 0;
     bool any = b != 0;
+    bool adjustedVolume = false;
     for (size_t p = 0; p < pads.size(); p++) {
         auto pad = pads[p];
         if (!pad)
@@ -513,7 +520,15 @@ void App::input() {
         auto down = [&](SDL_GameControllerButton v) {
             return SDL_GameControllerGetButton(pad, v) != 0;
         };
-        if (settings.quickControls && !menu && down(SDL_CONTROLLER_BUTTON_RIGHTSTICK)) {
+        bool rightStick = down(SDL_CONTROLLER_BUTTON_RIGHTSTICK);
+        if (!adjustedVolume)
+            adjustedVolume =
+                moveVolumeCamera(SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_RIGHTX) /
+                                     32767.f,
+                                 SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_RIGHTY) /
+                                     32767.f,
+                                 rightStick, seconds);
+        if (settings.quickControls && !menu && rightStick) {
             uint16_t held = uint16_t(down(SDL_CONTROLLER_BUTTON_DPAD_RIGHT)) |
                             uint16_t(down(SDL_CONTROLLER_BUTTON_DPAD_LEFT)) << 1 |
                             uint16_t(down(SDL_CONTROLLER_BUTTON_DPAD_UP)) << 2 |
@@ -553,8 +568,10 @@ void App::input() {
                 settings.cameraMode = 1;
                 settings.freeze = false;
             }
-            any = true;
-            continue;
+            if (held) {
+                any = true;
+                continue;
+            }
         }
         previousQuick[p] = 0;
         bool m = down(SDL_CONTROLLER_BUTTON_BACK), start = down(SDL_CONTROLLER_BUTTON_START),
@@ -640,6 +657,15 @@ void App::input() {
         settings.cameraY += (k[SDL_SCANCODE_K] ? speed : 0) - (k[SDL_SCANCODE_I] ? speed : 0);
     }
 }
+bool App::moveVolumeCamera(float x, float y, bool pan, float seconds) {
+    if (!core.loaded || menu || backgrounded || (!focused && settings.pauseFocus) ||
+        !settings.volumeMode || !volumeScene.ready)
+        return false;
+    if (!volumeView.move(x, y, pan, seconds, settings.deadzone * .01f))
+        return false;
+    dirty = true;
+    return true;
+}
 bool App::play(const std::string &id, bool resume) {
     auto it = library.paths.find(id);
     if (it == library.paths.end()) {
@@ -661,6 +687,8 @@ bool App::play(const std::string &id, bool resume) {
     // cartridge selection path after Core falls back to a fresh boot.
     hasResume = hasResume && core.status == "State restored";
     world.reset();
+    volumeScene.clear();
+    volumeView = {};
     settings.lastGame = id;
     settings.freeze = settings.cameraMode == 2;
     menu = false;
@@ -876,10 +904,13 @@ void App::drawGame() {
 #endif
         if (skipRaster)
             volumeRendered = true;
+        auto camera = volumeView.apply(volumeScene.camera);
+        auto cameraKey = std::array<float, 4>{camera.yaw, camera.pitch, camera.panX, camera.panY};
         bool rasterChanged = !voxelTex || vw != voxelWidth || vh != voxelHeight ||
-                             voxelRasterVersion != volumeScene.version();
+                             voxelRasterVersion != volumeScene.version() ||
+                             voxelRasterView != cameraKey;
         if (!skipRaster &&
-            (!rasterChanged || volumeRaster.render(volumeScene.mesh, volumeScene.camera, vw, vh))) {
+            (!rasterChanged || volumeRaster.render(volumeScene.mesh, camera, vw, vh))) {
             if (!voxelTex || vw != voxelWidth || vh != voxelHeight) {
                 if (voxelTex)
                     SDL_DestroyTexture(voxelTex);
@@ -897,6 +928,7 @@ void App::drawGame() {
                 SDL_UpdateTexture(voxelTex, nullptr, volumeRaster.pixels.data(), vw * 4) == 0) {
                 uploaded = true;
                 voxelRasterVersion = volumeScene.version();
+                voxelRasterView = cameraKey;
                 ++textureUploads;
                 textureUploadBytes += uint64_t(vw) * vh * 4;
             }
@@ -954,7 +986,7 @@ void App::drawGame() {
     volumeDrawn = volumeRendered;
     // Draw the authoritative framebuffer again at full source resolution. Atlas
     // quality budgets and panorama sampling must never downsample the live game.
-    if (!deferNative && !volumeRendered)
+    if (!deferNative && !volumeRendered && !world.cleanOverview)
         nativeBlitter->copy(nativeTex, core.width, core.height, nativeRect,
                             settings.view == 2 ? 0 : settings.filter, nativeContentVersion);
     float rowHeight = nativeRect.h / core.height;
@@ -984,7 +1016,7 @@ void App::drawGame() {
         if (volumeHudTex)
             SDL_RenderCopyF(renderer, volumeHudTex, nullptr, &hudRect);
     }
-    if (settings.scanlines && rowHeight >= 2.f && !volumeRendered) {
+    if (settings.scanlines && rowHeight >= 2.f && !volumeRendered && !world.cleanOverview) {
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, uint8_t(settings.scanlines * 255 / 100));
         SDL_FRect area = world.expanded
@@ -1081,6 +1113,33 @@ void App::request(int action, int slot, const std::string &game) {
     menu = true;
     core.clearAudio();
 }
+void App::defaultsButton(Defaults group) {
+    const char *label =
+        group == Defaults::All ? "Reset all settings" : "Reset this section";
+    if (button(label, nullptr, {-1, group == Defaults::All ? 42.f : 34.f}))
+        request(6, int(group));
+}
+void App::applyDefaults(Defaults group) {
+    settings.restoreDefaults(group);
+#ifdef MCU_QUEST
+    settings.performanceReserve = std::max(35, settings.performanceReserve);
+#endif
+    if (group == Defaults::All || group == Defaults::Screen || group == Defaults::Spatial) {
+        resolution = AdaptiveResolution{};
+        volumeView = {};
+        watchZoomAt = 0;
+    }
+    lastCompose = ~uint64_t(0);
+    focusPage = true;
+    releaseInput = true;
+    try {
+        settings.save(library);
+        notify(tr("Default settings restored."));
+    } catch (const std::exception &e) {
+        SDL_Log("Save default settings: %s", e.what());
+        notify(tr("Could not save the default settings."));
+    }
+}
 bool App::gameAvailable(const std::string &id) const {
     auto entry = library.paths.find(id);
     std::error_code ec;
@@ -1094,6 +1153,8 @@ int App::availableGames() const {
     return count;
 }
 void App::libraryUi() {
+    defaultsButton(Defaults::All);
+    ImGui::Spacing();
     ImGui::TextColored({.64f, .84f, .74f, 1}, "%s",
                        tr("SIX ADVENTURES · YOUR CARTRIDGES", "SIX AVENTURES · TES CARTOUCHES"));
     ImGui::TextWrapped(
@@ -1173,6 +1234,11 @@ void App::optionsUi() {
 #else
     constexpr int reserveFloor = 15, automaticReserve = 25;
 #endif
+    const Defaults groups[] = {Defaults::All, Defaults::Screen, Defaults::Camera,
+                               Defaults::AudioSaves, Defaults::Controls, Defaults::All,
+                               Defaults::Spatial};
+    if (tab != 5 && (tab != 6 || !mobileActive()))
+        defaultsButton(groups[tab]);
     mobileOptions();
     if (watchActive() && (tab == 1 || tab == 2 || tab == 4 || tab == 5))
         return;
@@ -1189,6 +1255,7 @@ void App::optionsUi() {
         combo("View", "Vue", settings.view,
               {"Original framing", "Panorama", "Pixel world", "Stage atlas", "Full level map"});
         choice("Pixel volume", settings.volumeMode, {"Original 2D", "Pixel relief", "Voxels"});
+        exampleGallery();
         if (settings.volumeMode) {
             this->slider("Voxel thickness", settings.volumeDepth, 1, 16, "%d px");
             this->slider("Layer spacing", settings.volumeSpacing, 1, 12, "%d px");
@@ -1198,6 +1265,10 @@ void App::optionsUi() {
 #endif
             if (settings.volumeMode == 2)
                 tick("Rounded voxel shapes", settings.volumeRound);
+            if (button("Center volume camera"))
+                volumeView = {};
+            ImGui::TextWrapped("%s", tr("Right stick: look around. Hold the stick click and move "
+                                       "it to pan."));
         }
         ImGui::TextColored({.55f, .9f, .75f, 1}, "%s", tr("Find your balance"));
         bool presetRow = ImGui::GetContentRegionAvail().x > 720 * uiUnit();
@@ -1234,8 +1305,10 @@ void App::optionsUi() {
             ImGui::TextWrapped("%s",
                                tr("Pixel world keeps square pixels and integer zoom. The crisp "
                                   "filter balances sharp detail and even pixels at other sizes."));
-            if (button("Recommended picture", "Image recommandée"))
+            if (button("Recommended picture", "Image recommandée")) {
                 settings.recommendedPicture();
+                volumeView = {};
+            }
             ImGui::PushID("Pixel zoom");
             settingTitle("Pixel zoom");
             ImGui::SetNextItemWidth(-1);
@@ -1684,14 +1757,17 @@ void App::dialogs() {
             "Restore this state? Current unsaved progress will be replaced.",
             "Switch game? Current progress will be saved automatically when enabled.",
             "Quit the collection?",
-            "Restart the cartridge?"};
+            "Restart the cartridge?",
+            "Restore default settings? Cartridge imports and saves are kept."};
         const char *fr[] = {"",
                             "Remplacer cette sauvegarde ?",
                             "Charger cet état ? La progression actuelle sera remplacée.",
                             "Changer de jeu ? La progression sera enregistrée si la reprise "
                             "automatique est activée.",
                             "Quitter la collection ?",
-                            "Redémarrer la cartouche ?"};
+                            "Redémarrer la cartouche ?",
+                            "Rétablir les réglages par défaut ? Les cartouches importées et les "
+                            "sauvegardes sont conservées."};
         ImGui::TextWrapped("%s", tr(en[dialog], fr[dialog]));
         float confirmWidth = mobileActive() ? std::min(180.f, (ImGui::GetContentRegionAvail().x -
                                                                ImGui::GetStyle().ItemSpacing.x) /
@@ -1727,6 +1803,8 @@ void App::dialogs() {
                 bootstrapAge = 0;
                 bootstrapPhase = 0;
             }
+            if (action == 6)
+                applyDefaults(Defaults(dialogSlot));
         }
         ImGui::EndPopup();
     }
@@ -1768,6 +1846,7 @@ void App::render() {
     if (frameTarget)
         SDL_SetRenderTarget(renderer, frameTarget);
 #endif
+    renderNextExample();
 #ifdef MCU_QUEST
     Settings persistentSettings = settings;
     if (quest)
@@ -1876,9 +1955,10 @@ void App::render() {
             SDL_RenderCopyF(renderer, sceneTarget, nullptr, &dest);
             // The expensive surround can be smaller, but never resample the
             // authoritative camera through that reduced intermediate target.
-            nativeBlitter->copy(nativeTex, core.width, core.height, nativeRect,
-                                settings.view == 2 ? 0 : settings.filter, nativeContentVersion);
-            if (settings.scanlines && nativeRect.h / core.height >= 2) {
+            if (!world.cleanOverview)
+                nativeBlitter->copy(nativeTex, core.width, core.height, nativeRect,
+                                    settings.view == 2 ? 0 : settings.filter, nativeContentVersion);
+            if (settings.scanlines && !world.cleanOverview && nativeRect.h / core.height >= 2) {
                 float row = nativeRect.h / core.height;
                 SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, uint8_t(settings.scanlines * 255 / 100));
@@ -1964,7 +2044,7 @@ void App::render() {
         auto *d = ImGui::GetForegroundDrawList();
         ImVec2 size{float(gameViewport.w), float(gameViewport.h)};
         bool volumeActive = volumeDrawn && voxelWidth > 0 && voxelHeight > 0;
-        VoxelProjection volumeProjection(volumeScene.camera, std::max(1, voxelWidth),
+        VoxelProjection volumeProjection(volumeView.apply(volumeScene.camera), std::max(1, voxelWidth),
                                          std::max(1, voxelHeight));
         auto xy = [&](float x, float y, float z = 0.f) {
             if (volumeActive) {
@@ -2242,6 +2322,8 @@ void App::report(const fs::path &p, double elapsed) const {
       << insetRect.h << "]"
       << ",\n\"renderer\":" << jsonString(rendererInfo.name ? rendererInfo.name : "unknown")
       << ",\n\"volume_mode\":" << settings.volumeMode
+      << ",\n\"volume_camera\":[" << volumeView.yaw << ',' << volumeView.pitch << ','
+      << volumeView.panX << ',' << volumeView.panY << ']'
       << ",\n\"volume_ready\":" << (core.loaded && volumeDrawn ? "true" : "false")
       << ",\n\"volume_spacing\":" << settings.volumeSpacing
       << ",\n\"volume_faces\":" << (core.loaded && volumeDrawn ? volumeScene.mesh.faces.size() : 0)
@@ -2257,6 +2339,7 @@ void App::report(const fs::path &p, double elapsed) const {
       << ",\n\"ppu_layers\":" << core.snapshot.mainLayers
       << ",\n\"expanded\":" << (world.expanded ? "true" : "false")
       << ",\n\"complete_map_requested\":" << (settings.view == 4 ? "true" : "false")
+      << ",\n\"complete_map_foreground\":" << (world.cleanOverview ? "true" : "false")
       << ",\n\"complete_map_ready\":"
       << (settings.view == 4 && world.expanded && world.complete.ready ? "true" : "false")
       << ",\n\"complete_map_source\":"
@@ -2395,6 +2478,8 @@ void App::scriptCommand(const std::string &cmd, const std::string &value) {
         settings.scanlines = std::stoi(value);
     else if (cmd == "picture" && value == "recommended")
         settings.recommendedPicture();
+    else if (cmd == "examples")
+        startExamples();
     else if (cmd == "dump")
         atomicWrite(fs::u8path(value), {core.snapshot.ram.begin(), core.snapshot.ram.end()});
     else if (cmd == "game")

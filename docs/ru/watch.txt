@@ -1,4 +1,4 @@
-Mario Compilation Ultra 0.8.0 · Вид на часах
+Mario Compilation Ultra 0.9.0 · Вид на часах
 
 Вращайте коронку или безель для масштаба. В меню это прокрутка; сенсорные + и - тоже работают.
 
@@ -20,5 +20,5 @@ Mario Compilation Ultra 0.8.0 · Вид на часах
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.8.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.9.0-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

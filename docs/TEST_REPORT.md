@@ -1,4 +1,21 @@
-# Validation report — 0.8.0
+# Validation report
+
+## 0.9.0
+
+The automated suites cover settings reset and persistence, local captures from
+a paused cartridge, controller drift and camera movement, texture recovery,
+save states, mobile and watch layouts, and geometry and depth checks.
+
+The cartridge audit separates live stage entrances from table and map decoding
+checks. It covers flat rendering, pixel relief and voxel geometry at sampled
+entrances. A stage entrance is one sample of gameplay. Unsupported projections
+use the original SNES picture.
+
+The Quest build validates OpenXR code and shaders. Physical headset tracking,
+Touch interaction and sustained headset frame pacing require a headset run.
+Mac builds are experimental. Gameplay on physical Macs is untested.
+
+## 0.8.0
 
 ## Public fixtures and desktop
 

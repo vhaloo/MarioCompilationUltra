@@ -42,6 +42,9 @@ class App {
     int voxelWidth = 0, voxelHeight = 0;
     int volumeHudWidth = 0, volumeHudHeight = 0;
     uint64_t voxelRasterVersion = ~uint64_t(0), volumeHudVersion = ~uint64_t(0);
+    std::array<float, 4> voxelRasterView{};
+    VoxelView volumeView;
+    uint64_t padPoll = 0;
     VoxelScene volumeScene;
     VoxelRasterizer volumeRaster;
     std::unique_ptr<Blitter> nativeBlitter, worldBlitter, insetBlitter;
@@ -131,6 +134,17 @@ class App {
     void settingTitle(const char *key);
     void languageControl();
     void settingPicture(const char *key, float width, bool compact = false);
+    int exampleGame = -1, exampleStyle = 0, exampleJob = -1, examplesWritten = 0;
+    std::array<std::array<SDL_Texture *, 7>, 6> exampleTextures{};
+    std::array<std::array<bool, 7>, 6> exampleChecked{};
+    void exampleGallery();
+    void startExamples();
+    void renderNextExample();
+    void clearExampleTextures();
+    bool exampleImage(int game, int style, float width);
+    bool exampleForSetting(const char *key, float width);
+    void defaultsButton(Defaults group);
+    void applyDefaults(Defaults group);
     MobileLayout touchLayout;
     MobileTouches touch;
     uint16_t pendingTouchButtons = 0;
@@ -180,6 +194,7 @@ class App {
     void init();
     void events();
     void input();
+    bool moveVolumeCamera(float x, float y, bool pan, float seconds);
     void tick();
     void render();
     void finishFrame(double workMs, double gpuMs, double budgetMs);
@@ -187,6 +202,7 @@ class App {
     void toggleMenu();
     bool play(const std::string &, bool resume = true);
     void capture(const fs::path &);
+    bool capturingExamples() const { return exampleJob >= 0; }
     void report(const fs::path &, double elapsed) const;
     void scriptCommand(const std::string &, const std::string &);
     void refreshControllers() { hotplug(); }

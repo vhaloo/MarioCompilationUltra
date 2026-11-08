@@ -546,5 +546,18 @@
   "remote_up": "Up",
   "remote_volume": "Volume",
   "rewind": "Enable rewind (uses memory)",
-  "ultra": "Ultra quality"
+  "ultra": "Ultra quality",
+  "Reset all settings": "Reset all settings",
+  "Reset this section": "Reset this section",
+  "Restore default settings? Cartridge imports and saves are kept.": "Restore default settings? Cartridge imports and saves are kept.",
+  "Default settings restored.": "Default settings restored.",
+  "Could not save the default settings.": "Could not save the default settings.",
+  "Center volume camera": "Center volume camera",
+  "Right stick: look around. Hold the stick click and move it to pan.": "Right stick: look around. Hold the stick click and move it to pan.",
+  "Actual game captures": "Actual game captures",
+  "No local capture for this view. Open the settings during play to capture the current scene.": "No local capture for this view. Open the settings during play to capture the current scene.",
+  "Captured from a running cartridge.": "Captured from a running cartridge.",
+  "Capture current scene": "Capture current scene",
+  "Game captures saved locally.": "Game captures saved locally.",
+  "Could not capture this scene.": "Could not capture this scene."
 }

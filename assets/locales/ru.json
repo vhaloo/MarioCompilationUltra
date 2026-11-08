@@ -546,5 +546,18 @@
   "remote_up": "Вверх",
   "remote_volume": "Объём",
   "rewind": "Перемотка",
-  "ultra": "Высокий"
+  "ultra": "Высокий",
+  "Reset all settings": "Сбросить всё",
+  "Reset this section": "Сбросить раздел",
+  "Restore default settings? Cartridge imports and saves are kept.": "Восстановить настройки по умолчанию? Импортированные картриджи и сохранения будут сохранены.",
+  "Default settings restored.": "Настройки по умолчанию восстановлены.",
+  "Could not save the default settings.": "Не удалось сохранить настройки по умолчанию.",
+  "Center volume camera": "Центрировать 3D-камеру",
+  "Right stick: look around. Hold the stick click and move it to pan.": "Поворачивайте вид правым стиком. Нажмите на него и отклоните, чтобы сместить вид.",
+  "Actual game captures": "Снимки из игры",
+  "No local capture for this view. Open the settings during play to capture the current scene.": "Для этого вида нет локального снимка. Откройте настройки во время игры, чтобы снять текущую сцену.",
+  "Captured from a running cartridge.": "Снимок сделан во время игры.",
+  "Capture current scene": "Снять сцену",
+  "Game captures saved locally.": "Снимки сохранены на этом устройстве.",
+  "Could not capture this scene.": "Не удалось снять эту сцену."
 }

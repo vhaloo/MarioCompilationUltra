@@ -189,8 +189,8 @@ int main(int argc, char **argv) {
             VoxelScene scene;
             bool safe = scene.update(*core, *world, options, 5);
             core->loaded = false;
-            require(safe && scene.mesh.complete, "Coarse native framing at odd coordinates never "
-                                                 "reads unprepared offscreen terrain");
+            require(!safe && !scene.ready, "An empty coarse volume at an odd camera origin "
+                                           "returns to the native picture safely");
             require(world->sampleTerrainForTest(*core, 0, 0) == 0,
                     "Unprepared terrain lookup is safely transparent");
         }
@@ -255,6 +255,19 @@ int main(int argc, char **argv) {
                             "projection");
                 }
             }
+        VoxelView orbit;
+        require(!orbit.move(.08f, -.08f, false, .05f, .22f), "Stick drift leaves the view stable");
+        require(orbit.move(1, .5f, false, .02f, .22f) && orbit.yaw > 0 && orbit.pitch > 0 &&
+                    orbit.panX == 0,
+                "Right stick orbits on both axes without translating");
+        auto angles = orbit.key();
+        require(orbit.move(-1, 1, true, .02f, .22f) && orbit.yaw == angles[0] &&
+                    orbit.pitch == angles[1] && orbit.panX < 0 && orbit.panY > 0,
+                "Pressed stick translates without changing perspective");
+        auto centered = VoxelProjection(VoxelCamera{}, 640, 360).project({128, 112, 0});
+        auto moved = VoxelProjection(orbit.apply(VoxelCamera{}), 640, 360).project({128, 112, 0});
+        require(moved.x < centered.x && moved.y > centered.y,
+                "Camera motion changes the rendered center in the requested directions");
         s.volumeMode = 9;
         s.volumeDepth = 99;
         s.volumeAngle = -99;

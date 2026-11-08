@@ -1,4 +1,4 @@
-Mario Compilation Ultra 0.8.0 · 時計の表示
+Mario Compilation Ultra 0.9.0 · 時計の表示
 
 リューズやベゼルを回すとズーム、メニューではスクロールします。タッチの+と-も使えます。
 
@@ -20,5 +20,5 @@ CartridgeInboxに転送し、転送したカートリッジを確認するかア
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.8.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.9.0-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

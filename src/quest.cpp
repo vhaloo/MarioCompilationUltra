@@ -94,6 +94,9 @@ struct QuestPresentation::Impl {
     bool grabbing = false, pointerHit = false, pointerClick = false, previousB = false,
          bForMenu = false;
     bool lastMenu = true, blockPointerTrigger = false, previousY = false;
+    bool volumeThumbDown = false, volumeThumbTap = false;
+    bool volumeStartPending = false;
+    uint64_t volumeStartFrame = 0;
     float pointerX = 0, pointerY = 0, wheel = 0;
     XrPosef head = identity(), panel = identity(), grabPanel = identity();
     XrVector3f grabMid{};
@@ -1017,6 +1020,7 @@ struct QuestPresentation::Impl {
         sync.activeActionSets = &active;
         auto result = xrSyncActions(session, &sync);
         if (result == XR_SESSION_NOT_FOCUSED || state != XR_SESSION_STATE_FOCUSED) {
+            volumeThumbTap = volumeStartPending = false;
             if (joystick) {
                 for (int n = 0; n < SDL_CONTROLLER_BUTTON_MAX; ++n)
                     SDL_JoystickSetVirtualButton(joystick, n, 0);
@@ -1142,8 +1146,32 @@ struct QuestPresentation::Impl {
         if (app.menu && !grabbing && std::abs(right.y) > .2f)
             wheel = right.y * float(frame.predictedDisplayPeriod) * 1e-9f * 12.f;
         bool manipulating = grabbing || singleGrabHand >= 0;
+        bool volumeControl = app.settings.volumeMode && app.volumeScene.ready;
+        bool canPlay = app.settings.questTouch && !app.menu && !manipulating;
+        bool start = clicked;
+        if (volumeControl) {
+            if (clicked && !volumeThumbDown)
+                volumeThumbTap = canPlay;
+            if (!canPlay || (clicked && std::hypot(right.x, right.y) >
+                                            app.settings.deadzone * .01f))
+                volumeThumbTap = false;
+            if (canPlay && !clicked && volumeThumbDown && volumeThumbTap) {
+                volumeStartPending = true;
+                volumeStartFrame = app.core.frame;
+            }
+            if (!clicked)
+                volumeThumbTap = false;
+            volumeStartPending =
+                canPlay && volumeStartPending && volumeStartFrame == app.core.frame;
+            start = volumeStartPending;
+            if (canPlay)
+                app.moveVolumeCamera(right.x, -right.y, clicked,
+                                     float(frame.predictedDisplayPeriod) * 1e-9f);
+        } else
+            volumeThumbTap = volumeStartPending = false;
+        volumeThumbDown = clicked;
         if (app.settings.questTouch && !app.menu && !manipulating) {
-            app.spatialButtons |= questPlayButtons(a, b, x, !uiConsumed[1] && rt > .55f, clicked);
+            app.spatialButtons |= questPlayButtons(a, b, x, !uiConsumed[1] && rt > .55f, start);
             app.spatialButtons |=
                 questDirectionButtons(left.x, left.y, app.settings.deadzone * .01f);
         }
@@ -1157,8 +1185,8 @@ struct QuestPresentation::Impl {
             };
             axis(SDL_CONTROLLER_AXIS_LEFTX, app.menu && !manipulating ? left.x : 0);
             axis(SDL_CONTROLLER_AXIS_LEFTY, app.menu && !manipulating ? -left.y : 0);
-            axis(SDL_CONTROLLER_AXIS_RIGHTX, app.menu || manipulating ? 0 : right.x);
-            axis(SDL_CONTROLLER_AXIS_RIGHTY, app.menu || manipulating ? 0 : -right.y);
+            axis(SDL_CONTROLLER_AXIS_RIGHTX, 0);
+            axis(SDL_CONTROLLER_AXIS_RIGHTY, 0);
             axis(SDL_CONTROLLER_AXIS_TRIGGERLEFT,
                  app.menu || manipulating || uiConsumed[0] ? -1 : lt * 2 - 1);
             axis(SDL_CONTROLLER_AXIS_TRIGGERRIGHT, -1);
@@ -1343,6 +1371,7 @@ struct QuestPresentation::Impl {
             XrStageContent content;
             content.volume =
                 app.settings.volumeMode && app.volumeScene.ready ? &app.volumeScene : nullptr;
+            content.volumeView = app.volumeView;
             content.loaded = app.core.loaded;
             content.expanded = gameScreen.valid && gameScreen.mode == mode() && app.core.loaded
                                    ? gameScreen.canvas
@@ -1526,7 +1555,8 @@ bool QuestPresentation::needsRedraw() const {
     auto &target = p.companion() ? p.menuScreen : p.gameScreen;
     auto size = p.canvasSize(p.companion());
     return p.app.menu || !target.valid || target.mode != p.mode() ||
-           target.imageVersion != p.app.core.imageVersion || p.app.dirty || false ||
+           target.imageVersion != p.app.core.imageVersion || p.app.dirty ||
+           p.app.capturingExamples() ||
            target.requestedWidth != size.first || target.requestedHeight != size.second;
 }
 void QuestPresentation::prepareRender() { impl->prepareRender(); }

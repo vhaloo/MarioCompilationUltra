@@ -60,6 +60,42 @@ int main() {
                   settings.language == 4 && settings.volume == 31 && !settings.fullscreen &&
                   !settings.autoResume,
               "Recommended picture preserves language, audio, window and progress preferences");
+        Settings defaults;
+        Library imports;
+        settings.dataDir = fs::temp_directory_path() /
+                           ("mcu-defaults-" + std::to_string(SDL_GetPerformanceCounter()));
+        settings.lastGame = "world";
+        imports.paths.emplace("world", settings.dataDir / "test cartridge.sfc");
+        settings.volumeMode = 2;
+        settings.view = 4;
+        settings.watchLens = false;
+        settings.questMode = 5;
+        settings.restoreDefaults(Defaults::Screen);
+        check(settings.view == defaults.view && settings.volumeMode == defaults.volumeMode &&
+                  settings.watchLens == defaults.watchLens && settings.volume == 31 &&
+                  settings.language == 4 && settings.questMode == 5,
+              "Screen reset changes only its own preferences");
+        settings.cameraMode = 2;
+        settings.cameraX = 123;
+        settings.freeze = true;
+        settings.restoreDefaults(Defaults::Camera);
+        check(!settings.freeze && settings.cameraX == 0 && settings.questMode == 5,
+              "Camera reset releases a previously frozen camera");
+        auto directory = settings.dataDir;
+        auto slot = directory / "states" / "test.mstate";
+        atomicWrite(slot, {1, 2, 3});
+        settings.restoreDefaults(Defaults::All);
+        settings.save(imports);
+        Settings reloaded;
+        reloaded.dataDir = directory;
+        Library restoredImports;
+        reloaded.load(restoredImports);
+        check(reloaded.language == defaults.language && reloaded.volume == defaults.volume &&
+                  reloaded.autoResume == defaults.autoResume && reloaded.questMode == 0 &&
+                  reloaded.quality == defaults.quality && reloaded.lastGame == "world" &&
+                  restoredImports.paths == imports.paths &&
+                  readFile(slot) == std::vector<uint8_t>({1, 2, 3}),
+              "Global reset persists defaults, keeps imports and does not touch save slots");
         auto *surface = SDL_CreateRGBSurfaceWithFormat(0, 96, 96, 32, SDL_PIXELFORMAT_ARGB8888);
         auto *renderer = SDL_CreateSoftwareRenderer(surface);
         check(surface && renderer, "Software renderer is available");

@@ -546,5 +546,18 @@
   "remote_up": "上へ",
   "remote_volume": "立体",
   "rewind": "巻き戻しを有効化 (メモリを使用)",
-  "ultra": "ウルトラ品質"
+  "ultra": "ウルトラ品質",
+  "Reset all settings": "設定をすべて初期化",
+  "Reset this section": "この項目の設定を初期化",
+  "Restore default settings? Cartridge imports and saves are kept.": "初期設定に戻しますか？取り込んだカートリッジとセーブデータは保持されます。",
+  "Default settings restored.": "初期設定に戻しました。",
+  "Could not save the default settings.": "初期設定を保存できませんでした。",
+  "Center volume camera": "立体表示の視点を中央に戻す",
+  "Right stick: look around. Hold the stick click and move it to pan.": "右スティックで視点を回転。押し込みながら倒すと視点を移動します。",
+  "Actual game captures": "実際のゲーム画面",
+  "No local capture for this view. Open the settings during play to capture the current scene.": "この表示の画像はまだありません。プレイ中に設定を開いて、現在のシーンを撮影できます。",
+  "Captured from a running cartridge.": "プレイ中に撮影した実際の画面です。",
+  "Capture current scene": "現在のシーンを撮影",
+  "Game captures saved locally.": "ゲーム画面をこの端末に保存しました。",
+  "Could not capture this scene.": "このシーンを撮影できませんでした。"
 }

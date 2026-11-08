@@ -1,4 +1,5 @@
 #include "world.h"
+#include "voxel_scene.h"
 #include "presentation.h"
 #include <algorithm>
 #include <cmath>
@@ -341,6 +342,7 @@ void World::remember(const Core &c, const Scene &s) {
         (!s.fullMap && (std::abs(s.cameraX - previousCameraX) > 512 ||
                         std::abs(s.cameraY - previousCameraY) > 448))) {
         cache.clear();
+        cameraReady = false;
         minX = s.cameraX;
         maxX = minX + 256;
         minY = s.cameraY;
@@ -525,6 +527,9 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
         scene.height = std::max(scene.height, maxY);
     }
     expanded = scene.valid && s.view != 0 && (!wholeLevel || completeReady);
+    cleanOverview = expanded && wholeLevel && !s.projectionWatch && c.snapshot.rasterValid &&
+                    !c.snapshot.objectInterlace && c.snapshot.brightness > 0 &&
+                    c.native.size() == size_t(c.width) * c.height;
     backdropPixels.resize(64 * 56);
     for (int y = 0; y < 56; y++)
         for (int x = 0; x < 64; x++) {
@@ -598,13 +603,14 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
         canvas.worldHeight = h / scale;
         float cx = s.cameraMode == 1 ? sc.playerX + 8.f : sc.cameraX + c.width / 2.f;
         float cy = s.cameraMode == 1 ? sc.playerY + 12.f : sc.cameraY + c.height / 2.f;
-        if (s.freeze) {
+        if (s.freeze && cameraReady) {
             cx = s.cameraX;
             cy = s.cameraY;
         } else {
             s.cameraX = cx;
             s.cameraY = cy;
         }
+        cameraReady = true;
         canvas.x = cx - canvas.worldWidth / 2;
         canvas.y = cy - canvas.worldHeight / 2;
     }
@@ -708,6 +714,31 @@ void World::rasterCanvas(const Core &c, const Settings &s) {
     auto overlayNative = [&] {
         if (c.native.empty())
             return;
+        std::vector<uint8_t> actors;
+        if (cleanOverview) {
+            actors.resize(c.native.size());
+            const auto &video = c.snapshot;
+            if (video.visibleLayers & 16) {
+                for (const auto &object : video.objects) {
+                    auto size = voxelSpriteSize(video.objectSize, object.large);
+                    int sx = object.x >= 256 ? object.x - 512 : object.x;
+                    int sy = object.y > 239 ? object.y - 256 : object.y;
+                    for (int y = std::max(0, sy); y < std::min(int(c.height), sy + size.height); ++y)
+                        for (int x = std::max(0, sx); x < std::min(int(c.width), sx + size.width);
+                             ++x) {
+                            size_t i = size_t(y) * c.width + x;
+                            auto color = voxelSpritePixel(video, object, x - sx, y - sy);
+                            auto native = c.native[i];
+                            if (color && std::abs(int(color & 255) - int(native & 255)) <= 18 &&
+                                std::abs(int((color >> 8) & 255) -
+                                         int((native >> 8) & 255)) <= 18 &&
+                                std::abs(int((color >> 16) & 255) -
+                                         int((native >> 16) & 255)) <= 18)
+                                actors[i] = 1;
+                        }
+                }
+            }
+        }
         int x0 =
             std::clamp(int(std::ceil((sc.cameraX - canvas.x) * canvas.width / canvas.worldWidth)),
                        0, canvas.width);
@@ -728,9 +759,13 @@ void World::rasterCanvas(const Core &c, const Settings &s) {
             for (int x = x0; x < x1; ++x) {
                 int nx =
                     int(std::floor(canvas.x + x * canvas.worldWidth / canvas.width)) - sc.cameraX;
-                if (nx >= 0 && nx < int(c.width))
-                    canvas.pixels[size_t(y) * canvas.width + x] =
-                        c.native[size_t(ny) * c.width + nx];
+                if (nx < 0 || nx >= int(c.width))
+                    continue;
+                size_t i = size_t(ny) * c.width + nx;
+                bool high = false;
+                if (!cleanOverview || actors[i] || volumeLayer(c, 0, nx, ny, high) ||
+                    (complete.secondary && volumeLayer(c, 1, nx, ny, high)))
+                    canvas.pixels[size_t(y) * canvas.width + x] = c.native[i];
             }
         }
     };

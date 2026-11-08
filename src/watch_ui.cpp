@@ -75,6 +75,7 @@ void App::watchMenu() {
         watchScrollPending = 0;
     }
     if (tab == 0) {
+        defaultsButton(Defaults::All);
         static const char *names[] = {"SMB 1", "Lost Levels",       "SMB 2",
                                       "SMB 3", "Super Mario World", "Yoshi's Island"};
         int index = 0;
@@ -153,11 +154,14 @@ void App::watchOptions() {
         return;
     ImGui::TextColored({.5f, .87f, .74f, 1}, "%s", tr("Watch view"));
     choice("Pixel volume", settings.volumeMode, {"Original 2D", "Pixel relief", "Voxels"});
+    exampleGallery();
     if (settings.volumeMode) {
         slider("Voxel thickness", settings.volumeDepth, 1, 16, "%d px");
         slider("Layer spacing", settings.volumeSpacing, 1, 12, "%d px");
         if (settings.volumeMode == 2)
             tick("Rounded voxel shapes", settings.volumeRound);
+        if (button("Center volume camera"))
+            volumeView = {};
     }
     int percentage = settings.watchZoom / 10;
     if (slider("Watch zoom", percentage, 0, 100, "%d%%"))

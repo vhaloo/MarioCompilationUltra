@@ -103,7 +103,9 @@ int main() {
               "Separate All-Stars coverage");
         fs::path dir = fs::temp_directory_path() / ("mcu-test-" + std::to_string(SDL_GetTicks64()));
         Settings s;
-        check(s.view == 1 && s.zoom == 0, "Readable panorama and automatic pixel zoom defaults");
+        check(s.view == 0 && s.volumeMode == 0 && s.zoom == 0 && s.questMode == 0 &&
+                  !s.questPassthrough,
+              "Fresh profiles start with original framing on a flat screen");
         check(s.pixelZoom(7680, 1440, 256, 224) == 6, "48:9 pixel view fits the native image");
         check(s.pixelZoom(1280, 720, 256, 224) == 3, "16:9 automatic integer zoom");
         check(s.pixelZoom(768, 1440, 256, 224) == 3,
@@ -270,6 +272,7 @@ int main() {
             Settings pixelSettings;
             pixelSettings.view = 2;
             pixelSettings.zoom = 1;
+            pixelSettings.background = 0;
             ++core.imageVersion;
             layout.reset();
             layout.compose(core, pixelSettings, 512, 224);

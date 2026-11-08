@@ -5,6 +5,72 @@
 #include <iomanip>
 #include <sstream>
 namespace mcu {
+void Settings::restoreDefaults(Defaults group) {
+    Settings defaults;
+    auto restore = [&](auto... fields) { ((this->*fields = defaults.*fields), ...); };
+    switch (group) {
+    case Defaults::All:
+        defaults.dataDir = dataDir;
+        defaults.lastGame = lastGame;
+        *this = std::move(defaults);
+        break;
+    case Defaults::Screen:
+        restore(&Settings::view, &Settings::zoom, &Settings::zoomOut, &Settings::panoramaHeight,
+                &Settings::filter, &Settings::aspect, &Settings::quality, &Settings::fullscreen,
+                &Settings::span, &Settings::vsync, &Settings::display, &Settings::scanlines,
+                &Settings::showStats, &Settings::smoothMap, &Settings::desktopPresentation,
+                &Settings::desktopFrameScale, &Settings::desktopCrtStrength,
+                &Settings::mobileOrientation, &Settings::mobileKeepAwake,
+                &Settings::adaptiveResolution, &Settings::thermalAware,
+                &Settings::performanceMode, &Settings::performanceReserve, &Settings::watchZoom,
+                &Settings::watchLens, &Settings::watchCrownSensitivity, &Settings::watchCrownReverse,
+                &Settings::volumeMode, &Settings::volumeDepth, &Settings::volumeSpacing,
+                &Settings::volumeAngle, &Settings::volumeTilt, &Settings::volumeRound);
+        break;
+    case Defaults::Camera:
+        restore(&Settings::background, &Settings::blur, &Settings::brightness,
+                &Settings::softEdges, &Settings::cameraMode, &Settings::freeze,
+                &Settings::cameraX, &Settings::cameraY, &Settings::guide, &Settings::locator,
+                &Settings::minimap, &Settings::inset, &Settings::enemyMarkers, &Settings::showHud,
+                &Settings::enemyOpacity, &Settings::enemyPreview, &Settings::bossPreview,
+                &Settings::objectPreview, &Settings::spawnLabels, &Settings::hintCorner,
+                &Settings::hintScale, &Settings::hintOpacity, &Settings::hintMargin,
+                &Settings::hintDetail, &Settings::hintSeconds, &Settings::noticeSeconds);
+        break;
+    case Defaults::AudioSaves:
+        restore(&Settings::autoResume, &Settings::rewind, &Settings::pauseFocus, &Settings::mute,
+                &Settings::volume, &Settings::rewindMemory, &Settings::rewindButton,
+                &Settings::rewindAudio, &Settings::rewindIndicator);
+        break;
+    case Defaults::Controls:
+        restore(&Settings::deadzone, &Settings::menuDeadzone, &Settings::padLayout,
+                &Settings::quickControls, &Settings::language, &Settings::uiScale,
+                &Settings::highContrast, &Settings::help, &Settings::touchMode,
+                &Settings::touchPlacement, &Settings::touchScale, &Settings::touchOpacity,
+                &Settings::touchLeftHanded, &Settings::touchHaptics, &Settings::watchTouchScale);
+        break;
+    case Defaults::Spatial:
+        restore(&Settings::questWidth, &Settings::questDistance, &Settings::questHeight,
+                &Settings::questTilt, &Settings::questResolution, &Settings::questAnchor,
+                &Settings::questHaptics, &Settings::questMode, &Settings::questWallHeight,
+                &Settings::questWallGap, &Settings::questRefresh, &Settings::questWallDetail,
+                &Settings::questMenuDistance, &Settings::questScale, &Settings::questResizeSpeed,
+                &Settings::questCabinetWidth, &Settings::questCabinetHeight,
+                &Settings::questCabinetTilt, &Settings::questTvWidth, &Settings::questCurve,
+                &Settings::questCrt, &Settings::questCrtMask, &Settings::questCrtStrength,
+                &Settings::questCrtCurve, &Settings::questGlass, &Settings::questSurroundBrightness,
+                &Settings::questEnvironment, &Settings::questEyeDetail, &Settings::questRemoteScale,
+                &Settings::questInsetWidth, &Settings::questHandJoystick, &Settings::questTvModel,
+                &Settings::questOptionsScale, &Settings::questShader, &Settings::questPassthrough,
+                &Settings::questTransparent, &Settings::questTouch, &Settings::questFlip,
+                &Settings::questSurround, &Settings::questWorldBackdrop, &Settings::questAutoWall,
+                &Settings::questWallLocked, &Settings::questAdaptive, &Settings::questPauseLost,
+                &Settings::questCompanion, &Settings::questRemote, &Settings::questHandTracking,
+                &Settings::questInsetCrt, &Settings::questCrtCoplanar, &Settings::questMoveRotate,
+                &Settings::questControlHints, &Settings::questFoveation);
+        break;
+    }
+}
 void Settings::recommendedPicture() {
     volumeMode = 0;
     volumeDepth = 6;
@@ -292,7 +358,7 @@ void Settings::load(Library &l) {
 #undef I
 #undef B
     }
-    if (!qualityPolicy && adaptiveResolution && questAdaptive) {
+    if (f.is_open() && !qualityPolicy && adaptiveResolution && questAdaptive) {
         quality = 2;
         questResolution = 3;
         questEyeDetail = 2;

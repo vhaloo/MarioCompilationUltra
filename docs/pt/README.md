@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.8.0
+# Mario Compilation Ultra 0.9.0
 
 Coleção SNES local com interface adaptável ao PC e visualizações ampliadas experimentais. O Snes9x emula os cartuchos, incluindo Super FX. O projeto não afirma ter descompilado todos os jogos.
 
-[Download e início pela área de trabalho](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.8.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download e início pela área de trabalho](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.9.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download e início pela área de trabalho
 
@@ -47,6 +47,12 @@ Mapa completo (Ctrl+5) mostra todo o terreno da área carregada desde o primeiro
 
 Os perfis de memória e a seleção automática All-Stars usam as edições dos EUA listadas. Uma edição reconhecida sem perfil verificado usa o enquadramento original. A tradução da interface não traduz a história nem os gráficos do cartucho comercial. Não se afirma uma nova descompilação nativa dos cinco jogos.
 
+## Capturas do jogo
+
+Em Ecrã, abre Capturas do jogo para comparar a mesma cena em várias vistas. Durante o jogo, abre o menu e escolhe Capturar cena para guardar exemplos no dispositivo.
+
+A Coleção permite repor todas as definições. Cada página tem o seu próprio botão. Os cartuchos e os jogos guardados são mantidos. Um novo perfil abre na vista 2D original.
+
 ## Volume dos pixels
 
 ![Volume dos pixels](../voxel-preview.png)
@@ -71,15 +77,15 @@ A versão 0.8 adapta resolução do cenário, grade de voxels, frequência decor
 
 ## Celulares e tablets Android
 
-[Celulares e tablets Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Android-public.apk)
+[Celulares e tablets Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Android-public.apk)
 
 ## Vista do relógio
 
-[Vista do relógio](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [Configurações ilustradas](SETTINGS.md)
+[Vista do relógio](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Wear-public.apk) · [Configurações ilustradas](SETTINGS.md)
 
 ## Quest RV / RA
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Quest-public.apk) · [Quest RV / RA](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Quest-public.apk) · [Quest RV / RA](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Controles
 
@@ -98,6 +104,8 @@ esquerda/cima: Y/X · botões superiores: L/R · Start: Start<br>
 View/Back: opções · LT: retroceder · RT: Select<br>
 Clique no stick esquerdo: atlas / mapa completo / panorama · LB/RB: seções<br>
 Menus: direcional + baixo confirmar + direita voltar
+
+Roda a vista com o manípulo direito. Mantém-no premido e move-o para deslocar a vista.
 
 ## Salvamentos e som
 
@@ -149,7 +157,7 @@ Escolha o cartucho novamente se o arquivo foi movido ou a unidade desconectada. 
 
 ![Quest RV / RA](screenshots/6.png)
 
-## Pacotes e validação · 0.8.0
+## Pacotes e validação · 0.9.0
 
 A versão 0.8 adiciona relevo procedural e voxels. Nove suítes públicas verificam geometria original, profundidade, transparência, ajustes e funções existentes. Seis jogos locais são testados separadamente; suas imagens ficam privadas. Telefone, tablet e Wear OS usam emuladores. O jogo em Mac e Android, relógio e Quest físicos continua experimental; veja o relatório atual.
 

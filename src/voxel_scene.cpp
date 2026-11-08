@@ -46,16 +46,14 @@ bool VoxelScene::update(const Core &c, const World &w, const Settings &s, int pr
     float width = w.expanded ? cv.worldWidth : float(c.width),
           height = w.expanded ? cv.worldHeight : float(c.height);
     pressure = std::clamp(pressure, 0, 5);
-    std::array<double, 22> k{{x,
+    std::array<double, 20> k{{x,
                               y,
                               width,
                               height,
                               double(s.volumeMode),
                               double(s.volumeDepth),
-                              double(s.volumeAngle),
                               double(pressure),
                               double(sc.stage),
-                              double(s.volumeTilt),
                               double(s.volumeRound),
                               double(s.volumeSpacing),
                               double(s.view),
@@ -283,7 +281,7 @@ bool VoxelScene::update(const Core &c, const World &w, const Settings &s, int pr
                 planes.push_back(std::move(p));
         }
         auto candidate = mesher.build(planes);
-        if (candidate.complete) {
+        if (candidate.complete && !candidate.faces.empty()) {
             mesh = std::move(candidate);
             grid = step;
             image = c.imageVersion;

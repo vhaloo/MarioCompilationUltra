@@ -1,14 +1,15 @@
 #pragma once
 #include "rom.h"
 namespace mcu {
+enum class Defaults { All, Screen, Camera, AudioSaves, Controls, Spatial };
 struct Settings {
     fs::path dataDir;
-    int view = 1, zoom = 0, background = 0, blur = 18, brightness = 65, scanlines = 0, language = 0,
+    int view = 0, zoom = 0, background = 2, blur = 18, brightness = 65, scanlines = 0, language = 0,
         volume = 70, quality = 1, uiScale = 100, deadzone = 22, display = -1, filter = 1,
         aspect = 0;
     bool fullscreen = true, span = false, vsync = true, mute = false, pauseFocus = true,
-         rewind = true, autoResume = true, minimap = true, locator = true, inset = true,
-         guide = false, freeze = false, enemyMarkers = true, showHud = true, highContrast = false,
+         rewind = true, autoResume = true, minimap = false, locator = false, inset = true,
+         guide = false, freeze = false, enemyMarkers = false, showHud = false, highContrast = false,
          showStats = false, softEdges = true;
     int zoomOut = 0, panoramaHeight = 224, rewindMemory = 1, rewindButton = 0;
     int hintCorner = 0, hintScale = 100, hintOpacity = 80, hintMargin = 8, hintSeconds = 0,
@@ -18,7 +19,7 @@ struct Settings {
     bool rewindAudio = true, rewindIndicator = true, smoothMap = true, quickControls = true;
     bool enemyPreview = true, bossPreview = true, objectPreview = true, spawnLabels = false;
     int questWidth = 320, questDistance = 220, questHeight = 0, questTilt = 0;
-    int questResolution = 1, questAnchor = 0, questHaptics = 30, questMode = 2;
+    int questResolution = 1, questAnchor = 0, questHaptics = 30, questMode = 0;
     int questWallHeight = 200, questWallGap = 0, questRefresh = 90, questWallDetail = 1,
         questMenuDistance = 100;
     int questScale = 100, questResizeSpeed = 100, questCabinetWidth = 140, questCabinetHeight = 85;
@@ -27,7 +28,7 @@ struct Settings {
     int questEnvironment = 1, questEyeDetail = 1, questRemoteScale = 100, questInsetWidth = 60;
     int questHandJoystick = 0, questTvModel = 0, questOptionsScale = 100;
     int questShader = 2;
-    bool questPassthrough = true, questTransparent = true, questTouch = true, questFlip = false;
+    bool questPassthrough = false, questTransparent = true, questTouch = true, questFlip = false;
     bool questSurround = true, questWorldBackdrop = true, questAutoWall = true,
          questWallLocked = true;
     bool questAdaptive = true, questPauseLost = true, questCompanion = true, questRemote = true;
@@ -57,6 +58,7 @@ struct Settings {
     void load(Library &);
     void save(const Library &) const;
     void clamp();
+    void restoreDefaults(Defaults group);
     void recommendedPicture();
     int pixelZoom(int width, int height, int nativeWidth, int nativeHeight) const;
 };

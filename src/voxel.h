@@ -51,6 +51,13 @@ class VoxelMesher {
 };
 struct VoxelCamera {
     float x = 0, y = 0, width = 256, height = 224, yaw = 18, pitch = -12, fitDepth = 0;
+    float panX = 0, panY = 0;
+};
+struct VoxelView {
+    float yaw = 0, pitch = 0, panX = 0, panY = 0;
+    bool move(float x, float y, bool pan, float seconds, float deadzone);
+    VoxelCamera apply(VoxelCamera base) const;
+    std::array<float, 4> key() const { return {yaw, pitch, panX, panY}; }
 };
 class VoxelProjection {
     float centerX = 0, centerY = 0, sineYaw = 0, cosineYaw = 1, sinePitch = 0, cosinePitch = 1;

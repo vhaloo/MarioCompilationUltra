@@ -1160,10 +1160,19 @@ struct XrStageRenderer::Impl {
                 V3 position = mode == 3   ? V3{0, lift + s.questWallGap * .01f, 0}
                               : mode == 4 ? V3{0, center + lift, 0}
                                           : V3{0, 1.3f + s.questHeight * .01f, .025f};
-                Matrix volumeModel =
+                Matrix neutralModel =
                     product(poseMatrix(origin, s.questScale * .01f),
                             placement(position, {width, width, width},
                                       mode == 3 || mode == 4 ? -pi / 2 + tilt : 0));
+                const auto &orbit = content.volumeView;
+                float yaw = orbit.yaw * pi / 180, pitch = orbit.pitch * pi / 180;
+                Matrix volumeModel =
+                    product(neutralModel,
+                            product(poseMatrix({{0, std::sin(yaw / 2), 0, std::cos(yaw / 2)},
+                                                {orbit.panX, -orbit.panY * camera.height /
+                                                                  std::max(1.f, camera.width),
+                                                 0}}),
+                                    placement({0, 0, 0}, {1, 1, 1}, pitch)));
                 float curveAngle =
                     mode == 6 ? std::clamp(float(s.questCurve), 10.f, 250.f) * pi / 180 : 0;
                 float curveDepth = curveAngle > 0
@@ -1207,7 +1216,7 @@ struct XrStageRenderer::Impl {
                     glDepthMask(GL_TRUE);
                 }
                 glDisable(GL_CULL_FACE);
-                draw(volumeHud, volumeModel, 1, volumeHudImage);
+                draw(volumeHud, neutralModel, 1, volumeHudImage);
                 glUniform1f(voxelCurveUniform, 0);
                 glUniform1f(voxelDepthUniform, 1);
             }

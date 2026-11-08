@@ -546,5 +546,18 @@
   "remote_up": "Hoch",
   "remote_volume": "Volumen",
   "rewind": "Rückspulen",
-  "ultra": "Hoch"
+  "ultra": "Hoch",
+  "Reset all settings": "Alles zurücksetzen",
+  "Reset this section": "Abschnitt zurücksetzen",
+  "Restore default settings? Cartridge imports and saves are kept.": "Standardeinstellungen wiederherstellen? Importierte Module und Spielstände bleiben erhalten.",
+  "Default settings restored.": "Standardeinstellungen wiederhergestellt.",
+  "Could not save the default settings.": "Die Standardeinstellungen konnten nicht gespeichert werden.",
+  "Center volume camera": "3D-Kamera zentrieren",
+  "Right stick: look around. Hold the stick click and move it to pan.": "Drehe die Ansicht mit dem rechten Stick. Halte ihn gedrückt und bewege ihn, um die Ansicht zu verschieben.",
+  "Actual game captures": "Spielaufnahmen",
+  "No local capture for this view. Open the settings during play to capture the current scene.": "Für diese Ansicht gibt es keine lokale Aufnahme. Öffne die Einstellungen im Spiel, um die aktuelle Szene aufzunehmen.",
+  "Captured from a running cartridge.": "Während des Spiels aufgenommen.",
+  "Capture current scene": "Szene aufnehmen",
+  "Game captures saved locally.": "Spielaufnahmen auf diesem Gerät gespeichert.",
+  "Could not capture this scene.": "Diese Szene konnte nicht aufgenommen werden."
 }

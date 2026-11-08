@@ -1,11 +1,33 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "app.h"
 #include "setting_help.h"
+#include <memory>
+#include <string_view>
 #include <imgui_internal.h>
 #include <cmath>
 #include <cstring>
 namespace mcu {
 namespace {
+struct ExamplePreset {
+    const char *file;
+    const char *label;
+    int view, volume;
+};
+constexpr ExamplePreset Examples[] = {
+    {"original", "Original framing", 0, 0}, {"panorama", "Panorama", 1, 0},
+    {"pixel", "Pixel world", 2, 0},         {"atlas", "Stage atlas", 3, 0},
+    {"full-map", "Full level map", 4, 0},   {"relief", "Pixel relief", 0, 1},
+    {"voxels", "Voxels", 0, 2},
+};
+int gameIndex(const std::string &id) {
+    for (int i = 0; i < int(games().size()); ++i)
+        if (games()[i].id == id)
+            return i;
+    return -1;
+}
+fs::path examplePath(const fs::path &root, int game, int style) {
+    return root / "examples" / games()[game].id / (std::string(Examples[style].file) + ".bmp");
+}
 #include "setting_help.inc"
 void icon(HelpPicture picture, ImDrawList *d, ImVec2 p, float size) {
     auto color = IM_COL32(121, 224, 194, 255), ink = IM_COL32(15, 37, 48, 255);
@@ -41,6 +63,212 @@ void icon(HelpPicture picture, ImDrawList *d, ImVec2 p, float size) {
     }
 }
 } // namespace
+void App::clearExampleTextures() {
+    for (auto &game : exampleTextures)
+        for (auto &texture : game) {
+            if (texture)
+                SDL_DestroyTexture(texture);
+            texture = nullptr;
+        }
+    exampleChecked = {};
+}
+bool App::exampleImage(int game, int style, float width) {
+    auto &texture = exampleTextures[game][style];
+    auto &checked = exampleChecked[game][style];
+    if (!checked) {
+        checked = true;
+        try {
+            auto bytes = readFile(examplePath(settings.dataDir, game, style), 2 * 1024 * 1024);
+            if (bytes.size() >= 54 && bytes[0] == 'B' && bytes[1] == 'M' &&
+                u32(bytes, 14) >= 40 && u32(bytes, 18) > 0 && u32(bytes, 18) <= 1024 &&
+                int32_t(u32(bytes, 22)) != 0 && int32_t(u32(bytes, 22)) >= -1024 &&
+                int32_t(u32(bytes, 22)) <= 1024) {
+                if (auto *source = SDL_RWFromConstMem(bytes.data(), int(bytes.size()))) {
+                    if (auto *bitmap = SDL_LoadBMP_RW(source, 1)) {
+                        texture = SDL_CreateTextureFromSurface(renderer, bitmap);
+                        SDL_FreeSurface(bitmap);
+                    }
+                }
+            }
+        } catch (const std::exception &) {
+            // A local capture is optional. Keep settings usable with a missing file.
+        }
+    }
+    int w = 0, h = 0;
+    if (!texture || SDL_QueryTexture(texture, nullptr, nullptr, &w, &h) || w <= 0 || h <= 0)
+        return false;
+    ImGui::Image((ImTextureID)(intptr_t)texture, {width, width * h / w});
+    return true;
+}
+bool App::exampleForSetting(const char *key, float width) {
+    std::string_view label(key);
+    int style = -1;
+    if (label == "View")
+        style = settings.view;
+    else if (label == "Pixel volume")
+        style = settings.volumeMode == 0 ? 0 : 4 + settings.volumeMode;
+    else if (label == "Voxel thickness" || label == "Layer spacing" ||
+             label == "Rounded voxel shapes" || label == "Volume angle" || label == "Volume tilt")
+        style = settings.volumeMode == 1 ? 5 : 6;
+    else {
+        for (int i = 0; i < int(std::size(Examples)); ++i)
+            if (label == Examples[i].label)
+                style = i;
+    }
+    int game = exampleGame < 0 ? std::max(0, gameIndex(core.currentId)) : exampleGame;
+    return style >= 0 && exampleImage(game, style, width);
+}
+void App::exampleGallery() {
+    if (!ImGui::CollapsingHeader(tr("Actual game captures")))
+        return;
+    int game = exampleGame < 0 ? std::max(0, gameIndex(core.currentId)) : exampleGame;
+    ImGui::SetNextItemWidth(-1);
+    if (ImGui::BeginCombo("##example-game", games()[game].title.c_str())) {
+        for (int i = 0; i < int(games().size()); ++i)
+            if (ImGui::Selectable(games()[i].title.c_str(), i == game))
+                exampleGame = game = i;
+        ImGui::EndCombo();
+    }
+    ImGui::SetNextItemWidth(-1);
+    if (ImGui::BeginCombo("##example-mode", tr(Examples[exampleStyle].label))) {
+        for (int i = 0; i < int(std::size(Examples)); ++i)
+            if (ImGui::Selectable(tr(Examples[i].label), i == exampleStyle))
+                exampleStyle = i;
+        ImGui::EndCombo();
+    }
+    auto picture = [&](int style) {
+        float width = std::min(520.f * uiUnit(), ImGui::GetContentRegionAvail().x);
+        ImGui::TextWrapped("%s", tr(Examples[style].label));
+        if (!exampleImage(game, style, width))
+            ImGui::TextWrapped("%s", tr("No local capture for this view. Open the settings during "
+                                        "play to capture the current scene."));
+        else
+            ImGui::TextWrapped("%s", tr("Captured from a running cartridge."));
+    };
+    if (exampleStyle && ImGui::GetContentRegionAvail().x >= 720 * uiUnit() &&
+        ImGui::BeginTable("##example-comparison", 2)) {
+        ImGui::TableNextColumn();
+        picture(0);
+        ImGui::TableNextColumn();
+        picture(exampleStyle);
+        ImGui::EndTable();
+    } else
+        picture(exampleStyle);
+    ImGui::BeginDisabled(!core.loaded || capturingExamples());
+    if (button("Capture current scene"))
+        startExamples();
+    ImGui::EndDisabled();
+    if (capturingExamples())
+        ImGui::ProgressBar(float(exampleJob) / std::size(Examples), {-1, 0});
+}
+void App::startExamples() {
+    int game = gameIndex(core.currentId);
+    if (!menu || !core.loaded || game < 0 || capturingExamples())
+        return;
+    exampleGame = game;
+    exampleJob = examplesWritten = 0;
+    dirty = true;
+}
+void App::renderNextExample() {
+    if (!capturingExamples())
+        return;
+    int game = gameIndex(core.currentId);
+    if (!menu || !core.loaded || game < 0 || backgrounded) {
+        exampleJob = -1;
+        return;
+    }
+    constexpr int width = 384, height = 216;
+    const auto &preset = Examples[exampleJob];
+    auto target = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>(
+        SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, width,
+                          height),
+        SDL_DestroyTexture);
+    auto *previous = SDL_GetRenderTarget(renderer);
+    SDL_Rect viewport{}, clip{};
+    SDL_RenderGetViewport(renderer, &viewport);
+    SDL_RenderGetClipRect(renderer, &clip);
+    bool clipped = SDL_RenderIsClipEnabled(renderer);
+    float sx = 1, sy = 1;
+    SDL_RenderGetScale(renderer, &sx, &sy);
+    if (target && SDL_SetRenderTarget(renderer, target.get()) == 0) {
+        auto preferences = settings;
+        auto motion = volumeView;
+        auto liveWorld = std::move(world);
+        auto liveVolume = std::move(volumeScene);
+        auto livePreviews = std::move(previews);
+        auto liveNativeRect = nativeRect, liveInsetRect = insetRect;
+        bool liveVolumeDrawn = volumeDrawn;
+        int w = drawableWidth, h = drawableHeight;
+        SDL_RenderSetScale(renderer, 1, 1);
+        SDL_RenderSetViewport(renderer, nullptr);
+        SDL_RenderSetClipRect(renderer, nullptr);
+        settings = Settings{};
+        settings.dataDir = preferences.dataDir;
+        settings.view = preset.view;
+        settings.volumeMode = preset.volume;
+        settings.adaptiveResolution = false;
+        settings.background = 3;
+        settings.inset = false;
+        world = preset.view == 1 || preset.view == 3 ? liveWorld : World{};
+        volumeScene = VoxelScene{};
+        previews = ObjectPreviews{};
+        volumeView = {};
+        voxelRasterVersion = volumeHudVersion = lastCompose = ~uint64_t(0);
+        drawableWidth = width;
+        drawableHeight = height;
+        try {
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+            drawGame();
+            bool mapView = preset.view == 1 || preset.view >= 3;
+            bool supported = (!preset.volume || volumeDrawn) && (!mapView || world.expanded) &&
+                             (preset.view != 4 || world.complete.ready);
+            if (supported) {
+                auto image = std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)>(
+                    SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_RGB888),
+                    SDL_FreeSurface);
+                if (!image || SDL_RenderReadPixels(renderer, nullptr, image->format->format,
+                                                   image->pixels, image->pitch))
+                    throw std::runtime_error(SDL_GetError());
+                std::vector<uint8_t> bytes(width * height * 4 + 4096);
+                auto stream = std::unique_ptr<SDL_RWops, decltype(&SDL_RWclose)>(
+                    SDL_RWFromMem(bytes.data(), int(bytes.size())), SDL_RWclose);
+                if (!stream || SDL_SaveBMP_RW(image.get(), stream.get(), 0))
+                    throw std::runtime_error(SDL_GetError());
+                bytes.resize(size_t(SDL_RWtell(stream.get())));
+                atomicWrite(examplePath(settings.dataDir, game, exampleJob), bytes);
+                auto &texture = exampleTextures[game][exampleJob];
+                if (texture)
+                    SDL_DestroyTexture(texture);
+                texture = nullptr;
+                exampleChecked[game][exampleJob] = false;
+                ++examplesWritten;
+            }
+        } catch (const std::exception &e) {
+            SDL_Log("Capture setting example: %s", e.what());
+        }
+        drawableWidth = w;
+        drawableHeight = h;
+        settings = std::move(preferences);
+        volumeView = motion;
+        world = std::move(liveWorld);
+        volumeScene = std::move(liveVolume);
+        previews = std::move(livePreviews);
+        nativeRect = liveNativeRect;
+        insetRect = liveInsetRect;
+        volumeDrawn = liveVolumeDrawn;
+        voxelRasterVersion = volumeHudVersion = lastCompose = ~uint64_t(0);
+        SDL_SetRenderTarget(renderer, previous);
+        SDL_RenderSetScale(renderer, sx, sy);
+        SDL_RenderSetViewport(renderer, &viewport);
+        SDL_RenderSetClipRect(renderer, clipped ? &clip : nullptr);
+    }
+    if (++exampleJob == int(std::size(Examples))) {
+        exampleJob = -1;
+        notify(tr(examplesWritten ? "Game captures saved locally." : "Could not capture this scene."));
+    } else
+        dirty = true;
+}
 const SettingHelp *settingHelpEntries(size_t &count) {
     count = sizeof(HelpEntries) / sizeof(*HelpEntries);
     return HelpEntries;

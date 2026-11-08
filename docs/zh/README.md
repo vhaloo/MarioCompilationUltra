@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.8.0
+# Mario Compilation Ultra 0.9.0
 
 本地SNES合集，提供可调整的电脑界面和实验性扩展视图。Snes9x负责模拟卡带，包括Super FX。本项目并未声称已反编译所有游戏。
 
-[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.8.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.9.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 下载与桌面启动
 
@@ -47,6 +47,12 @@ sh ./Install-Linux.sh
 
 扩展内存配置与All-Stars自动选择针对所列美版。已识别但没有已验证配置的版本使用原始画面。界面翻译不会翻译商业卡带的剧情或图像。项目并不声称实现了全部五款游戏的新原生反编译版本。
 
+## 实机画面
+
+在屏幕设置中打开实机画面，即可对比同一场景的不同视图。游戏中打开菜单并选择截取当前场景，即可将示例保存到设备。
+
+在合集页面可重置所有设置。各设置页面也可以单独重置。卡带和存档会保留。新档案默认使用原始 2D 视图。
+
 ## 像素体积
 
 ![像素体积](../voxel-preview.png)
@@ -71,15 +77,15 @@ sh ./Install-Linux.sh
 
 ## Android 手机和平板电脑
 
-[Android 手机和平板电脑](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Android-public.apk)
+[Android 手机和平板电脑](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Android-public.apk)
 
 ## 手表视图
 
-[手表视图](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [图解设置](SETTINGS.md)
+[手表视图](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Wear-public.apk) · [图解设置](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 操作
 
@@ -98,6 +104,8 @@ F1–F9：读档 · Shift+F1–F9：存档 · F12：截图<br>
 View/Back：设置 · LT：倒带 · RT：Select<br>
 按左摇杆：图集 / 完整地图 / 全景 · LB/RB：菜单分页<br>
 菜单：方向键 + 下键确认 + 右键返回
+
+拨动右摇杆旋转视角。按住右摇杆再拨动可平移视图。
 
 ## 存档与声音
 
@@ -149,7 +157,7 @@ View/Back：设置 · LT：倒带 · RT：Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 软件包与验证 · 0.8.0
+## 软件包与验证 · 0.9.0
 
 0.8新增程序化浮雕与体素。九套公开测试覆盖原创几何、深度、透明度、设置和已有功能。六款本地游戏另行验证，其画面保持私密。手机、平板和Wear OS采用模拟器测试。Mac及实体Android、手表、Quest游戏体验仍属实验性，详见当前报告。
 

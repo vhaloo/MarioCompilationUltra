@@ -100,6 +100,21 @@ int main() {
             check(!a.core.native.empty() &&
                       (a.core.native[a.core.native.size() / 2] & 0xffffff) == 0xff0000,
                   "Synthetic native frame is visible after its startup blanking interval");
+            auto pausedFrame = a.core.frame;
+            auto pausedNative = a.core.native;
+            a.showSection(1);
+            a.scriptCommand("examples", "1");
+            for (int i = 0; i < 8; ++i)
+                step();
+            auto examples = data / "examples" / "world";
+            auto *localCapture = SDL_LoadBMP((examples / "original.bmp").u8string().c_str());
+            check(localCapture && localCapture->w == 384 && localCapture->h == 216 &&
+                      a.core.frame == pausedFrame && a.core.native == pausedNative &&
+                      !fs::exists(examples / "full-map.bmp") && !fs::exists(examples / "voxels.bmp"),
+                  "Gallery captures the paused game and shows only supported views");
+            SDL_FreeSurface(localCapture);
+            a.toggleMenu();
+            a.settings.noticeSeconds = 0;
             a.settings.view = 0;
             a.settings.background = 3;
             for (int i = 0; i < 300; ++i)

@@ -199,7 +199,7 @@ int run(const std::vector<std::string> &args) {
         }
         xr.endFrame();
 #else
-        if (o.realtime || i % 8 == 0 || render || i == o.frames - 1)
+        if (o.realtime || i % 8 == 0 || render || app.capturingExamples() || i == o.frames - 1)
             app.render();
 #endif
         for (auto &p : captures)

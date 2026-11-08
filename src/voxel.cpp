@@ -262,17 +262,42 @@ VoxelMesh VoxelMesher::build(const std::vector<VoxelPlane> &planes, size_t limit
     return result;
 }
 
+bool VoxelView::move(float x, float y, bool pan, float seconds, float deadzone) {
+    float radius = std::hypot(x, y);
+    deadzone = std::clamp(deadzone, .05f, .8f);
+    if (radius <= deadzone || seconds <= 0)
+        return false;
+    auto before = key();
+    float gain = (std::min(1.f, radius) - deadzone) / ((1 - deadzone) * radius);
+    x *= gain * std::min(seconds, .05f);
+    y *= gain * std::min(seconds, .05f);
+    if (pan) {
+        panX = std::clamp(panX + x * .55f, -.30f, .30f);
+        panY = std::clamp(panY + y * .55f, -.30f, .30f);
+    } else {
+        yaw = std::clamp(yaw + x * 65.f, -30.f, 30.f);
+        pitch = std::clamp(pitch + y * 55.f, -25.f, 25.f);
+    }
+    return before != key();
+}
+VoxelCamera VoxelView::apply(VoxelCamera base) const {
+    base.yaw += yaw;
+    base.pitch += pitch;
+    base.panX = panX;
+    base.panY = panY;
+    return base;
+}
 VoxelProjection::VoxelProjection(const VoxelCamera &c, int w, int h) {
-    float yaw = std::clamp(c.yaw, -35.f, 35.f) * .01745329252f,
-          pitch = std::clamp(c.pitch, -30.f, 30.f) * .01745329252f;
+    float yaw = std::clamp(c.yaw, -60.f, 60.f) * .01745329252f,
+          pitch = std::clamp(c.pitch, -55.f, 55.f) * .01745329252f;
     sineYaw = std::sin(yaw);
     cosineYaw = std::cos(yaw);
     sinePitch = std::sin(pitch);
     cosinePitch = std::cos(pitch);
     centerX = c.x + c.width * .5f;
     centerY = c.y + c.height * .5f;
-    offsetX = w * .5f;
-    offsetY = h * .5f;
+    offsetX = w * (.5f + c.panX);
+    offsetY = h * (.5f + c.panY);
     scaleX = float(w) / std::max(1.f, c.width);
     scaleY = float(h) / std::max(1.f, c.height);
     float margin = std::isfinite(c.fitDepth) ? std::clamp(c.fitDepth, 0.f, 4096.f) : 0.f;

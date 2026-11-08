@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.8.0
+# Mario Compilation Ultra 0.9.0
 
 A local SNES collection with an adaptive PC interface and experimental world views. Snes9x supplies the cartridge simulation, including Super FX. No decompilation of every game is claimed.
 
-[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.8.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download and desktop startup](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.9.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download and desktop startup
 
@@ -47,6 +47,12 @@ Full level map (Ctrl+5) shows all decoded terrain in the loaded area from its fi
 
 Expanded memory profiles and automatic All-Stars selection target the listed US editions. A recognized edition without a verified profile uses original framing. Interface translation does not translate the commercial cartridge’s story or graphics. No new native decompilation of all five games is claimed.
 
+## Actual game captures
+
+Open Actual game captures under Screen to compare the same scene in different views. During play, open the menu and choose Capture current scene to create examples on your device.
+
+The Collection has a global reset. Each settings page has its own reset. Both keep cartridge imports and save files. A fresh profile opens in the original 2D view.
+
 ## Pixel volume
 
 ![Pixel volume](../voxel-preview.png)
@@ -71,15 +77,15 @@ Version 0.8 adapts scenery resolution, voxel grid, decorative cadence and VR sha
 
 ## Android phones and tablets
 
-[Android phones and tablets](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Android-public.apk)
+[Android phones and tablets](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Android-public.apk)
 
 ## Watch view
 
-[Watch view](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [Illustrated settings](SETTINGS.md)
+[Watch view](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Wear-public.apk) · [Illustrated settings](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Controls
 
@@ -98,6 +104,8 @@ left/top: Y/X · bumpers: L/R · Start: Start<br>
 View/Back: options · LT: rewind · RT: Select<br>
 Left stick click: atlas / full map / panorama · LB/RB: menu sections<br>
 Menus: D-pad + bottom confirm + right back
+
+Right stick: look around. Hold the stick click and move it to pan.
 
 ## Saves & sound
 
@@ -149,7 +157,7 @@ Choose cartridge again if its file was moved or a drive is disconnected. ZIPs mu
 
 ![Quest VR / AR](screenshots/6.png)
 
-## Packages and validation · 0.8.0
+## Packages and validation · 0.9.0
 
 Version 0.8 adds procedural relief and voxels. Nine public test suites cover original geometry, depth, transparency, settings and existing functions. Six local games are checked separately; commercial images stay private. Phone, tablet and Wear OS checks use emulators. Mac and physical Android, watch and Quest gameplay remain experimental; see the current report.
 

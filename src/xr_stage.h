@@ -25,6 +25,7 @@ struct XrSpatialControls {
 // compositor quad, independent of the size of the game or its furniture.
 struct XrStageContent {
     const VoxelScene *volume = nullptr;
+    VoxelView volumeView;
     SDL_Texture *expanded = nullptr;
     const std::vector<uint32_t> *native = nullptr;
     const std::vector<uint32_t> *backdrop = nullptr;

@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.8.0
+# Mario Compilation Ultra 0.9.0
 
 Локальная коллекция SNES с адаптивным интерфейсом для ПК и экспериментальными расширенными видами. Snes9x эмулирует картриджи, включая Super FX. Проект не заявляет о декомпиляции всех игр.
 
-[Загрузка и запуск с рабочего стола](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.8.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Загрузка и запуск с рабочего стола](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.9.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Загрузка и запуск с рабочего стола
 
@@ -47,6 +47,12 @@ sh ./Install-Linux.sh
 
 Расширенные профили памяти и автоматический выбор All-Stars рассчитаны на перечисленные версии США. Распознанная версия без проверенного профиля использует исходный кадр. Перевод интерфейса не переводит сюжет или графику коммерческого картриджа. Новая нативная декомпиляция всех пяти игр не заявляется.
 
+## Снимки из игры
+
+Откройте «Снимки из игры» в разделе экрана, чтобы сравнить одну сцену в разных режимах. Во время игры откройте меню и выберите «Снять сцену», чтобы сохранить примеры на устройстве.
+
+В коллекции можно сбросить все настройки. У каждой страницы есть свой сброс. Картриджи и сохранения остаются. Новый профиль открывается в исходном режиме 2D.
+
 ## Объём пикселей
 
 ![Объём пикселей](../voxel-preview.png)
@@ -71,15 +77,15 @@ sh ./Install-Linux.sh
 
 ## Телефоны и планшеты Android
 
-[Телефоны и планшеты Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Android-public.apk)
+[Телефоны и планшеты Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Android-public.apk)
 
 ## Вид на часах
 
-[Вид на часах](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [Настройки с иллюстрациями](SETTINGS.md)
+[Вид на часах](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Wear-public.apk) · [Настройки с иллюстрациями](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Управление
 
@@ -98,6 +104,8 @@ F1–F9: загрузить · Shift+F1–F9: сохранить · F12: сни�
 View/Back: настройки · LT: перемотка · RT: Select<br>
 Левый стик: атлас / вся карта / панорама · LB/RB: разделы меню<br>
 Меню: крестовина + низ подтвердить + право назад
+
+Поворачивайте вид правым стиком. Нажмите на него и отклоните, чтобы сместить вид.
 
 ## Сохранения и звук
 
@@ -149,7 +157,7 @@ View/Back: настройки · LT: перемотка · RT: Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## Пакеты и проверка · 0.8.0
+## Пакеты и проверка · 0.9.0
 
 Версия 0.8 добавляет процедурный рельеф и воксели. Девять открытых наборов тестов проверяют собственную геометрию, глубину, прозрачность, настройки и прежние функции. Шесть локальных игр проверяются отдельно; их изображения остаются частными. Телефон, планшет и Wear OS проверяются в эмуляторах. Игра на Mac и физических Android, часах и Quest остаётся экспериментальной; см. текущий отчёт.
 

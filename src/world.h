@@ -47,7 +47,7 @@ class World {
     int lastStage = -1, lastKind = -1, minX = 0, maxX = 256, minY = 0, maxY = 224,
         previousCameraX = 0, previousCameraY = 0;
     uint64_t lastFrame = ~uint64_t(0);
-    bool wholeLevel = false, needScenery = false;
+    bool wholeLevel = false, needScenery = false, cameraReady = false;
     uint32_t tilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
     uint32_t preparedTilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
     uint32_t bgPixel(const McuVideo &, int bg, int x, int y, bool prepared = false,
@@ -63,13 +63,14 @@ class World {
     Scene scene;
     CompleteMap complete;
     std::vector<uint32_t> backdropPixels;
-    bool expanded = false, retainTerrain = true, canvasRasterized = false;
+    bool expanded = false, retainTerrain = true, canvasRasterized = false, cleanOverview = false;
     uint64_t terrainBuilds = 0, terrainReuses = 0;
     size_t knownTiles() const { return cache.size(); }
     void reset() {
         lastStage = -1;
         lastKind = -1;
         lastFrame = ~uint64_t(0);
+        cameraReady = false;
         cache.clear();
         graphicsVersion = ~uint64_t(0);
         graphicsCached = false;

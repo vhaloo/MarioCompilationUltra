@@ -11,7 +11,7 @@ uint32_t voxelSpritePixel(const McuVideo &, const McuVideo::Object &, int x, int
 class VoxelScene {
     VoxelMesher mesher;
     uint64_t image = ~uint64_t(0), serial = 0;
-    std::array<double, 22> key{};
+    std::array<double, 20> key{};
 
   public:
     VoxelMesh mesh;

@@ -546,5 +546,18 @@
   "remote_up": "向上",
   "remote_volume": "立体",
   "rewind": "倒带",
-  "ultra": "高"
+  "ultra": "高",
+  "Reset all settings": "重置所有设置",
+  "Reset this section": "重置本页设置",
+  "Restore default settings? Cartridge imports and saves are kept.": "恢复默认设置？已导入的卡带和存档会保留。",
+  "Default settings restored.": "已恢复默认设置。",
+  "Could not save the default settings.": "无法保存默认设置。",
+  "Center volume camera": "重置立体视角",
+  "Right stick: look around. Hold the stick click and move it to pan.": "拨动右摇杆旋转视角。按住右摇杆再拨动可平移视图。",
+  "Actual game captures": "实机画面",
+  "No local capture for this view. Open the settings during play to capture the current scene.": "此视图暂无本地截图。游戏中打开设置即可截取当前场景。",
+  "Captured from a running cartridge.": "截图采自游戏运行画面。",
+  "Capture current scene": "截取当前场景",
+  "Game captures saved locally.": "游戏截图已保存到本机。",
+  "Could not capture this scene.": "无法截取此场景。"
 }

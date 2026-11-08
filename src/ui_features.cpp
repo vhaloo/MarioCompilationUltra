@@ -25,7 +25,8 @@ void App::control(const char *key) {
         float width = std::min(340.f * uiUnit(), ImGui::GetIO().DisplaySize.x - 24 * uiUnit());
         ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + width);
         ImGui::TextColored({.55f, .9f, .75f, 1}, "%s", tr(key));
-        settingPicture(key, width, true);
+        if (!exampleForSetting(key, width))
+            settingPicture(key, width, true);
         ImGui::TextWrapped("%s", tr(settingHelp(key).description));
         ImGui::PopTextWrapPos();
         ImGui::EndTooltip();
@@ -211,9 +212,13 @@ void App::helpUi() {
             ImGui::SetScrollY(ImGui::GetScrollY() + watchScrollPending);
             watchScrollPending = 0;
         }
-        settingPicture(guideKey.c_str(), watchActive() ? width * .7f : width, watchActive());
+        float pictureWidth = watchActive() ? width * .7f : width;
+        bool actual = exampleForSetting(guideKey.c_str(), pictureWidth);
+        if (!actual)
+            settingPicture(guideKey.c_str(), pictureWidth, watchActive());
         ImGui::TextWrapped("%s", tr(settingHelp(guideKey.c_str()).description));
-        ImGui::TextDisabled("%s", tr("Original illustration"));
+        ImGui::TextWrapped("%s", tr(actual ? "Captured from a running cartridge."
+                                          : "Original illustration"));
         ImGui::EndChild();
         if (button("Close")) {
             guideOpen = false;

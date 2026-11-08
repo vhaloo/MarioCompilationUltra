@@ -546,5 +546,18 @@
   "remote_up": "위쪽",
   "remote_volume": "입체",
   "rewind": "되감기",
-  "ultra": "높게"
+  "ultra": "높게",
+  "Reset all settings": "모든 설정 초기화",
+  "Reset this section": "이 섹션 초기화",
+  "Restore default settings? Cartridge imports and saves are kept.": "기본 설정으로 되돌릴까요? 가져온 카트리지와 저장 데이터는 유지됩니다.",
+  "Default settings restored.": "기본 설정으로 복원했습니다.",
+  "Could not save the default settings.": "기본 설정을 저장하지 못했습니다.",
+  "Center volume camera": "입체 카메라 중앙으로",
+  "Right stick: look around. Hold the stick click and move it to pan.": "오른쪽 스틱으로 시점을 돌립니다. 스틱을 누른 채 움직이면 시점이 이동합니다.",
+  "Actual game captures": "실제 게임 화면",
+  "No local capture for this view. Open the settings during play to capture the current scene.": "이 보기의 로컬 캡처가 없습니다. 게임 중에 설정을 열어 현재 장면을 캡처하세요.",
+  "Captured from a running cartridge.": "게임 실행 중 캡처한 화면입니다.",
+  "Capture current scene": "현재 장면 캡처",
+  "Game captures saved locally.": "게임 화면을 이 기기에 저장했습니다.",
+  "Could not capture this scene.": "이 장면을 캡처하지 못했습니다."
 }

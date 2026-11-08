@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.8.0
+# Mario Compilation Ultra 0.9.0
 
 Une collection SNES locale avec une interface PC adaptable et des vues de monde expérimentales. Snes9x assure la simulation des cartouches, y compris le Super FX. Le projet ne revendique pas une décompilation de tous les jeux.
 
-[Téléchargement et lancement sur le bureau](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.8.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Téléchargement et lancement sur le bureau](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.9.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Téléchargement et lancement sur le bureau
 
@@ -47,6 +47,12 @@ Carte entière (Ctrl+5) affiche tout le terrain décodé de la zone chargée dè
 
 Les profils mémoire étendus et la sélection All-Stars automatique visent les éditions américaines listées. Une édition reconnue sans profil vérifié utilise le cadrage d’origine. Traduire l’interface ne traduit pas l’histoire ou les graphismes de la cartouche commerciale. Le projet ne revendique pas une nouvelle décompilation native des cinq jeux.
 
+## Captures de jeu
+
+Dans Écran, ouvre Captures de jeu pour comparer une même scène dans plusieurs vues. En cours de partie, ouvre le menu et choisis Capturer cette scène pour créer les exemples sur ton appareil.
+
+La Collection propose un bouton de réinitialisation générale. Chaque page de réglages a son propre bouton. Les imports et les sauvegardes sont conservés. Un nouveau profil s’ouvre dans la vue 2D d’origine.
+
 ## Volume des pixels
 
 ![Volume des pixels](../voxel-preview.png)
@@ -71,15 +77,15 @@ La version 0.8 adapte la résolution des décors, la grille de voxels, la cadenc
 
 ## Téléphones et tablettes Android
 
-[Téléphones et tablettes Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Android-public.apk)
+[Téléphones et tablettes Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Android-public.apk)
 
 ## Vue montre
 
-[Vue montre](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [Réglages illustrés](SETTINGS.md)
+[Vue montre](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Wear-public.apk) · [Réglages illustrés](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Commandes
 
@@ -98,6 +104,8 @@ gauche/haut : Y/X · gâchettes hautes : L/R · Start : Start<br>
 View/Back : options · LT : rembobiner · RT : Select<br>
 Clic stick gauche : atlas / carte entière / panorama · LB/RB : onglets<br>
 Menus : croix + bas confirmer + droite retour
+
+Oriente la vue avec le stick droit. Maintiens-le enfoncé et incline-le pour déplacer la vue.
 
 ## Sauvegardes et son
 
@@ -149,7 +157,7 @@ Choisis à nouveau la cartouche si son fichier a été déplacé ou si le disque
 
 ![Quest VR / AR](screenshots/6.png)
 
-## Paquets et validation · 0.8.0
+## Paquets et validation · 0.9.0
 
 La version 0.8 ajoute le relief procédural et les voxels. Neuf suites publiques couvrent géométrie originale, profondeur, transparence, réglages et fonctions existantes. Six jeux locaux sont vérifiés séparément ; leurs images restent privées. Téléphone, tablette et Wear OS sont testés sur émulateurs. Le jeu sur Mac et appareils Android, montre et Quest physiques reste expérimental ; voir le rapport actuel.
 

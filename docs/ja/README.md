@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.8.0
+# Mario Compilation Ultra 0.9.0
 
 PC向けの使いやすい画面と実験的な拡張表示を備えたローカルSNESコレクションです。Super FXを含むカートリッジの動作はSnes9xが再現します。全作品を逆コンパイルしたものではありません。
 
-[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.8.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.9.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## ダウンロードとデスクトップからの起動
 
@@ -47,6 +47,12 @@ sh ./Install-Linux.sh
 
 拡張メモリプロファイルとAll-Starsの自動選択は一覧の米国版向けです。認識できても検証済みプロファイルのない版は元の表示を使います。画面メニューの翻訳は市販カートリッジの物語や画像を翻訳しません。5作品すべての新しいネイティブ逆コンパイルを実現したとは主張しません。
 
+## 実際のゲーム画面
+
+画面設定の「実際のゲーム画面」で、同じ場面の表示を比較できます。プレイ中にメニューを開き、「現在のシーンを撮影」を選ぶと端末に保存されます。
+
+コレクション画面ですべての設定を初期化できます。設定ページごとの初期化もできます。カートリッジとセーブデータは保持されます。新規プロファイルはオリジナルの2D表示で開きます。
+
 ## ピクセルの立体化
 
 ![ピクセルの立体化](../voxel-preview.png)
@@ -71,15 +77,15 @@ sh ./Install-Linux.sh
 
 ## Androidスマートフォンとタブレット
 
-[Androidスマートフォンとタブレット](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Android-public.apk)
+[Androidスマートフォンとタブレット](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Android-public.apk)
 
 ## 時計の表示
 
-[時計の表示](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Wear-public.apk) · [図解設定ガイド](SETTINGS.md)
+[時計の表示](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Wear-public.apk) · [図解設定ガイド](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.8.0/MarioCompilationUltra-0.8.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 操作
 
@@ -98,6 +104,8 @@ F1–F9: 読込 · Shift+F1–F9: 保存 · F12: 撮影<br>
 View/Back: 設定 · LT: 巻き戻し · RT: Select<br>
 左スティック押し込み：アトラス / 全体マップ / パノラマ · LB/RB：メニュー切替<br>
 メニュー: 方向キー + 下で決定 + 右で戻る
+
+右スティックで視点を回転。押し込みながら倒すと視点を移動します。
 
 ## 保存とサウンド
 
@@ -149,7 +157,7 @@ View/Back: 設定 · LT: 巻き戻し · RT: Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 配布パッケージと検証 · 0.8.0
+## 配布パッケージと検証 · 0.9.0
 
 0.8は手続き型のレリーフとボクセルを追加します。9つの公開テストが独自の形状、奥行き、透明度、設定、既存機能を検証します。ローカルの6ゲームは別に検査し、画像は非公開です。スマートフォン、タブレット、Wear OSはエミュレーターを使います。Mac、Android、時計、Quest実機のゲーム動作は実験的です。最新レポートを参照してください。
 

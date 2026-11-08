@@ -546,5 +546,18 @@
   "remote_up": "Su",
   "remote_volume": "Volume",
   "rewind": "Riavvolgi",
-  "ultra": "Alto"
+  "ultra": "Alto",
+  "Reset all settings": "Ripristina tutto",
+  "Reset this section": "Ripristina sezione",
+  "Restore default settings? Cartridge imports and saves are kept.": "Ripristinare le impostazioni predefinite? Le cartucce importate e i salvataggi vengono conservati.",
+  "Default settings restored.": "Impostazioni predefinite ripristinate.",
+  "Could not save the default settings.": "Impossibile salvare le impostazioni predefinite.",
+  "Center volume camera": "Centra la visuale 3D",
+  "Right stick: look around. Hold the stick click and move it to pan.": "Ruota la vista con la levetta destra. Tienila premuta e muovila per spostare la vista.",
+  "Actual game captures": "Schermate di gioco",
+  "No local capture for this view. Open the settings during play to capture the current scene.": "Nessuna schermata locale per questa vista. Apri le impostazioni durante la partita per catturare la scena attuale.",
+  "Captured from a running cartridge.": "Acquisita durante una partita.",
+  "Capture current scene": "Cattura la scena",
+  "Game captures saved locally.": "Schermate salvate su questo dispositivo.",
+  "Could not capture this scene.": "Impossibile catturare questa scena."
 }
