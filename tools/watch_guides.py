@@ -26,17 +26,17 @@ def main():
         code=language['code'];tr=json.loads((R/f'assets/locales/{code}.json').read_text(encoding='utf8'))
         title=tr['Watch view'];folder=R/'docs'/code
         inbox='/sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/'
-        text='Mario Compilation Ultra 0.9.1 · '+title+'\n\n'+'\n\n'.join(tr[k] for k in keys)
-        text+='\n\n'+inbox+'\n\nadb install -r MarioCompilationUltra-0.9.1-Wear-public.apk\nadb push cartridge.sfc '+inbox+'\n'
+        text='Mario Compilation Ultra 0.9.2 · '+title+'\n\n'+'\n\n'.join(tr[k] for k in keys)
+        text+='\n\n'+inbox+'\n\nadb install -r MarioCompilationUltra-0.9.2-Wear-public.apk\nadb push cartridge.sfc '+inbox+'\n'
         outputs[folder/'watch.txt']=text
         svg=f'<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="400" viewBox="0 0 1000 400"><rect width="1000" height="400" rx="24" fill="#0e1c2b"/><g fill="#223c4b" stroke="#91ddc5" stroke-width="4"><circle cx="200" cy="195" r="145"/><rect x="455" y="100" width="200" height="180" rx="10"/><circle cx="820" cy="195" r="120"/></g><g fill="none" stroke="#f1cc69" stroke-width="8"><path d="M65 240H130V215H180V180H240V210H300V240H335M710 260V185H775V140H840V210H905M675 190H690m-8-8v16"/></g><g font-family="sans-serif" fill="#ecf6f2" font-size="22"><text x="145" y="375">0%</text><text x="780" y="375">100%</text><text x="495" y="325">+ / −</text></g></svg>\n'
         outputs[folder/'watch.svg']=svg
         nav=' · '.join(f'[{x["name"]}](../{x["code"]}/WATCH.md)' for x in languages)
-        md=f'# Mario Compilation Ultra 0.9.1 · {title}\n\n{nav}\n\n![{title}](watch.svg)\n\n'+'\n\n'.join(tr[k] for k in keys)+'\n\n'
-        md+='```text\n'+inbox+'\n\nadb install -r MarioCompilationUltra-0.9.1-Wear-public.apk\nadb push cartridge.sfc '+inbox+'\n```\n\n'
-        md+='[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.1/MarioCompilationUltra-0.9.1-Wear-public.apk) · [HTML](watch.html) · ['+tr['Settings illustrated']+'](SETTINGS.md) · [Guide](README.md)\n'
+        md=f'# Mario Compilation Ultra 0.9.2 · {title}\n\n{nav}\n\n![{title}](watch.svg)\n\n'+'\n\n'.join(tr[k] for k in keys)+'\n\n'
+        md+='```text\n'+inbox+'\n\nadb install -r MarioCompilationUltra-0.9.2-Wear-public.apk\nadb push cartridge.sfc '+inbox+'\n```\n\n'
+        md+='[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.2/MarioCompilationUltra-0.9.2-Wear-public.apk) · [HTML](watch.html) · ['+tr['Settings illustrated']+'](SETTINGS.md) · [Guide](README.md)\n'
         outputs[folder/'WATCH.md']=md
-        body='<h1>Mario Compilation Ultra 0.9.1 · '+h(title)+'</h1><img src="watch.svg" alt="'+h(title)+'">'+''.join('<p>'+h(tr[k])+'</p>' for k in keys)+'<pre>'+h(inbox)+'</pre>'
+        body='<h1>Mario Compilation Ultra 0.9.2 · '+h(title)+'</h1><img src="watch.svg" alt="'+h(title)+'">'+''.join('<p>'+h(tr[k])+'</p>' for k in keys)+'<pre>'+h(inbox)+'</pre>'
         css='@font-face{font-family:MCU;src:url(../../assets/Interface.otf)}body{font:17px/1.65 MCU,system-ui;background:#0e1c2b;color:#ecf6f2;margin:24px auto;max-width:1000px;padding:16px}a{color:#91ddc5}img{max-width:100%}pre{white-space:pre-wrap;overflow-wrap:anywhere}section{padding:20px;margin:20px 0;border:1px solid #42605d;border-radius:18px}h2{font-size:20px}'
         page=lambda title,body:f'<!doctype html>\n<html lang="{code}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{h(title)}</title><style>{css}</style><body>{body}</body></html>\n'
         outputs[folder/'watch.html']=page(title,body)

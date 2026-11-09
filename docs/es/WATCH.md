@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.9.1 · Vista del reloj
+# Mario Compilation Ultra 0.9.2 · Vista del reloj
 
 [English](../en/WATCH.md) · [Français](../fr/WATCH.md) · [Español](../es/WATCH.md) · [日本語](../ja/WATCH.md) · [Deutsch](../de/WATCH.md) · [Italiano](../it/WATCH.md) · [Português](../pt/WATCH.md) · [Русский](../ru/WATCH.md) · [简体中文](../zh/WATCH.md) · [한국어](../ko/WATCH.md)
 
@@ -25,8 +25,8 @@ Actualizar un APK firmado conserva los datos. Desinstalar o borrar datos elimina
 ```text
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.9.1-Wear-public.apk
+adb install -r MarioCompilationUltra-0.9.2-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 ```
 
-[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.1/MarioCompilationUltra-0.9.1-Wear-public.apk) · [HTML](watch.html) · [Ajustes ilustrados](SETTINGS.md) · [Guide](README.md)
+[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.2/MarioCompilationUltra-0.9.2-Wear-public.apk) · [HTML](watch.html) · [Ajustes ilustrados](SETTINGS.md) · [Guide](README.md)

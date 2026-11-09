@@ -1,5 +1,9 @@
 # Releases
 
+## 0.9.2 — 2026-11-08
+
+- Use the native defaults for fresh Android, Wear OS and Quest profiles. Start in simple settings and original framing.
+
 ## 0.9.1 — 2026-11-08
 
 - Use the project version in desktop archive names and macOS bundle metadata. Validate the folder created by the packager on each desktop platform.

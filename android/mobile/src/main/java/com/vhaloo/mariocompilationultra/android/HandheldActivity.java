@@ -67,15 +67,6 @@ public final class HandheldActivity extends SDLActivity {
             AssetPreparation.prepare(this,root);
             com.vhaloo.mariocompilationultra.CartridgeInbox.collect(this,root);
             File data=new File(root,"UserData");ensureDirectory(data);ensureDirectory(new File(root,"ROMs"));
-            File settings=new File(data,"settings.ini");
-            if(!settings.exists()) {
-                int language=0;String system=java.util.Locale.getDefault().getLanguage();
-                for(int i=0;i<LANGUAGES.length;i++)if(LANGUAGES[i].equals(system))language=i;
-                try(Writer out=new OutputStreamWriter(new FileOutputStream(settings),"UTF-8")) {
-                    out.write("language "+language+"\nview 4\ninset 1\nlocator 1\nminimap 0\nquality 1\nrewindMemory 0\nadaptiveResolution 1\n"
-                        +"fullscreen 0\nspan 0\nvsync 1\nautoResume 1\ntouchMode 0\ntouchPlacement 0\n");
-                }
-            }
         } catch(IOException error) {preparationError="Could not prepare local game data: "+error.getMessage();}
         super.onCreate(state);
         if(Build.VERSION.SDK_INT>=33)getOnBackInvokedDispatcher().registerOnBackInvokedCallback(

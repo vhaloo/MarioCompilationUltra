@@ -1,4 +1,4 @@
-Mario Compilation Ultra 0.9.1 · Vista orologio
+Mario Compilation Ultra 0.9.2 · Vista orologio
 
 Ruota la corona o ghiera per lo zoom. Nei menu scorre il contenuto; funzionano anche + e - tattili.
 
@@ -20,5 +20,5 @@ Aggiornare un APK firmato conserva i dati. Disinstallare o cancellare i dati eli
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.9.1-Wear-public.apk
+adb install -r MarioCompilationUltra-0.9.2-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

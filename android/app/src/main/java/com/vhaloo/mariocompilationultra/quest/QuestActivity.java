@@ -36,20 +36,6 @@ public final class QuestActivity extends SDLActivity {
             File data = new File(root, "UserData");
             ensureDirectory(data);
             ensureDirectory(new File(root, "ROMs"));
-            File settings = new File(data, "settings.ini");
-            if (!settings.exists()) {
-                try (Writer out = new OutputStreamWriter(new FileOutputStream(settings), "UTF-8")) {
-                    String[] languages = {"en","fr","es","ja","de","it","pt","ru","zh","ko"};
-                    int language = 0;
-                    String system = java.util.Locale.getDefault().getLanguage();
-                    for (int i=0;i<languages.length;i++) if (languages[i].equals(system)) language=i;
-                    out.write("language " + language + "\nview 4\nquality 1\nadaptiveResolution 1\nbackground 0\nblur 12\n"
-                        + "fullscreen 0\nvsync 0\nrewind 1\nrewindMemory 0\n"
-                        + "questResolution 1\nquestMode 2\nquestPassthrough 1\nquestTransparent 1\n"
-                        + "questWallHeight 200\nquestScale 100\nquestRefresh 90\n"
-                        + "questWallLocked 1\nquestCompanion 1\n");
-                }
-            }
         } catch (IOException failure) {
             // SDL still owns Activity initialization; native startup will report inaccessible data.
             android.util.Log.e("MCU", "Could not prepare local data", failure);

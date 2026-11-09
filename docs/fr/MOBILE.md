@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.9.1 · Téléphones et tablettes Android
+# Mario Compilation Ultra 0.9.2 · Téléphones et tablettes Android
 
 [English](../en/MOBILE.md) · [Français](../fr/MOBILE.md) · [Español](../es/MOBILE.md) · [日本語](../ja/MOBILE.md) · [Deutsch](../de/MOBILE.md) · [Italiano](../it/MOBILE.md) · [Português](../pt/MOBILE.md) · [Русский](../ru/MOBILE.md) · [简体中文](../zh/MOBILE.md) · [한국어](../ko/MOBILE.md)
 
@@ -29,6 +29,6 @@ Les essais sur émulateur téléphone et tablette sont distingués du matériel 
 
 ![Collection](screenshots/android-phone.png)
 
-[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.1/MarioCompilationUltra-0.9.1-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
+[Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.2/MarioCompilationUltra-0.9.2-Android-public.apk) · [HTML](mobile.html) · [Guide](README.md) · [Quest](XR.md) · [Validation](../TEST_REPORT.md)
 
 [Adaptive Android apps](https://developer.android.com/develop/adaptive-apps/guides/support-different-display-sizes) · [16 KiB page sizes](https://developer.android.com/guide/practices/page-sizes)

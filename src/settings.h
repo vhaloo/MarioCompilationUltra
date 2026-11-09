@@ -5,15 +5,22 @@ enum class Defaults { All, Screen, Camera, AudioSaves, Controls, Spatial };
 enum class Appearance { Original, Panorama, FullMap, Relief, Voxels };
 struct Settings {
     static constexpr int ProfileCount = 6;
+#ifdef __ANDROID__
+    static constexpr bool DefaultFullscreen = false;
+    static constexpr int DefaultRewindMemory = 0;
+#else
+    static constexpr bool DefaultFullscreen = true;
+    static constexpr int DefaultRewindMemory = 1;
+#endif
     fs::path dataDir;
     int view = 0, zoom = 0, background = 2, blur = 18, brightness = 65, scanlines = 0, language = 0,
         volume = 70, quality = 1, uiScale = 100, deadzone = 22, display = -1, filter = 1,
         aspect = 0;
-    bool fullscreen = true, span = false, vsync = true, mute = false, pauseFocus = true,
+    bool fullscreen = DefaultFullscreen, span = false, vsync = true, mute = false, pauseFocus = true,
          rewind = true, autoResume = true, minimap = false, locator = false, inset = true,
          guide = false, freeze = false, enemyMarkers = false, showHud = false, highContrast = false,
          showStats = false, softEdges = true;
-    int zoomOut = 0, panoramaHeight = 224, rewindMemory = 1, rewindButton = 0;
+    int zoomOut = 0, panoramaHeight = 224, rewindMemory = DefaultRewindMemory, rewindButton = 0;
     int hintCorner = 0, hintScale = 100, hintOpacity = 80, hintMargin = 8, hintSeconds = 0,
         noticeSeconds = 6;
     int hintDetail = 0, desktopPresentation = 0, desktopFrameScale = 100, desktopCrtStrength = 40;
