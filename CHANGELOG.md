@@ -1,5 +1,9 @@
 # Releases
 
+## 0.9.1 — 2026-11-08
+
+- Use the project version in desktop archive names and macOS bundle metadata. Validate the folder created by the packager on each desktop platform.
+
 ## 0.9.0 — 2026-11-08
 
 - Start fresh profiles in the original 2D view and provide a global reset and a reset per settings page. Both keep imported cartridges and save files.

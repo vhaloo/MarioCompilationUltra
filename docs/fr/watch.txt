@@ -1,4 +1,4 @@
-Mario Compilation Ultra 0.9.0 · Vue montre
+Mario Compilation Ultra 0.9.1 · Vue montre
 
 Tourne la couronne ou la lunette pour zoomer. Dans les menus, elle fait défiler ; les boutons tactiles + et - fonctionnent aussi.
 
@@ -20,5 +20,5 @@ Mettre à jour un APK signé conserve les données. Désinstaller ou effacer les
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.9.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.9.1-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

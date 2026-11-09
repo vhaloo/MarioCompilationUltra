@@ -1,6 +1,6 @@
 # Validation report
 
-## 0.9.0
+## 0.9.1
 
 The automated suites cover settings reset and persistence, local captures from
 a paused cartridge, controller drift and camera movement, texture recovery,

@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.9.0
+# Mario Compilation Ultra 0.9.1
 
 PC에 맞게 조정할 수 있는 인터페이스와 실험적인 확장 화면을 제공하는 로컬 SNES 모음입니다. Super FX를 포함한 카트리지 동작은 Snes9x가 에뮬레이션합니다. 모든 게임을 역컴파일했다고 주장하지 않습니다.
 
-[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.9.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.9.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 다운로드와 바탕 화면에서 실행
 
@@ -83,15 +83,15 @@ sh ./Install-Linux.sh
 
 ## Android 휴대전화와 태블릿
 
-[Android 휴대전화와 태블릿](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Android-public.apk)
+[Android 휴대전화와 태블릿](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.1/MarioCompilationUltra-0.9.1-Android-public.apk)
 
 ## 시계 보기
 
-[시계 보기](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Wear-public.apk) · [그림으로 보는 설정](SETTINGS.md)
+[시계 보기](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.1/MarioCompilationUltra-0.9.1-Wear-public.apk) · [그림으로 보는 설정](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.1/MarioCompilationUltra-0.9.1-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 조작
 
@@ -163,7 +163,7 @@ View/Back: 설정 · LT: 되감기 · RT: Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 패키지와 검증 · 0.9.0
+## 패키지와 검증 · 0.9.1
 
 0.8은 절차적 부조와 복셀을 추가합니다. 공개 테스트 9종이 자체 형상, 깊이, 투명도, 설정과 기존 기능을 검사합니다. 로컬 게임 6종은 별도로 검사하며 게임 이미지는 비공개로 유지합니다. 휴대전화, 태블릿과 Wear OS는 에뮬레이터를 사용합니다. Mac 및 실제 Android, 시계와 Quest 게임 실행은 실험용입니다. 최신 보고서를 확인하세요.
 

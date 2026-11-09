@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.9.0
+# Mario Compilation Ultra 0.9.1
 
 Raccolta SNES locale con interfaccia adattabile al PC e viste estese sperimentali. Snes9x emula le cartucce, incluso Super FX. Il progetto non dichiara di aver decompilato tutti i giochi.
 
-[Download e avvio dal desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.9.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download e avvio dal desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.9.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download e avvio dal desktop
 
@@ -83,15 +83,15 @@ La versione 0.8 adatta risoluzione dello scenario, griglia voxel, frequenza deco
 
 ## Telefoni e tablet Android
 
-[Telefoni e tablet Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Android-public.apk)
+[Telefoni e tablet Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.1/MarioCompilationUltra-0.9.1-Android-public.apk)
 
 ## Vista orologio
 
-[Vista orologio](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Wear-public.apk) · [Impostazioni illustrate](SETTINGS.md)
+[Vista orologio](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.1/MarioCompilationUltra-0.9.1-Wear-public.apk) · [Impostazioni illustrate](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.0/MarioCompilationUltra-0.9.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.9.1/MarioCompilationUltra-0.9.1-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Comandi
 
@@ -163,7 +163,7 @@ Scegli di nuovo la cartuccia se il file è stato spostato o l’unità scollegat
 
 ![Quest VR / AR](screenshots/6.png)
 
-## Pacchetti e verifica · 0.9.0
+## Pacchetti e verifica · 0.9.1
 
 La versione 0.8 aggiunge rilievo procedurale e voxel. Nove suite pubbliche verificano geometria originale, profondità, trasparenza, impostazioni e funzioni esistenti. Sei giochi locali sono verificati separatamente; le loro immagini restano private. Telefono, tablet e Wear OS usano emulatori. Il gioco su Mac e Android, orologio e Quest fisici resta sperimentale; vedi il rapporto attuale.
 

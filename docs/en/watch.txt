@@ -1,4 +1,4 @@
-Mario Compilation Ultra 0.9.0 · Watch view
+Mario Compilation Ultra 0.9.1 · Watch view
 
 Turn the crown or bezel to zoom. In menus it scrolls; touch + and - also work.
 
@@ -20,5 +20,5 @@ Updating a signed APK preserves app data. Uninstalling or clearing app data remo
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.9.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.9.1-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

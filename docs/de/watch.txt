@@ -1,4 +1,4 @@
-Mario Compilation Ultra 0.9.0 · Uhransicht
+Mario Compilation Ultra 0.9.1 · Uhransicht
 
 Drehe Krone oder Lünette zum Zoomen. Im Menü scrollen sie; Touch-Tasten + und - funktionieren ebenfalls.
 
@@ -20,5 +20,5 @@ Ein signiertes APK-Update erhält App-Daten. Deinstallation oder Datenlöschung 
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.9.0-Wear-public.apk
+adb install -r MarioCompilationUltra-0.9.1-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
