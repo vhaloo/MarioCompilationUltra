@@ -41,6 +41,7 @@ def main():
         md += f'## {para("platform_heading")}\n\n- {para("windows_status")}\n- {para("linux_status")}\n- **{para("mac_status")}**\n\n'
         md += f'## {tr("View modes")}\n\n![{tr("View modes")}](views.svg)\n\n{para("display_defaults")}\n\n{para("view_details")}\n\n{para("editions")}\n\n'
         md += f'## {tr("Actual game captures")}\n\n{para("game_examples")}\n\n{para("settings_reset")}\n\n'
+        md += f'## {tr("Open advanced settings")}\n\n{tr("Choose an appearance. It replaces the current picture and camera.")}\n\n**{tr("Option profiles")}** · {tr("Save a custom setup here before applying an appearance.")}\n\n'
         md += f'## {tr("Pixel volume")}\n\n![{tr("Pixel volume")}](../voxel-preview.png)\n\n{volume[code]}\n\n[{tr("Pixel volume")}](VOXELS.md) · [HTML](voxels.html)\n\n'
         md += f'## {tr("Automatic resolution")}\n\n{para("performance_note")}\n\n[Performance / GPU](../PERFORMANCE.md)\n\n'
         md += '| CRC32 | SNES |\n|---|---|\n' + ''.join(f'| `{crc}` | {name} |\n' for crc,name in EDITIONS) + '\n'
@@ -64,6 +65,7 @@ def main():
         body += section(para('platform_heading'), '<ul>' + ''.join(f'<li>{h(para(key))}</li>' for key in ['windows_status','linux_status','mac_status']) + '</ul>')
         body += section(tr('View modes'), f'<img src="views.svg" alt="{h(tr("View modes"))}"><p>{h(para("display_defaults"))}</p><p>{h(para("view_details"))}</p><p>{h(para("editions"))}</p><table><thead><tr><th>CRC32</th><th>SNES</th></tr></thead><tbody>' + ''.join(f'<tr><td><code>{crc}</code></td><td>{h(name)}</td></tr>' for crc,name in EDITIONS) + '</tbody></table>')
         body += section(tr('Actual game captures'), f'<p>{h(para("game_examples"))}</p><p>{h(para("settings_reset"))}</p>')
+        body += section(tr('Open advanced settings'), f'<p>{h(tr("Choose an appearance. It replaces the current picture and camera."))}</p><p><strong>{h(tr("Option profiles"))}</strong> · {h(tr("Save a custom setup here before applying an appearance."))}</p>')
         body += section(tr('Automatic resolution'), f'<p>{h(para("performance_note"))}</p><p><a href="../PERFORMANCE.md">Performance / GPU</a></p>')
         body += section(tr('Pixel volume'), f'<img src="../voxel-preview.png" alt="{h(tr("Pixel volume"))}"><p>{h(volume[code])}</p><p><a href="voxels.html">{h(tr("Pixel volume"))}</a></p>')
         body += section(tr('Android phones and tablets'), f'<p><a href="mobile.html">{h(tr("Android phones and tablets"))}</a></p>')

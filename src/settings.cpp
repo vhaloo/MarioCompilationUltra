@@ -5,6 +5,44 @@
 #include <iomanip>
 #include <sstream>
 namespace mcu {
+void Settings::applyAppearance(Appearance look) {
+    Settings defaults;
+    view = look == Appearance::FullMap ? 4 : look == Appearance::Panorama ? 1 : 0;
+    volumeMode = look == Appearance::Voxels ? 2 : look == Appearance::Relief ? 1 : 0;
+    zoom = zoomOut = 0;
+    panoramaHeight = defaults.panoramaHeight;
+    filter = defaults.filter;
+    aspect = defaults.aspect;
+    scanlines = defaults.scanlines;
+    background = look == Appearance::Panorama ? 0 : defaults.background;
+    blur = defaults.blur;
+    brightness = defaults.brightness;
+    softEdges = defaults.softEdges;
+    inset = defaults.inset;
+    freeze = false;
+    cameraMode = 0;
+    cameraX = cameraY = 0;
+    locator = guide = minimap = enemyMarkers = showHud = false;
+    enemyPreview = defaults.enemyPreview;
+    bossPreview = defaults.bossPreview;
+    objectPreview = defaults.objectPreview;
+    spawnLabels = defaults.spawnLabels;
+    enemyOpacity = defaults.enemyOpacity;
+    smoothMap = defaults.smoothMap;
+    desktopPresentation = defaults.desktopPresentation;
+    desktopCrtStrength = defaults.desktopCrtStrength;
+    desktopFrameScale = defaults.desktopFrameScale;
+    volumeDepth = defaults.volumeDepth;
+    volumeSpacing = defaults.volumeSpacing;
+    volumeAngle = defaults.volumeAngle;
+    volumeTilt = defaults.volumeTilt;
+    volumeRound = defaults.volumeRound;
+    watchLens = defaults.watchLens;
+    watchZoom = look == Appearance::Original ? 1000
+                : look == Appearance::FullMap ? 0
+                : look == Appearance::Panorama ? 780
+                                               : 620;
+}
 void Settings::restoreDefaults(Defaults group) {
     Settings defaults;
     auto restore = [&](auto... fields) { ((this->*fields = defaults.*fields), ...); };
@@ -197,7 +235,12 @@ void Settings::stepZoom(int direction) {
         zoomOut = std::min(3, zoomOut + 1);
 }
 void Settings::load(Library &l) {
-    std::ifstream f(dataDir / "settings.ini");
+    readSettings(dataDir / "settings.ini", l);
+}
+bool Settings::readSettings(const fs::path &path, Library &l, bool profile) {
+    std::ifstream f(path);
+    if (!f)
+        return false;
     bool qualityPolicy = false;
     std::string key;
     int n;
@@ -223,6 +266,7 @@ void Settings::load(Library &l) {
     x = n != 0
         if (key == "qualityPolicy")
             qualityPolicy = true;
+        B(advancedOptions);
         I(zoomOut);
         I(touchMode);
         I(touchPlacement);
@@ -358,7 +402,9 @@ void Settings::load(Library &l) {
 #undef I
 #undef B
     }
-    if (f.is_open() && !qualityPolicy && adaptiveResolution && questAdaptive) {
+    if (profile && (!qualityPolicy || !f.eof()))
+        return false;
+    if (!qualityPolicy && adaptiveResolution && questAdaptive) {
         quality = 2;
         questResolution = 3;
         questEyeDetail = 2;
@@ -367,11 +413,36 @@ void Settings::load(Library &l) {
     }
     clamp();
     freeze = cameraMode == 2;
+    return true;
 }
 void Settings::save(const Library &l) const {
+    writeSettings(dataDir / "settings.ini", &l);
+}
+fs::path Settings::profilePath(int slot) const {
+    if (slot < 1 || slot > ProfileCount)
+        throw std::out_of_range("Settings profile slot");
+    return dataDir / "settings-profiles" / (std::to_string(slot) + ".ini");
+}
+void Settings::saveProfile(int slot) const {
+    writeSettings(profilePath(slot), nullptr);
+}
+bool Settings::loadProfile(int slot) {
+    Settings profile;
+    Library ignored;
+    if (!profile.readSettings(profilePath(slot), ignored, true))
+        return false;
+    profile.dataDir = dataDir;
+    profile.lastGame = lastGame;
+    profile.advancedOptions = advancedOptions;
+    *this = std::move(profile);
+    return true;
+}
+void Settings::writeSettings(const fs::path &path, const Library *library) const {
     std::ostringstream o;
     o << "qualityPolicy 1\n";
 #define S(x) o << #x << ' ' << int(x) << '\n'
+    if (library)
+        S(advancedOptions);
     S(zoomOut);
     S(touchMode);
     S(touchPlacement);
@@ -505,9 +576,11 @@ void Settings::save(const Library &l) const {
     S(showStats);
     S(softEdges);
 #undef S
-    o << "lastGame " << lastGame << '\n';
-    for (auto &p : l.paths)
-        o << "rom " << p.first << ' ' << std::quoted(p.second.u8string()) << '\n';
-    atomicText(dataDir / "settings.ini", o.str());
+    if (library) {
+        o << "lastGame " << lastGame << '\n';
+        for (auto &p : library->paths)
+            o << "rom " << p.first << ' ' << std::quoted(p.second.u8string()) << '\n';
+    }
+    atomicText(path, o.str());
 }
 } // namespace mcu

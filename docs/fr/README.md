@@ -53,6 +53,12 @@ Dans Écran, ouvre Captures de jeu pour comparer une même scène dans plusieurs
 
 La Collection propose un bouton de réinitialisation générale. Chaque page de réglages a son propre bouton. Les imports et les sauvegardes sont conservés. Un nouveau profil s’ouvre dans la vue 2D d’origine.
 
+## Ouvrir les réglages avancés
+
+Choisis une apparence. Elle remplace les réglages d’image et de caméra actuels.
+
+**Profils d’options** · Enregistre ici ta configuration personnalisée avant d’appliquer une apparence.
+
 ## Volume des pixels
 
 ![Volume des pixels](../voxel-preview.png)

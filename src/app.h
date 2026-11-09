@@ -135,6 +135,7 @@ class App {
     void languageControl();
     void settingPicture(const char *key, float width, bool compact = false);
     int exampleGame = -1, exampleStyle = 0, exampleJob = -1, examplesWritten = 0;
+    int optionProfile = 1;
     std::array<std::array<SDL_Texture *, 7>, 6> exampleTextures{};
     std::array<std::array<bool, 7>, 6> exampleChecked{};
     void exampleGallery();
@@ -145,6 +146,10 @@ class App {
     bool exampleForSetting(const char *key, float width);
     void defaultsButton(Defaults group);
     void applyDefaults(Defaults group);
+    void appearanceOptions();
+    void optionProfiles();
+    void profileOperation(bool load, int slot);
+    void persistOptions(const char *notice);
     MobileLayout touchLayout;
     MobileTouches touch;
     uint16_t pendingTouchButtons = 0;

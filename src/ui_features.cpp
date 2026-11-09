@@ -164,6 +164,8 @@ void App::extrasUi() {
                {"questscreenmode", "questwallfit", "questmural", "questflooratlas", "questpinball",
                 "questcrtroom", "questcurved"});
         tick("questar", settings.questPassthrough);
+        if (!settings.advancedOptions)
+            return;
         tick("questtransparent", settings.questTransparent);
         slider("questscale", settings.questScale, 5, 20000, "%d%%");
         slider("questwallheight", settings.questWallHeight, 50, 500, "%d cm");

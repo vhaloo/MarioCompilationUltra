@@ -154,7 +154,6 @@ void App::watchOptions() {
         return;
     ImGui::TextColored({.5f, .87f, .74f, 1}, "%s", tr("Watch view"));
     choice("Pixel volume", settings.volumeMode, {"Original 2D", "Pixel relief", "Voxels"});
-    exampleGallery();
     if (settings.volumeMode) {
         slider("Voxel thickness", settings.volumeDepth, 1, 16, "%d px");
         slider("Layer spacing", settings.volumeSpacing, 1, 12, "%d px");

@@ -96,6 +96,31 @@ int main() {
                   restoredImports.paths == imports.paths &&
                   readFile(slot) == std::vector<uint8_t>({1, 2, 3}),
               "Global reset persists defaults, keeps imports and does not touch save slots");
+        check(!reloaded.advancedOptions, "A fresh or reset profile opens simple settings");
+        reloaded.advancedOptions = true;
+        reloaded.volumeMode = 2;
+        reloaded.volumeDepth = 13;
+        reloaded.filter = 2;
+        reloaded.cameraMode = 1;
+        reloaded.volume = 38;
+        reloaded.saveProfile(1);
+        reloaded.applyAppearance(Appearance::FullMap);
+        check(reloaded.view == 4 && !reloaded.volumeMode && !reloaded.cameraMode &&
+                  reloaded.filter == defaults.filter && reloaded.watchZoom == 0 &&
+                  reloaded.volumeDepth == defaults.volumeDepth && reloaded.volume == 38,
+              "One-click map preset overrides the custom picture and camera");
+        reloaded.advancedOptions = false;
+        check(reloaded.loadProfile(1) && reloaded.volumeMode == 2 && reloaded.volumeDepth == 13 &&
+                  reloaded.filter == 2 && reloaded.cameraMode == 1 && !reloaded.advancedOptions &&
+                  reloaded.lastGame == "world" && reloaded.dataDir == directory &&
+                  !reloaded.loadProfile(Settings::ProfileCount),
+              "Option profile restores fine adjustments while preserving the active profile context");
+        atomicText(reloaded.profilePath(2), "unrecognized profile\n");
+        check(!reloaded.loadProfile(2) && reloaded.volumeDepth == 13,
+              "A damaged option profile leaves the current settings usable");
+        reloaded.applyAppearance(Appearance::Voxels);
+        check(reloaded.volumeMode == 2 && reloaded.view == 0 && reloaded.watchZoom == 620,
+              "Voxel appearance supplies a ready-to-play volume on desktop and watch");
         auto *surface = SDL_CreateRGBSurfaceWithFormat(0, 96, 96, 32, SDL_PIXELFORMAT_ARGB8888);
         auto *renderer = SDL_CreateSoftwareRenderer(surface);
         check(surface && renderer, "Software renderer is available");

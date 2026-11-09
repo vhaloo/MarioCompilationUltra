@@ -53,6 +53,12 @@ Unter Bildschirm findest du Spielaufnahmen zum Vergleich derselben Szene in mehr
 
 In der Sammlung kannst du alle Einstellungen zurücksetzen. Jede Einstellungsseite hat eine eigene Rücksetzfunktion. Module und Spielstände bleiben erhalten. Ein neues Profil startet in der ursprünglichen 2D-Ansicht.
 
+## Erweiterte Einstellungen öffnen
+
+Wähle eine Darstellung. Sie ersetzt die aktuellen Bild- und Kameraeinstellungen.
+
+**Einstellungsprofile** · Speichere hier deine eigenen Einstellungen, bevor du eine Darstellung anwendest.
+
 ## Pixelvolumen
 
 ![Pixelvolumen](../voxel-preview.png)

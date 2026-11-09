@@ -3,6 +3,7 @@
 ## 0.9.0 — 2026-11-08
 
 - Start fresh profiles in the original 2D view and provide a global reset and a reset per settings page. Both keep imported cartridges and save files.
+- Start in simple settings with five one-click appearances. Advanced settings keep the fine controls and offer six slots for option profiles.
 - Compare seven views of a paused game in the Screen gallery. The app generates examples locally from the running cartridge.
 - Rotate the pixel volume with the right stick. Hold the stick click to move the volume. A separate command centers the view.
 - Blend live foreground and actors into the full map when per-scanline data is available. The optional close-up shows the original frame. Initialize the free camera at the current scene on entry.

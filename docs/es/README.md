@@ -53,6 +53,12 @@ Abre Capturas del juego en Pantalla para comparar la misma escena en distintas v
 
 La Colección tiene un botón de restablecimiento general. Cada página de ajustes tiene su propio botón. Los cartuchos y las partidas se conservan. Un perfil nuevo abre la vista 2D original.
 
+## Abrir ajustes avanzados
+
+Elige una apariencia. Sustituye los ajustes actuales de imagen y cámara.
+
+**Perfiles de ajustes** · Guarda aquí tu configuración personalizada antes de aplicar una apariencia.
+
 ## Volumen de píxeles
 
 ![Volumen de píxeles](../voxel-preview.png)

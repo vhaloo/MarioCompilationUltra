@@ -59,6 +59,12 @@ Open Actual game captures under Screen to compare the same scene in different vi
 
 The Collection has a global reset. Each settings page has its own reset. Both keep cartridge imports and save files. A fresh profile opens in the original 2D view.
 
+## Open advanced settings
+
+Choose an appearance. It replaces the current picture and camera.
+
+**Option profiles** · Save a custom setup here before applying an appearance.
+
 ## Pixel volume
 
 ![Pixel volume](docs/voxel-preview.png)

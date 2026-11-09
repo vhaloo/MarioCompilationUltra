@@ -1132,12 +1132,90 @@ void App::applyDefaults(Defaults group) {
     lastCompose = ~uint64_t(0);
     focusPage = true;
     releaseInput = true;
+    persistOptions("Default settings restored.");
+}
+void App::persistOptions(const char *notice) {
     try {
         settings.save(library);
-        notify(tr("Default settings restored."));
+        if (notice)
+            notify(tr(notice));
     } catch (const std::exception &e) {
-        SDL_Log("Save default settings: %s", e.what());
-        notify(tr("Could not save the default settings."));
+        SDL_Log("Save settings: %s", e.what());
+        notify(tr("Could not save settings."));
+    }
+}
+void App::profileOperation(bool load, int slot) {
+    try {
+        if (load) {
+            if (!settings.loadProfile(slot)) {
+                notify(tr("Could not load this option profile."));
+                return;
+            }
+#ifdef MCU_QUEST
+            settings.performanceReserve = std::max(35, settings.performanceReserve);
+            if (quest)
+                quest->recenter();
+#endif
+            volumeView = {};
+            watchZoomAt = 0;
+            resolution = AdaptiveResolution{};
+            lastCompose = ~uint64_t(0);
+            releaseInput = true;
+            persistOptions("Option profile applied.");
+        } else {
+            settings.saveProfile(slot);
+            notify(tr("Option profile saved."));
+        }
+    } catch (const std::exception &e) {
+        SDL_Log("Option profile: %s", e.what());
+        notify(tr(load ? "Could not load this option profile." : "Could not save settings."));
+    }
+}
+void App::optionProfiles() {
+    if (!ImGui::CollapsingHeader(tr("Option profiles")))
+        return;
+    ImGui::TextWrapped("%s", tr("Save a custom setup here before applying an appearance."));
+    auto title = [&](int n) { return std::string(tr("Profile")) + " " + std::to_string(n); };
+    auto occupied = [&](int n) {
+        std::error_code ec;
+        return fs::is_regular_file(settings.profilePath(n), ec);
+    };
+    ImGui::SetNextItemWidth(-1);
+    if (ImGui::BeginCombo("##option-profile", title(optionProfile).c_str())) {
+        for (int n = 1; n <= Settings::ProfileCount; ++n) {
+            auto label = title(n) + (occupied(n) ? "" : " · " + std::string(tr("Empty")));
+            if (ImGui::Selectable(label.c_str(), n == optionProfile))
+                optionProfile = n;
+        }
+        ImGui::EndCombo();
+    }
+    bool saved = occupied(optionProfile);
+    if (button("Save current options", nullptr, {-1, 0})) {
+        if (saved)
+            request(7, optionProfile);
+        else
+            profileOperation(false, optionProfile);
+    }
+    ImGui::BeginDisabled(!saved);
+    if (button("Load option profile", nullptr, {-1, 0}))
+        request(8, optionProfile);
+    ImGui::EndDisabled();
+}
+void App::appearanceOptions() {
+    ImGui::TextWrapped("%s", tr("Choose an appearance. It replaces the current picture and camera."));
+    static constexpr std::array<const char *, 5> labels{
+        {"Original framing", "Panorama", "Full level map", "Pixel relief", "Voxels"}};
+    bool row = ImGui::GetContentRegionAvail().x > 820 * uiUnit();
+    for (int i = 0; i < int(labels.size()); ++i) {
+        if (row && i)
+            ImGui::SameLine();
+        if (button(labels[i], nullptr, {row ? 0.f : -1.f, 38.f})) {
+            settings.applyAppearance(Appearance(i));
+            volumeView = {};
+            watchZoomAt = 0;
+            lastCompose = ~uint64_t(0);
+            persistOptions("Appearance applied.");
+        }
     }
 }
 bool App::gameAvailable(const std::string &id) const {
@@ -1237,10 +1315,40 @@ void App::optionsUi() {
     const Defaults groups[] = {Defaults::All, Defaults::Screen, Defaults::Camera,
                                Defaults::AudioSaves, Defaults::Controls, Defaults::All,
                                Defaults::Spatial};
+    if (tab != 5 && button(settings.advancedOptions ? "Use simple settings"
+                                                    : "Open advanced settings",
+                           nullptr, {-1, 38})) {
+        settings.advancedOptions = !settings.advancedOptions;
+        focusPage = true;
+        persistOptions(nullptr);
+    }
     if (tab != 5 && (tab != 6 || !mobileActive()))
         defaultsButton(groups[tab]);
-    mobileOptions();
-    if (watchActive() && (tab == 1 || tab == 2 || tab == 4 || tab == 5))
+    if (tab == 1) {
+        appearanceOptions();
+        exampleGallery();
+        if (settings.advancedOptions)
+            optionProfiles();
+        else {
+            if (settings.volumeMode) {
+                if (button("Center volume camera"))
+                    volumeView = {};
+                ImGui::TextWrapped("%s", tr("Right stick: look around. Hold the stick click and "
+                                           "move it to pan."));
+            }
+            return;
+        }
+    }
+    if (tab == 2 && !settings.advancedOptions) {
+        ImGui::TextWrapped("%s", tr("Choose an appearance on the Screen page."));
+        if (button("Screen"))
+            showSection(1);
+        return;
+    }
+    if (settings.advancedOptions || tab == 5)
+        mobileOptions();
+    if (watchActive() && (tab == 1 || tab == 2 || tab == 5 ||
+                         (tab == 4 && settings.advancedOptions)))
         return;
     auto combo = [&](const char *en, const char *, int &v,
                      std::initializer_list<const char *> labels) { choice(en, v, labels); };
@@ -1255,7 +1363,6 @@ void App::optionsUi() {
         combo("View", "Vue", settings.view,
               {"Original framing", "Panorama", "Pixel world", "Stage atlas", "Full level map"});
         choice("Pixel volume", settings.volumeMode, {"Original 2D", "Pixel relief", "Voxels"});
-        exampleGallery();
         if (settings.volumeMode) {
             this->slider("Voxel thickness", settings.volumeDepth, 1, 16, "%d px");
             this->slider("Layer spacing", settings.volumeSpacing, 1, 12, "%d px");
@@ -1377,9 +1484,11 @@ void App::optionsUi() {
     }
     if (tab == 3) {
         check("Automatic resume", "Reprise automatique", settings.autoResume);
-        check("Rewind (20–32 seconds, 96 MB maximum)",
-              "Retour arrière (20–32 secondes, 96 Mo maximum)", settings.rewind);
-        check("Pause when unfocused", "Pause en quittant la fenêtre", settings.pauseFocus);
+        if (settings.advancedOptions) {
+            check("Rewind (20–32 seconds, 96 MB maximum)",
+                  "Retour arrière (20–32 secondes, 96 Mo maximum)", settings.rewind);
+            check("Pause when unfocused", "Pause en quittant la fenêtre", settings.pauseFocus);
+        }
         slider("Volume", "Volume", settings.volume, 0, 100);
         check("Mute", "Couper le son", settings.mute);
         ImGui::Separator();
@@ -1415,11 +1524,15 @@ void App::optionsUi() {
         ImGui::EndDisabled();
     }
     if (tab == 4) {
-        slider("Stick dead zone (%)", "Zone morte du stick (%)", settings.deadzone, 5, 60);
+        if (settings.advancedOptions)
+            slider("Stick dead zone (%)", "Zone morte du stick (%)", settings.deadzone, 5, 60);
         languageControl();
         ImGui::TextWrapped("%s", tr("Original cartridge text keeps its original language."));
-        slider("Interface size (%)", "Taille de l'interface (%)", settings.uiScale, 75, 175);
+        if (settings.advancedOptions)
+            slider("Interface size (%)", "Taille de l'interface (%)", settings.uiScale, 75, 175);
         check("High contrast", "Contraste élevé", settings.highContrast);
+        if (watchActive() && !settings.advancedOptions)
+            return;
         ImGui::Separator();
         ImGui::TextWrapped(
             "%s",
@@ -1497,7 +1610,8 @@ void App::optionsUi() {
         if (button("Open project on GitHub", "Ouvrir le projet GitHub"))
             SDL_OpenURL("https://github.com/vhaloo/MarioCompilationUltra");
     }
-    extrasUi();
+    if (settings.advancedOptions || tab == 6)
+        extrasUi();
 }
 void App::menuUi() {
     if (watchActive()) {
@@ -1758,7 +1872,9 @@ void App::dialogs() {
             "Switch game? Current progress will be saved automatically when enabled.",
             "Quit the collection?",
             "Restart the cartridge?",
-            "Restore default settings? Cartridge imports and saves are kept."};
+            "Restore default settings? Cartridge imports and saves are kept.",
+            "Replace this option profile?",
+            "Apply this option profile to the current settings?"};
         const char *fr[] = {"",
                             "Remplacer cette sauvegarde ?",
                             "Charger cet état ? La progression actuelle sera remplacée.",
@@ -1767,7 +1883,9 @@ void App::dialogs() {
                             "Quitter la collection ?",
                             "Redémarrer la cartouche ?",
                             "Rétablir les réglages par défaut ? Les cartouches importées et les "
-                            "sauvegardes sont conservées."};
+                            "sauvegardes sont conservées.",
+                            "Remplacer ce profil d’options ?",
+                            "Appliquer ce profil d’options aux réglages actuels ?"};
         ImGui::TextWrapped("%s", tr(en[dialog], fr[dialog]));
         float confirmWidth = mobileActive() ? std::min(180.f, (ImGui::GetContentRegionAvail().x -
                                                                ImGui::GetStyle().ItemSpacing.x) /
@@ -1805,6 +1923,8 @@ void App::dialogs() {
             }
             if (action == 6)
                 applyDefaults(Defaults(dialogSlot));
+            if (action == 7 || action == 8)
+                profileOperation(action == 8, dialogSlot);
         }
         ImGui::EndPopup();
     }

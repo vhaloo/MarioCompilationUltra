@@ -53,6 +53,12 @@ In Schermo apri Schermate di gioco per confrontare la stessa scena in più viste
 
 La raccolta permette di ripristinare tutte le impostazioni. Ogni pagina ha un proprio pulsante. Le cartucce e i salvataggi vengono conservati. Un nuovo profilo si apre nella vista 2D originale.
 
+## Apri impostazioni avanzate
+
+Scegli un aspetto. Sostituisce le impostazioni correnti dell’immagine e della visuale.
+
+**Profili di impostazioni** · Salva qui la configurazione personalizzata prima di applicare un aspetto.
+
 ## Volume dei pixel
 
 ![Volume dei pixel](../voxel-preview.png)

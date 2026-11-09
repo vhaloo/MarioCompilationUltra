@@ -2,7 +2,9 @@
 #include "rom.h"
 namespace mcu {
 enum class Defaults { All, Screen, Camera, AudioSaves, Controls, Spatial };
+enum class Appearance { Original, Panorama, FullMap, Relief, Voxels };
 struct Settings {
+    static constexpr int ProfileCount = 6;
     fs::path dataDir;
     int view = 0, zoom = 0, background = 2, blur = 18, brightness = 65, scanlines = 0, language = 0,
         volume = 70, quality = 1, uiScale = 100, deadzone = 22, display = -1, filter = 1,
@@ -35,6 +37,7 @@ struct Settings {
     bool questHandTracking = true, questInsetCrt = true, questCrtCoplanar = true,
          questMoveRotate = true;
     bool questControlHints = true, help = true;
+    bool advancedOptions = false;
     int touchMode = 0, touchPlacement = 0, touchScale = 100, touchOpacity = 65,
         mobileOrientation = 0;
     bool touchLeftHanded = false, touchHaptics = false, mobileKeepAwake = true;
@@ -59,7 +62,15 @@ struct Settings {
     void save(const Library &) const;
     void clamp();
     void restoreDefaults(Defaults group);
+    void applyAppearance(Appearance look);
+    fs::path profilePath(int slot) const;
+    void saveProfile(int slot) const;
+    bool loadProfile(int slot);
     void recommendedPicture();
     int pixelZoom(int width, int height, int nativeWidth, int nativeHeight) const;
+
+  private:
+    bool readSettings(const fs::path &, Library &, bool profile = false);
+    void writeSettings(const fs::path &, const Library *) const;
 };
 } // namespace mcu

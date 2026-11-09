@@ -1629,16 +1629,6 @@ void QuestPresentation::options() {
     auto &s = a.settings;
     bool changed = false;
     ImGui::TextWrapped("%s", tr("questintro", a.settings.language));
-    changed |= a.tick("questremote", s.questRemote);
-    changed |= a.tick("questtransparent", s.questTransparent);
-    changed |= a.tick("questhandtracking", s.questHandTracking);
-    changed |= a.choice("questhandjoystick", s.questHandJoystick, {"auto", "enabled", "disabled"});
-    changed |= a.slider("questremotescale", s.questRemoteScale, 50, 180, "%d%%");
-    changed |= a.tick("questmoverotate", s.questMoveRotate);
-    changed |= a.tick("questcontrolhints", s.questControlHints);
-    changed |= a.tick("questinsetcrt", s.questInsetCrt);
-    changed |= a.slider("questinsetwidth", s.questInsetWidth, 25, 160, "%d cm");
-    changed |= a.choice("questeyedetail", s.questEyeDetail, {"light", "balanced", "ultra"});
     if (a.button("remote_recover")) {
         impl->placeDeck(true);
         impl->placeMenu();
@@ -1656,6 +1646,23 @@ void QuestPresentation::options() {
         }
         changed = true;
     }
+    changed |= a.tick("questar", s.questPassthrough);
+    if (a.button("questrecenter"))
+        recenter();
+    if (!s.advancedOptions) {
+        a.dirty |= changed;
+        return;
+    }
+    changed |= a.tick("questremote", s.questRemote);
+    changed |= a.tick("questtransparent", s.questTransparent);
+    changed |= a.tick("questhandtracking", s.questHandTracking);
+    changed |= a.choice("questhandjoystick", s.questHandJoystick, {"auto", "enabled", "disabled"});
+    changed |= a.slider("questremotescale", s.questRemoteScale, 50, 180, "%d%%");
+    changed |= a.tick("questmoverotate", s.questMoveRotate);
+    changed |= a.tick("questcontrolhints", s.questControlHints);
+    changed |= a.tick("questinsetcrt", s.questInsetCrt);
+    changed |= a.slider("questinsetwidth", s.questInsetWidth, 25, 160, "%d cm");
+    changed |= a.choice("questeyedetail", s.questEyeDetail, {"light", "balanced", "ultra"});
 
     a.settingTitle("questscale");
     float scalePercent = float(s.questScale);
@@ -1812,7 +1819,6 @@ void QuestPresentation::options() {
         ImGui::Text(tr("questrefreshruntime", a.settings.language), impl->displayHz,
                     impl->requestedHz);
     ImGui::BeginDisabled(!impl->passthroughSupported);
-    changed |= a.tick("questar", s.questPassthrough);
     ImGui::EndDisabled();
     if (!impl->passthroughSupported)
         ImGui::TextWrapped("%s", tr("questarunavailable", a.settings.language));
@@ -1831,8 +1837,6 @@ void QuestPresentation::options() {
     changed |= a.tick("questtouch", s.questTouch);
     changed |= a.slider("questhaptics", s.questHaptics, 0, 100, "%d%%");
     changed |= a.tick("questflip", s.questFlip);
-    if (a.button("questrecenter"))
-        recenter();
     a.nextButton("questcinema");
     if (a.button("questcinema")) {
         s.questMode = 0;

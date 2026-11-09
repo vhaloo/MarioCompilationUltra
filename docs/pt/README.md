@@ -53,6 +53,12 @@ Em Ecrã, abre Capturas do jogo para comparar a mesma cena em várias vistas. Du
 
 A Coleção permite repor todas as definições. Cada página tem o seu próprio botão. Os cartuchos e os jogos guardados são mantidos. Um novo perfil abre na vista 2D original.
 
+## Abrir definições avançadas
+
+Escolhe um aspeto. Substitui as definições atuais de imagem e câmara.
+
+**Perfis de definições** · Guarda aqui a tua configuração personalizada antes de aplicar um aspeto.
+
 ## Volume dos pixels
 
 ![Volume dos pixels](../voxel-preview.png)
