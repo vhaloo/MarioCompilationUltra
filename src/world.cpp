@@ -110,8 +110,11 @@ Scene World::inspect(const Core &c, bool completeView) const {
             return s;
         s.playerX = r[0x5e] | r[0x43] << 8;
         s.playerY = r[0x70] | r[0x55] << 8;
-        s.cameraX = std::max(0, s.playerX - int(r[0x79]));
-        s.cameraY = std::max(0, s.playerY - int(r[0x82])) + 1;
+        // The sprite's on-screen position wraps at 256 while scrolling, falling or riding a pipe.
+        auto camera = alignRasterCamera(
+            c.snapshot, 0, {word(r, 0x210), int(int16_t(r[0x543] | r[0x542] << 8)) + 1});
+        s.cameraX = camera.x;
+        s.cameraY = camera.y;
         s.vertical = r[0x425] != 0;
         s.stage = word(r, 0x2b) | (int(r[0x2d]) << 16);
         if (s.playerX > 8192 || s.playerY > 8192 || c.snapshot.mode != 1 || r[0x22] > 32)
@@ -157,7 +160,7 @@ uint32_t World::tilePixel(const McuVideo &s, int bg, uint16_t a, int x, int y) c
         palette += bg * 32;
     return rgb(s.palette[(palette + v) & 255], s.brightness);
 }
-uint32_t World::preparedTilePixel(const McuVideo &s, int bg, uint16_t a, int x, int y) const {
+const std::array<uint32_t, 64> &World::preparedTile(const McuVideo &s, int bg, uint16_t a) const {
     uint16_t id = a & 0x1fff; // Tile and palette; priority does not change its colour.
     auto &tiles = decodedTiles[bg];
     auto found = tiles.find(id);
@@ -168,13 +171,26 @@ uint32_t World::preparedTilePixel(const McuVideo &s, int bg, uint16_t a, int x, 
                 pixels[row * 8 + column] = tilePixel(s, bg, id, column, row);
         found = tiles.emplace(id, pixels).first;
     }
+    return found->second;
+}
+uint32_t World::preparedTilePixel(const McuVideo &s, int bg, uint16_t a, int x, int y) const {
     x &= 7;
     y &= 7;
     if (a & 0x4000)
         x = 7 - x;
     if (a & 0x8000)
         y = 7 - y;
-    return found->second[y * 8 + x];
+    return preparedTile(s, bg, a)[y * 8 + x];
+}
+void World::copyQuadrant(const McuVideo &s, int bg, uint16_t a, uint32_t *dst) const {
+    const auto &pixels = preparedTile(s, bg, a);
+    for (int y = 0; y < 8; ++y) {
+        const auto *row = pixels.data() + ((a & 0x8000) ? 7 - y : y) * 8;
+        if (a & 0x4000)
+            std::reverse_copy(row, row + 8, dst + y * 16);
+        else
+            std::copy_n(row, 8, dst + y * 16);
+    }
 }
 uint32_t World::bgPixel(const McuVideo &s, int bg, int x, int y, bool prepared, bool *high) const {
     auto &l = s.layers[bg];
@@ -325,10 +341,8 @@ const std::array<uint32_t, 256> *World::completeBlock(const Core &c, int id) con
         if (!complete.attributes(c, id, attributes))
             return nullptr;
         std::array<uint32_t, 256> pixels;
-        for (int yy = 0; yy < 16; ++yy)
-            for (int xx = 0; xx < 16; ++xx)
-                pixels[yy * 16 + xx] =
-                    preparedTilePixel(c.snapshot, 0, attributes[(yy / 8) * 2 + xx / 8], xx, yy);
+        for (int q = 0; q < 4; ++q)
+            copyQuadrant(c.snapshot, 0, attributes[q], pixels.data() + (q / 2) * 128 + (q % 2) * 8);
         index = int(completeBlocks.size());
         completeBlocks.push_back(pixels);
     }
@@ -404,9 +418,41 @@ void World::prepareGraphics(const Core &c, const Scene &s, bool terrain) {
     std::array<int, 10> key{{v.mode, v.brightness, v.layers[0].tiles, v.layers[1].tiles,
                              v.layers[2].tiles, v.layers[3].tiles, int(c.cart.checksum), s.kind,
                              s.stage, v.ram[0x70a]}};
-    bool sameGraphics = graphicsCached && key == graphicsKey && v.palette == graphicsPalette &&
-                        graphicsVram.size() == v.vram.size() &&
-                        std::equal(graphicsVram.begin(), graphicsVram.end(), v.vram.begin());
+    bool sameGraphics =
+        graphicsCached && key == graphicsKey && graphicsVram.size() == v.vram.size();
+    bool paletteChanged = !sameGraphics || v.palette != graphicsPalette;
+    bool vramChanged =
+        !sameGraphics || !std::equal(graphicsVram.begin(), graphicsVram.end(), v.vram.begin());
+    if (sameGraphics && (vramChanged || paletteChanged)) {
+        sameGraphics = graphicsPalette[0] == v.palette[0];
+        // Object animation and streamed tilemap entries share VRAM with terrain graphics.
+        // Only bytes and palette banks read by decoded background tiles can stale this cache.
+        for (int bg = 0; bg < 4 && sameGraphics; ++bg) {
+            int depth = bpp(v.mode, bg), bytes = depth * 8;
+            if (!depth)
+                continue;
+            for (const auto &entry : decodedTiles[bg]) {
+                int attr = entry.first;
+                int base = (v.layers[bg].tiles + (attr & 1023) * bytes) & 65535;
+                int palette =
+                    (depth == 8 ? 0 : ((attr >> 10) & 7) << depth) + (v.mode == 0 ? bg * 32 : 0);
+                if ((vramChanged &&
+                     (base + bytes > int(v.vram.size()) ||
+                      !std::equal(v.vram.begin() + base, v.vram.begin() + base + bytes,
+                                  graphicsVram.begin() + base))) ||
+                    (paletteChanged && !std::equal(v.palette.begin() + palette,
+                                                   v.palette.begin() + palette + (1 << depth),
+                                                   graphicsPalette.begin() + palette))) {
+                    sameGraphics = false;
+                    break;
+                }
+            }
+        }
+    }
+    if (vramChanged)
+        graphicsVram.assign(v.vram.begin(), v.vram.end());
+    if (paletteChanged)
+        graphicsPalette = v.palette;
     if (!sameGraphics) {
         ++graphicsRevision;
         for (auto &tiles : decodedTiles)
@@ -415,8 +461,6 @@ void World::prepareGraphics(const Core &c, const Scene &s, bool terrain) {
         completeIndex.assign(65536, -1);
         blockPixels.clear();
         secondaryPixels.clear();
-        graphicsVram.assign(v.vram.begin(), v.vram.end());
-        graphicsPalette = v.palette;
         graphicsKey = key;
         graphicsCached = true;
     }
@@ -476,21 +520,15 @@ void World::prepareGraphics(const Core &c, const Scene &s, bool terrain) {
         ++graphicsRevision;
         blockAttributes[id] = attributes;
         blockValid[id] = valid;
-        for (int y = 0; y < 16; y++)
-            for (int x = 0; x < 16; x++) {
-                int q = ((x & 8) ? 2 : 0) + ((y & 8) ? 1 : 0);
-                size_t a = p + size_t(q) * 2;
-                uint32_t pixel = 0;
-                if (ptr >= 0x8000 && a + 1 < c.cart.bytes.size())
-                    pixel = preparedTilePixel(
-                        v, 0, uint16_t(c.cart.bytes[a] | c.cart.bytes[a + 1] << 8), x, y);
-                blockPixels[id][y * 16 + x] = pixel;
-                if (!secondaryPixels.empty())
-                    secondaryPixels[id][y * 16 + x] =
-                        ptr >= 0x8000 && a + 1 < c.cart.bytes.size()
-                            ? preparedTilePixel(v, 1, blockAttributes[id][q], x, y)
-                            : 0;
+        for (int layer = 0; layer <= int(secondary); ++layer) {
+            auto &pixels = (layer ? secondaryPixels : blockPixels)[id];
+            if (!valid) {
+                pixels.fill(0);
+                continue;
             }
+            for (int q = 0; q < 4; ++q)
+                copyQuadrant(v, layer, attributes[q], pixels.data() + (q % 2) * 128 + (q / 2) * 8);
+        }
     }
 }
 void World::compose(const Core &c, Settings &s, int dw, int dh, float resolutionScale,
@@ -512,7 +550,7 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
             scene.height = complete.y + complete.height;
         }
     }
-    bool sceneryRequested = scene.fullMap && s.view > 0 && s.view < 3;
+    bool sceneryRequested = scene.fullMap && s.view > 0 && s.view < 3 && s.background <= 1;
     if (needScenery != sceneryRequested)
         graphicsVersion = ~uint64_t(0);
     needScenery = sceneryRequested;
@@ -527,35 +565,10 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
         scene.height = std::max(scene.height, maxY);
     }
     expanded = scene.valid && s.view != 0 && (!wholeLevel || completeReady);
-    cleanOverview = expanded && wholeLevel && !s.projectionWatch && c.snapshot.rasterValid &&
-                    !c.snapshot.objectInterlace && c.snapshot.brightness > 0 &&
-                    c.native.size() == size_t(c.width) * c.height;
-    backdropPixels.resize(64 * 56);
-    for (int y = 0; y < 56; y++)
-        for (int x = 0; x < 64; x++) {
-            uint32_t p = 0xff172433;
-            if (c.loaded && !c.native.empty()) {
-                // Ambient colour comes from the emitted image, including layers and
-                // effects absent from a decoded BG2. Crop HUD rows and area-average
-                // before blurring so fine patterns do not turn into colour bands.
-                int cropTop = scene.valid && scene.kind <= 1 ? 32 : 8;
-                int cropBottom = scene.valid && scene.kind == 3 ? 32 : 8;
-                int rows = std::max(1, int(c.height) - cropTop - cropBottom);
-                int x0 = x * int(c.width) / 64, x1 = (x + 1) * int(c.width) / 64;
-                int y0 = cropTop + y * rows / 56, y1 = cropTop + (y + 1) * rows / 56;
-                int rr = 0, gg = 0, bb = 0, n = 0;
-                for (int py = y0; py < std::max(y0 + 1, y1); ++py)
-                    for (int px = x0; px < std::max(x0 + 1, x1); ++px) {
-                        auto q = c.native[py * c.width + px];
-                        rr += (q >> 16) & 255;
-                        gg += (q >> 8) & 255;
-                        bb += q & 255;
-                        ++n;
-                    }
-                p = 0xff000000 | ((rr / n) << 16) | ((gg / n) << 8) | bb / n;
-            }
-            backdropPixels[y * 64 + x] = p;
-        }
+    cleanOverview = expanded && wholeLevel &&
+                    (!s.projectionWatch || s.projectionWatchZoom <= 0.f) &&
+                    c.snapshot.rasterValid && !c.snapshot.objectInterlace &&
+                    c.snapshot.brightness > 0 && c.native.size() == size_t(c.width) * c.height;
     if (!expanded) {
         canvas = {};
         return;
@@ -662,6 +675,37 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
     else
         canvas.pixels.clear();
 }
+const std::vector<uint32_t> &World::ambientPixels(const Core &c) {
+    if (backdropFrame == c.imageVersion && !backdropPixels.empty())
+        return backdropPixels;
+    backdropFrame = c.imageVersion;
+    backdropPixels.resize(64 * 56);
+    if (!c.loaded || !c.width || !c.height || c.native.size() != size_t(c.width) * c.height) {
+        std::fill(backdropPixels.begin(), backdropPixels.end(), 0xff172433);
+        return backdropPixels;
+    }
+    // Crop the status area and average the emitted colours, including scanline effects.
+    int top = std::min(scene.valid && scene.kind <= 1 ? 32 : 8, int(c.height) - 1);
+    int bottom = std::min(scene.valid && scene.kind == 3 ? 32 : 8, int(c.height) - top - 1);
+    int rows = int(c.height) - top - bottom;
+    for (int y = 0; y < 56; ++y) {
+        int y0 = top + y * rows / 56, y1 = std::max(y0 + 1, top + (y + 1) * rows / 56);
+        for (int x = 0; x < 64; ++x) {
+            int x0 = x * int(c.width) / 64, x1 = std::max(x0 + 1, (x + 1) * int(c.width) / 64);
+            int rr = 0, gg = 0, bb = 0;
+            for (int py = y0; py < y1; ++py)
+                for (int px = x0; px < x1; ++px) {
+                    auto p = c.native[size_t(py) * c.width + px];
+                    rr += (p >> 16) & 255;
+                    gg += (p >> 8) & 255;
+                    bb += p & 255;
+                }
+            int n = (y1 - y0) * (x1 - x0);
+            backdropPixels[y * 64 + x] = 0xff000000 | ((rr / n) << 16) | ((gg / n) << 8) | bb / n;
+        }
+    }
+    return backdropPixels;
+}
 void World::rasterCanvas(const Core &c, const Settings &s) {
     if (!expanded || canvasRasterized)
         return;
@@ -682,8 +726,8 @@ void World::rasterCanvas(const Core &c, const Settings &s) {
                                       double(sc.width),
                                       double(sc.height),
                                       double(c.cart.checksum),
-                                      double(sc.cameraX),
-                                      double(sc.cameraY),
+                                      double(wholeLevel ? 0 : sc.cameraX),
+                                      double(wholeLevel ? 0 : sc.cameraY),
                                       double(complete.secondaryX),
                                       double(complete.secondaryY),
                                       double(complete.primaryWidth),
@@ -714,27 +758,27 @@ void World::rasterCanvas(const Core &c, const Settings &s) {
     auto overlayNative = [&] {
         if (c.native.empty())
             return;
-        std::vector<uint8_t> actors;
         if (cleanOverview) {
-            actors.resize(c.native.size());
+            actorMask.assign(c.native.size(), 0);
             const auto &video = c.snapshot;
             if (video.visibleLayers & 16) {
                 for (const auto &object : video.objects) {
                     auto size = voxelSpriteSize(video.objectSize, object.large);
                     int sx = object.x >= 256 ? object.x - 512 : object.x;
                     int sy = object.y > 239 ? object.y - 256 : object.y;
-                    for (int y = std::max(0, sy); y < std::min(int(c.height), sy + size.height); ++y)
+                    for (int y = std::max(0, sy); y < std::min(int(c.height), sy + size.height);
+                         ++y)
                         for (int x = std::max(0, sx); x < std::min(int(c.width), sx + size.width);
                              ++x) {
                             size_t i = size_t(y) * c.width + x;
                             auto color = voxelSpritePixel(video, object, x - sx, y - sy);
                             auto native = c.native[i];
                             if (color && std::abs(int(color & 255) - int(native & 255)) <= 18 &&
-                                std::abs(int((color >> 8) & 255) -
-                                         int((native >> 8) & 255)) <= 18 &&
-                                std::abs(int((color >> 16) & 255) -
-                                         int((native >> 16) & 255)) <= 18)
-                                actors[i] = 1;
+                                std::abs(int((color >> 8) & 255) - int((native >> 8) & 255)) <=
+                                    18 &&
+                                std::abs(int((color >> 16) & 255) - int((native >> 16) & 255)) <=
+                                    18)
+                                actorMask[i] = 1;
                         }
                 }
             }
@@ -763,15 +807,17 @@ void World::rasterCanvas(const Core &c, const Settings &s) {
                     continue;
                 size_t i = size_t(ny) * c.width + nx;
                 bool high = false;
-                if (!cleanOverview || actors[i] || volumeLayer(c, 0, nx, ny, high) ||
+                if (cleanOverview && sc.kind == 3 && ny >= 192)
+                    continue;
+                if (!cleanOverview || actorMask[i] || volumeLayer(c, 0, nx, ny, high) ||
                     (complete.secondary && volumeLayer(c, 1, nx, ny, high)))
                     canvas.pixels[size_t(y) * canvas.width + x] = c.native[i];
             }
         }
     };
     if (retainTerrain && retainedValid && retainedKey == renderKey &&
-        retainedGraphics == graphicsRevision && retainedObserved == observedRevision &&
-        retainedMap == mapRevision) {
+        retainedGraphics == graphicsRevision &&
+        (wholeLevel || retainedObserved == observedRevision) && retainedMap == mapRevision) {
         canvas.pixels = retainedPixels;
         ++terrainReuses;
         overlayNative();
@@ -815,7 +861,6 @@ void World::rasterCanvas(const Core &c, const Settings &s) {
         for (int y = top; y < bottom; ++y) {
             int wy = int(std::floor(canvas.y + y * canvas.worldHeight / canvas.height));
             int sy = wy - complete.secondaryY;
-            int ny = wy - sc.cameraY;
             for (int x = left; x < right;) {
                 int wx = columns[x - left], sx = wx - complete.secondaryX;
                 int end = x + 1;
@@ -844,13 +889,6 @@ void World::rasterCanvas(const Core &c, const Settings &s) {
                 for (; x < end; ++x) {
                     wx = columns[x - left];
                     sx = wx - complete.secondaryX;
-                    int nx = wx - sc.cameraX;
-                    // The authoritative camera covers this region. Retain a
-                    // hole instead of decoding scenery that is immediately
-                    // overwritten; camera bounds are part of the cache key.
-                    if (!c.native.empty() && nx >= 0 && nx < int(c.width) && ny >= 0 &&
-                        ny < int(c.height))
-                        continue;
                     uint32_t pixel = p ? (*p)[(wy & 15) * 16 + (wx & 15)] : 0;
                     uint32_t other = q ? (*q)[(sy & 15) * 16 + (sx & 15)] : 0;
                     if (other &&

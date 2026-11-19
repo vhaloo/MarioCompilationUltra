@@ -99,6 +99,7 @@ std::vector<SDL_Rect> TextureDamage::update(int w, int h, const std::vector<uint
     std::vector<SDL_Rect> rectangles;
     if (width != w || height != h || previous.size() != pixels.size()) {
         rectangles.push_back({0, 0, w, h});
+        previous = pixels;
     } else {
         for (int y = 0; y < h; ++y) {
             const auto *a = pixels.data() + size_t(y) * w;
@@ -110,6 +111,7 @@ std::vector<SDL_Rect> TextureDamage::update(int w, int h, const std::vector<uint
                 ++left;
             while (right > left && a[right - 1] == b[right - 1])
                 --right;
+            std::copy(a + left, a + right, previous.data() + size_t(y) * w + left);
             if (!rectangles.empty()) {
                 auto &r = rectangles.back();
                 int x = std::min(left, r.x), end = std::max(right, r.x + r.w);
@@ -136,7 +138,6 @@ std::vector<SDL_Rect> TextureDamage::update(int w, int h, const std::vector<uint
             rectangles.assign(1, {x, y, right - x, bottom - y});
         }
     }
-    previous = pixels;
     width = w;
     height = h;
     return rectangles;

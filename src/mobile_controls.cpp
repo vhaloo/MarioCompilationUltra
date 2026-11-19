@@ -4,6 +4,9 @@
 #include <limits>
 
 namespace mcu {
+static bool faceButton(int action) {
+    return action == 0 || action == 1 || action == 8 || action == 9;
+}
 bool MobileRect::contains(float px, float py, float p) const {
     return std::isfinite(px) && std::isfinite(py) && w > 0 && h > 0 && px >= x - p && py >= y - p &&
            px < x + w + p && py < y + h + p;
@@ -108,6 +111,14 @@ uint16_t MobileTouches::buttons(const MobileLayout &layout, float deadzone) cons
             continue;
         for (int i = 0; i < layout.count; ++i) {
             const auto &b = layout.buttons[i];
+            // A thumb can roll from run to jump. In the gap between two pads both stay held.
+            if (faceButton(f.action) && faceButton(b.action) && b.rect.w > 0 && b.rect.h > 0) {
+                float dx = (f.x - b.rect.x) / b.rect.w - .5f;
+                float dy = (f.y - b.rect.y) / b.rect.h - .5f;
+                if (dx * dx + dy * dy <= .75f * .75f)
+                    out |= uint16_t(1 << b.action);
+                continue;
+            }
             if (b.action != f.action)
                 continue;
             if (f.action == TouchDpad) {

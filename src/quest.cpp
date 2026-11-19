@@ -1377,7 +1377,9 @@ struct QuestPresentation::Impl {
                                    ? gameScreen.canvas
                                    : nullptr;
             content.native = &app.core.native;
-            content.backdrop = &app.world.backdropPixels;
+            if (mode() == 5 && !passthroughActive && app.settings.questWorldBackdrop &&
+                app.core.loaded)
+                content.backdrop = &app.world.ambientPixels(app.core);
             content.nativeWidth = int(app.core.width);
             content.nativeHeight = int(app.core.height);
             content.version = app.core.imageVersion;

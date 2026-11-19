@@ -13,10 +13,27 @@ static void check(bool b, const char *m) {
 int main() {
     try {
         SDL_SetMainReady();
+        SDL_SetHint(SDL_HINT_GAMECONTROLLER_IGNORE_DEVICES_EXCEPT, "0x1209/0xa071");
+#ifdef _WIN32
+        // Windows can expose an XInput pad without a USB VID/PID for the allowlist.
+        SDL_SetHint(SDL_HINT_XINPUT_ENABLED, "0");
+        SDL_SetHint(SDL_HINT_DIRECTINPUT_ENABLED, "0");
+        SDL_SetHint(SDL_HINT_JOYSTICK_WGI, "0");
+        SDL_SetHint(SDL_HINT_JOYSTICK_RAWINPUT, "0");
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI, "0");
+#endif
         SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
-        int device =
-            SDL_JoystickAttachVirtual(SDL_JOYSTICK_TYPE_GAMECONTROLLER, SDL_CONTROLLER_AXIS_MAX,
-                                      SDL_CONTROLLER_BUTTON_MAX, 0);
+        SDL_VirtualJoystickDesc controller{};
+        controller.version = SDL_VIRTUAL_JOYSTICK_DESC_VERSION;
+        controller.type = SDL_JOYSTICK_TYPE_GAMECONTROLLER;
+        controller.naxes = SDL_CONTROLLER_AXIS_MAX;
+        controller.nbuttons = SDL_CONTROLLER_BUTTON_MAX;
+        controller.vendor_id = 0x1209;
+        controller.product_id = 0xa071;
+        controller.name = "MCU controller fixture";
+        controller.button_mask = (1u << SDL_CONTROLLER_BUTTON_MAX) - 1;
+        controller.axis_mask = (1u << SDL_CONTROLLER_AXIS_MAX) - 1;
+        int device = SDL_JoystickAttachVirtualEx(&controller);
         check(device >= 0, "Attach virtual gamepad");
         SDL_Joystick *joy = SDL_JoystickOpen(device);
         check(joy != nullptr, "Open virtual gamepad");
@@ -234,6 +251,7 @@ int main() {
             check(a.settings.view == 4, "Ctrl+5 selects the full level map");
             a.settings.recommendedPicture();
             a.settings.hintOpacity = 0;
+            a.settings.noticeSeconds = 0;
             // Reproduce a retained menu focus, as seen when launching straight
             // into a game before a normal visible menu frame has retired it.
             ImGui::SetWindowFocus("##menu");
@@ -247,8 +265,9 @@ int main() {
                              GImGui->NavWindowingTarget == nullptr &&
                              GImGui->NavWindowingTargetAnim == nullptr;
             }
-            check(cleanGame && a.core.frame == runFrame + 80 && (a.core.buttons[0] & 130) == 130,
-                  "Holding run and right cannot draw an invisible-menu window switcher over play");
+            check(cleanGame, "Holding run and right does not draw the menu switcher over play");
+            check(a.core.frame == runFrame + 80, "Holding game controls advances each simulation step");
+            check((a.core.buttons[0] & 130) == 130, "The fixture sends run and right to player one");
             press(SDL_CONTROLLER_BUTTON_BACK);
             press(SDL_CONTROLLER_BUTTON_START);
             step();
@@ -315,9 +334,7 @@ int main() {
             for (int i = 0; i < 4; i++)
                 step();
             check(a.core.loaded, "Disconnect does not unload the cartridge");
-            device =
-                SDL_JoystickAttachVirtual(SDL_JOYSTICK_TYPE_GAMECONTROLLER, SDL_CONTROLLER_AXIS_MAX,
-                                          SDL_CONTROLLER_BUTTON_MAX, 0);
+            device = SDL_JoystickAttachVirtualEx(&controller);
             joy = SDL_JoystickOpen(device);
             check(joy != nullptr, "Replacement gamepad reconnects");
             SDL_JoystickSetVirtualButton(joy, SDL_CONTROLLER_BUTTON_BACK, 1);

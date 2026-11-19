@@ -269,7 +269,38 @@ int main() {
             ++c.imageVersion;
             composeVerified(world, c, settings, 1280, 720);
             check(world.scene.cameraX == 64 && world.scene.cameraY == 33,
-                  "A moving native camera rebuilds the retained hole before it reveals terrain");
+                  "Moving both terrain planes places the updated live camera correctly");
+            auto builds = world.terrainBuilds;
+            put(r, 0x1a, 65);
+            put(r, 0x1e, 178);
+            c.snapshot.vram[0xf000] ^= 1;
+            c.snapshot.palette[254] ^= 31;
+            ++c.imageVersion;
+            composeVerified(world, c, settings, 1280, 720);
+            check(world.terrainBuilds == builds && world.scene.cameraX == 65,
+                  "Camera motion and unrelated sprite animation reuse the full terrain");
+            c.snapshot.rasterValid = true;
+            c.snapshot.layers[0].map = c.snapshot.layers[1].map = 0x6000;
+            for (int i = 0; i < 1024; ++i)
+                put(c.snapshot.vram, 0x6000 + i * 2, 1);
+            for (auto &line : c.snapshot.raster) {
+                line[0] = {65, 33};
+                line[1] = {178, 84};
+            }
+            ++c.imageVersion;
+            composeVerified(world, c, settings, 1280, 720);
+            const auto &covered = world.canvas;
+            int screenX = int(std::ceil((80 - covered.x) * covered.width / covered.worldWidth));
+            int screenY = int(std::ceil((64 - covered.y) * covered.height / covered.worldHeight));
+            check(world.cleanOverview &&
+                      covered.pixels[size_t(screenY) * covered.width + screenX] == 0xffff0000,
+                  "Transparent live camera pixels keep the complete terrain underneath");
+            c.snapshot.palette[1] = 31 << 10;
+            ++c.imageVersion;
+            composeVerified(world, c, settings, 1280, 720);
+            check(covered.pixels[size_t(screenY) * covered.width + screenX] == 0xff0000ff,
+                  "An animated terrain palette updates under the camera and invalidates the cache");
+            c.snapshot.rasterValid = false;
             c.width = 512;
             c.native.assign(size_t(c.width) * c.height, 0xffa65e18);
             ++c.imageVersion;

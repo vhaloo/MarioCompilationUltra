@@ -28,6 +28,9 @@ class World {
     std::vector<std::array<uint32_t, 256>> secondaryPixels;
     std::vector<std::array<uint16_t, 4>> blockAttributes;
     std::vector<uint32_t> scenery;
+    std::vector<uint8_t> actorMask;
+    std::vector<uint32_t> backdropPixels;
+    uint64_t backdropFrame = ~uint64_t(0);
     mutable std::array<std::unordered_map<uint16_t, std::array<uint32_t, 64>>, 4> decodedTiles;
     mutable std::vector<int> completeIndex;
     mutable std::vector<std::array<uint32_t, 256>> completeBlocks;
@@ -49,6 +52,8 @@ class World {
     uint64_t lastFrame = ~uint64_t(0);
     bool wholeLevel = false, needScenery = false, cameraReady = false;
     uint32_t tilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
+    const std::array<uint32_t, 64> &preparedTile(const McuVideo &, int bg, uint16_t attr) const;
+    void copyQuadrant(const McuVideo &, int bg, uint16_t attr, uint32_t *destination) const;
     uint32_t preparedTilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
     uint32_t bgPixel(const McuVideo &, int bg, int x, int y, bool prepared = false,
                      bool *high = nullptr) const;
@@ -62,7 +67,7 @@ class World {
     Canvas canvas;
     Scene scene;
     CompleteMap complete;
-    std::vector<uint32_t> backdropPixels;
+    const std::vector<uint32_t> &ambientPixels(const Core &);
     bool expanded = false, retainTerrain = true, canvasRasterized = false, cleanOverview = false;
     uint64_t terrainBuilds = 0, terrainReuses = 0;
     size_t knownTiles() const { return cache.size(); }
@@ -71,6 +76,7 @@ class World {
         lastKind = -1;
         lastFrame = ~uint64_t(0);
         cameraReady = false;
+        backdropFrame = ~uint64_t(0);
         cache.clear();
         graphicsVersion = ~uint64_t(0);
         graphicsCached = false;

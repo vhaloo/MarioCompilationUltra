@@ -216,11 +216,14 @@ void App::mobileOverlay() {
                            : std::min(1.f, alpha + (pressed ? .25f : 0.f))});
     };
     auto edge = ImGui::ColorConvertFloat4ToU32({.65f, .85f, .80f, std::min(1.f, alpha + .15f)});
+    auto pressedButtons = touch.buttons(touchLayout, settings.deadzone * .01f);
     for (int i = 0; i < touchLayout.count; ++i) {
         const auto &button = touchLayout.buttons[i];
         auto r = button.rect;
         ImVec2 a{r.x, r.y}, b{r.x + r.w, r.y + r.h}, centre{r.x + r.w * .5f, r.y + r.h * .5f};
-        bool held = touch.held(button.action);
+        bool held = button.action >= 0 && button.action < 12
+                        ? (pressedButtons & (1u << button.action)) != 0
+                        : touch.held(button.action);
         if (button.action == TouchDpad) {
             float u = r.w / 3;
             draw->AddRectFilled({a.x + u, a.y}, {a.x + u * 2, b.y}, fill(held), u * .15f);

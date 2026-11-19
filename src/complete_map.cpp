@@ -10,9 +10,7 @@ size_t offset(unsigned address) {
     return size_t((address >> 16) & 0x7f) * 0x8000 + (address & 0x7fff);
 }
 } // namespace
-McuVideo::Scroll worldCamera(const Core &c, int layer) {
-    auto &v = c.snapshot;
-    McuVideo::Scroll camera{word(v.ram, 0x1a + layer * 4), word(v.ram, 0x1c + layer * 4) + 1};
+McuVideo::Scroll alignRasterCamera(const McuVideo &v, int layer, McuVideo::Scroll camera) {
     if (v.rasterValid) {
         // RAM may already contain the next simulation frame's scroll. Resolve
         // the emitted frame's scroll near that world position, including wraps.
@@ -24,6 +22,11 @@ McuVideo::Scroll worldCamera(const Core &c, int layer) {
         camera = {resolve(camera.x, emitted.x), resolve(camera.y, emitted.y)};
     }
     return camera;
+}
+McuVideo::Scroll worldCamera(const Core &c, int layer) {
+    const auto &r = c.snapshot.ram;
+    return alignRasterCamera(c.snapshot, layer,
+                             {word(r, 0x1a + layer * 4), word(r, 0x1c + layer * 4) + 1});
 }
 int worldMapCell(const Core &c, int layer, int wx, int wy) {
     if (wx < 0 || wy < 0 || layer < 0 || layer > 1)

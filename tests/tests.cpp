@@ -287,7 +287,9 @@ int main() {
             ram[0x22] = 1;
             ram[0x55] = 1;
             ram[0x70] = 128;
-            ram[0x82] = 145;
+            ram[0x543] = 239;
+            ram[0x79] = 245;
+            ram[0x82] = 3;
             core.snapshot.layers[0] = back;
             core.snapshot.layers[0].x = core.snapshot.layers[0].y = 256;
             core.snapshot.rasterValid = true;
@@ -296,6 +298,8 @@ int main() {
             ++core.imageVersion;
             layout.reset();
             layout.compose(core, renderSettings, 1280, 720);
+            check(layout.scene.cameraX == 0 && layout.scene.cameraY == 240,
+                  "SMB3 scrolling follows the camera when sprite coordinates wrap");
             check(layout.sampleTerrainForTest(core, 16, 320) == 0xffff0000,
                   "Observed terrain uses gameplay row scroll instead of the final HUD scroll");
             check(layout.sampleTerrainForTest(core, 16, 440) == 0,
@@ -321,6 +325,9 @@ int main() {
             layout.reset();
             layout.compose(core, renderSettings, 1280, 720);
             ram[0x5e] = 64;
+            ram[0x210] = 64;
+            for (auto &line : core.snapshot.raster)
+                line[0].x = 64;
             ++core.imageVersion;
             layout.compose(core, renderSettings, 1280, 720);
             int skyX = int(
@@ -335,8 +342,9 @@ int main() {
             renderSettings.background = 1;
             ++core.imageVersion;
             layout.compose(core, renderSettings, 1280, 720);
-            check(std::all_of(layout.backdropPixels.begin(), layout.backdropPixels.end(),
-                              [](auto p) { return p == 0xff123456; }),
+            const auto &ambient = layout.ambientPixels(core);
+            check(ambient.size() == 64 * 56 && std::all_of(ambient.begin(), ambient.end(),
+                                                           [](auto p) { return p == 0xff123456; }),
                   "Sharp ambient scenery retains the emitted image's layers and colour effects");
             core.native = std::move(originalPixels);
             core.snapshot.rasterValid = false;

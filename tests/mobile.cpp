@@ -88,6 +88,13 @@ int main() {
               "A sliding finger changes direction without releasing run or jump");
         touches.up(3);
         check(!(touches.buttons(layout) & 1), "Lifting a finger releases only its button");
+        auto run = rect(layout, 1), jump = rect(layout, 0);
+        touches.move(2, (run.x + run.w * .5f + jump.x + jump.w * .5f) * .5f,
+                     (run.y + run.h * .5f + jump.y + jump.h * .5f) * .5f);
+        check((touches.buttons(layout) & 3) == 3,
+              "One thumb holds run and jump together between adjacent face pads");
+        touches.move(2, jump.x + jump.w * .5f, jump.y + jump.h * .5f);
+        check((touches.buttons(layout) & 3) == 1, "Rolling the thumb onto jump releases run");
         touches.move(2, -1000, -1000);
         check(!(touches.buttons(layout) & 2), "Sliding away releases a face button");
         touches.clear();

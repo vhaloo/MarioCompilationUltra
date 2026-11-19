@@ -814,7 +814,7 @@ void App::background() {
     if (backdropVersion == ~uint64_t(0) || !backgroundTex || backdropKey != key ||
         (backdropVersion != core.imageVersion && core.imageVersion % effectCadence() == 0)) {
         auto pixels =
-            softenBackdrop(world.backdropPixels, w, h,
+            softenBackdrop(world.ambientPixels(core), w, h,
                            settings.background == 0 ? settings.blur / 4 : 0, settings.brightness);
         if (pixels.empty())
             return;

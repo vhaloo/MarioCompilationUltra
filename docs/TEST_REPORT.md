@@ -1,5 +1,22 @@
 # Validation report
 
+## 0.10.0
+
+The full-map regression fixture moves the camera across two overlapping terrain
+layers, changes sprite memory, then animates a terrain palette. It compares the
+retained map with a fresh render and independently checks the colour underneath
+the live camera. Mobile input tests cover sliding a single thumb from run to
+jump, holding both in the gap and releasing one on the destination pad.
+
+A private Windows replay sampled the foreground of Super Mario Bros. 3 every
+15 frames over 180 emulated frames. The old renderer advanced the camera three
+pixels early on one sample. The corrected map matched all 3,209 foreground
+samples on that frame and the complete set of samples on the other eleven.
+This comparison follows movement within one room.
+
+Physical Mac, Quest, phone, tablet and watch gameplay remain unverified for
+this release. The nine ROM-free test suites can run from the public source.
+
 ## 0.9.2
 
 The automated suites cover settings reset and persistence, local captures from
