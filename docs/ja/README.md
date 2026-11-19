@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.10.0
+# Mario Compilation Ultra 0.10.1
 
 PC向けの使いやすい画面と実験的な拡張表示を備えたローカルSNESコレクションです。Super FXを含むカートリッジの動作はSnes9xが再現します。全作品を逆コンパイルしたものではありません。
 
-[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.10.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.10.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## ダウンロードとデスクトップからの起動
 
@@ -83,15 +83,15 @@ sh ./Install-Linux.sh
 
 ## Androidスマートフォンとタブレット
 
-[Androidスマートフォンとタブレット](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.10.0/MarioCompilationUltra-0.10.0-Android-public.apk)
+[Androidスマートフォンとタブレット](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.10.1/MarioCompilationUltra-0.10.1-Android-public.apk)
 
 ## 時計の表示
 
-[時計の表示](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.10.0/MarioCompilationUltra-0.10.0-Wear-public.apk) · [図解設定ガイド](SETTINGS.md)
+[時計の表示](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.10.1/MarioCompilationUltra-0.10.1-Wear-public.apk) · [図解設定ガイド](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.10.0/MarioCompilationUltra-0.10.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.10.1/MarioCompilationUltra-0.10.1-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 操作
 
@@ -163,7 +163,7 @@ View/Back: 設定 · LT: 巻き戻し · RT: Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 配布パッケージと検証 · 0.10.0
+## 配布パッケージと検証 · 0.10.1
 
 全体マップではカメラが動いても地形が表示されます。タッチ操作では親指をYからBへ滑らせると、走りながらジャンプできます。Mac版は実験版です。Questと腕時計の実機でのプレイは未検証です。
 

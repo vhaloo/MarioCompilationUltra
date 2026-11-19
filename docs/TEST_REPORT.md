@@ -1,6 +1,6 @@
 # Validation report
 
-## 0.10.0
+## 0.10.1
 
 The full-map regression fixture moves the camera across two overlapping terrain
 layers, changes sprite memory, then animates a terrain palette. It compares the
@@ -13,6 +13,14 @@ A private Windows replay sampled the foreground of Super Mario Bros. 3 every
 pixels early on one sample. The corrected map matched all 3,209 foreground
 samples on that frame and the complete set of samples on the other eleven.
 This comparison follows movement within one room.
+
+The level-entry harness checked 105 classic room definitions, 115 Mario 2
+areas, 1,024 World entries across two cartridge editions, and 222 Yoshi entries.
+World produced 976 expanded maps and Yoshi produced 217. Their geometry checks
+passed. A separate Mario 3 harness forcibly entered 210 rooms. Of the 87 that
+produced a map, 83 diverged from the emitted foreground. Several sampled native
+frames contained only edge columns of the room after forced entry. The full
+Mario 3 room set still needs validation through normal entrances.
 
 Physical Mac, Quest, phone, tablet and watch gameplay remain unverified for
 this release. The nine ROM-free test suites can run from the public source.
