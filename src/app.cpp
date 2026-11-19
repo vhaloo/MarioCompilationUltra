@@ -344,6 +344,7 @@ void App::hotplug() {
 }
 void App::toggleMenu() {
     touch.clear();
+    volumeFinger.reset();
     pendingTouchButtons = 0;
     menu = !menu || !core.loaded;
     releaseInput = true;
@@ -395,6 +396,13 @@ void App::events() {
         }
         if (mobileActive() && mobileEvent(e))
             continue;
+        if (!mobileActive() && e.type == SDL_MOUSEMOTION && e.motion.which != SDL_TOUCH_MOUSEID &&
+            (e.motion.state & SDL_BUTTON_LMASK)) {
+            int w, h;
+            SDL_GetWindowSize(window, &w, &h);
+            dragVolume(float(e.motion.xrel) / std::max(1, w),
+                       float(e.motion.yrel) / std::max(1, h));
+        }
         ImGui_ImplSDL2_ProcessEvent(&e);
         if (e.type == SDL_RENDER_TARGETS_RESET || e.type == SDL_RENDER_DEVICE_RESET)
             invalidateGraphics(e.type == SDL_RENDER_DEVICE_RESET);
@@ -497,10 +505,17 @@ void App::input() {
         if (on)
             b |= 1 << bit;
     };
-    add(k[SDL_SCANCODE_UP], 4);
-    add(k[SDL_SCANCODE_DOWN], 5);
-    add(k[SDL_SCANCODE_LEFT], 6);
-    add(k[SDL_SCANCODE_RIGHT], 7);
+    bool keyboardOrbit = !menu && core.loaded && settings.volumeMode && volumeScene.ready &&
+                         (SDL_GetModState() & KMOD_ALT);
+    if (keyboardOrbit)
+        moveVolumeCamera(float(k[SDL_SCANCODE_RIGHT] - k[SDL_SCANCODE_LEFT]),
+                         float(k[SDL_SCANCODE_DOWN] - k[SDL_SCANCODE_UP]), false, seconds);
+    else {
+        add(k[SDL_SCANCODE_UP], 4);
+        add(k[SDL_SCANCODE_DOWN], 5);
+        add(k[SDL_SCANCODE_LEFT], 6);
+        add(k[SDL_SCANCODE_RIGHT], 7);
+    }
     add(k[SDL_SCANCODE_RETURN] && !(SDL_GetModState() & KMOD_ALT), 3);
     add(k[SDL_SCANCODE_RSHIFT], 2);
     add(k[SDL_SCANCODE_Z], 0);
@@ -657,6 +672,11 @@ void App::input() {
         settings.cameraY += (k[SDL_SCANCODE_K] ? speed : 0) - (k[SDL_SCANCODE_I] ? speed : 0);
     }
 }
+void App::dragVolume(float dx, float dy) {
+    if (!menu && core.loaded && focused && !backgrounded && settings.volumeMode &&
+        volumeScene.ready && volumeView.rotate(240.f * dx, 130.f * dy))
+        dirty = true;
+}
 bool App::moveVolumeCamera(float x, float y, bool pan, float seconds) {
     if (!core.loaded || menu || backgrounded || (!focused && settings.pauseFocus) ||
         !settings.volumeMode || !volumeScene.ready)
@@ -761,7 +781,6 @@ void App::tick() {
     uint64_t began = SDL_GetPerformanceCounter();
     if (rewinding) {
         core.rewind();
-        world.reset();
         simulationWorkMs +=
             1000. * (SDL_GetPerformanceCounter() - began) / SDL_GetPerformanceFrequency();
         return;
@@ -810,8 +829,10 @@ void App::background() {
                                           SDL_TEXTUREACCESS_STREAMING, w, h);
         SDL_SetTextureScaleMode(backgroundTex, SDL_ScaleModeLinear);
     }
-    std::array<int, 3> key{{settings.background, settings.blur, settings.brightness}};
-    if (backdropVersion == ~uint64_t(0) || !backgroundTex || backdropKey != key ||
+    std::array<int, 6> key{{settings.background, settings.blur, settings.brightness,
+                            int(world.scene.valid), world.scene.kind, world.scene.stage}};
+    if (backdropVersion == ~uint64_t(0) || backdropVersion < core.lastRestoreImage ||
+        !backgroundTex || backdropKey != key ||
         (backdropVersion != core.imageVersion && core.imageVersion % effectCadence() == 0)) {
         auto pixels =
             softenBackdrop(world.ambientPixels(core), w, h,
@@ -1367,15 +1388,14 @@ void App::optionsUi() {
             this->slider("Voxel thickness", settings.volumeDepth, 1, 16, "%d px");
             this->slider("Layer spacing", settings.volumeSpacing, 1, 12, "%d px");
 #ifndef MCU_QUEST
-            this->slider("Volume angle", settings.volumeAngle, -30, 30);
-            this->slider("Volume tilt", settings.volumeTilt, -30, 30);
+            this->slider("Volume angle", settings.volumeAngle, -180, 180, "%d°");
+            this->slider("Volume tilt", settings.volumeTilt, -80, 80, "%d°");
 #endif
             if (settings.volumeMode == 2)
                 tick("Rounded voxel shapes", settings.volumeRound);
             if (button("Center volume camera"))
                 volumeView = {};
-            ImGui::TextWrapped("%s", tr("Right stick: look around. Hold the stick click and move "
-                                       "it to pan."));
+            ImGui::TextWrapped("%s", tr("Orbit controls"));
         }
         ImGui::TextColored({.55f, .9f, .75f, 1}, "%s", tr("Find your balance"));
         bool presetRow = ImGui::GetContentRegionAvail().x > 720 * uiUnit();
@@ -2524,9 +2544,9 @@ void App::scriptCommand(const std::string &cmd, const std::string &value) {
     else if (cmd == "volumeSpacing")
         settings.volumeSpacing = std::clamp(std::stoi(value), 1, 12);
     else if (cmd == "volumeAngle")
-        settings.volumeAngle = std::clamp(std::stoi(value), -30, 30);
+        settings.volumeAngle = std::clamp(std::stoi(value), -180, 180);
     else if (cmd == "volumeTilt")
-        settings.volumeTilt = std::clamp(std::stoi(value), -30, 30);
+        settings.volumeTilt = std::clamp(std::stoi(value), -80, 80);
     else if (cmd == "volumeRound")
         settings.volumeRound = std::stoi(value) != 0;
     else if (cmd == "buttons")
@@ -2548,7 +2568,6 @@ void App::scriptCommand(const std::string &cmd, const std::string &value) {
         bootstrap = false;
     } else if (cmd == "rewind") {
         core.rewind();
-        world.reset();
     } else if (cmd == "capture")
         capture(fs::u8path(value));
     else if (cmd == "background")

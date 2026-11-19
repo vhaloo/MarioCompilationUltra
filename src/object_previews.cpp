@@ -67,7 +67,8 @@ void ObjectPreviews::update(const Core &c, const Scene &s, int cadence) {
         objects.clear();
         return;
     }
-    if (game != c.currentId || cartridge != c.cart.checksum || room != s.stage) {
+    if (game != c.currentId || cartridge != c.cart.checksum || room != s.stage ||
+        version < c.lastRestoreImage) {
         images.clear();
         game = c.currentId;
         cartridge = c.cart.checksum;
@@ -188,7 +189,7 @@ void ObjectPreviews::update(const Core &c, const Scene &s, int cadence) {
                     true);
         }
     }
-    if (c.imageVersion % std::max(1, cadence) == 0)
+    if (c.imageVersion == c.lastRestoreImage || c.imageVersion % std::max(1, cadence) == 0)
         learn(c, s, cadence > 1 ? 1 : 128);
 }
 uint32_t ObjectPreviews::spritePixel(const McuVideo &v, const McuVideo::Object &o, int x, int y) {

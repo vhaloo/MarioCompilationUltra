@@ -156,12 +156,25 @@ int main() {
             check((core.native[(core.height / 2) * core.width + 100] & 0x00ff0000) >= 0x00e00000 &&
                       (core.native[(core.height / 2) * core.width + 100] & 0x0000ffff) == 0,
                   "Original synthetic backdrop rendered");
+            // The observer sees the PPU at video delivery, before VBlank may
+            // replace the tilemap, palette and the scroll used by the HUD.
+            core.snapshot.raster[4][2] = {37, 932};
+            core.snapshot.raster[194][0] = {288, 1};
+            core.snapshot.vram[0x4200] = 63;
+            core.snapshot.palette[31] = 0x725;
+            core.snapshot.objects[43] = {-7, 92, 301, 6, true, true, false, 3};
             auto b = core.state();
             check(!b.empty(), "SNES state serialization");
             uint8_t ramBefore = core.snapshot.ram[0];
             for (int i = 0; i < 20; i++)
                 core.tick();
             check(core.restore(b), "SNES state restore");
+            check(core.snapshot.rasterValid && core.frame == 30 &&
+                      core.snapshot.raster[4][2].y == 932 &&
+                      core.snapshot.raster[194][0].x == 288 && core.snapshot.vram[0x4200] == 63 &&
+                      core.snapshot.palette[31] == 0x725 && core.snapshot.objects[43].x == -7 &&
+                      core.snapshot.objects[43].flipX,
+                  "A restored image retains its displayed scanlines and timeline position");
             check(core.snapshot.ram[0] == ramBefore, "Restored WRAM identity");
             auto fast = core.state(true);
             check(fast.capacity() <= fast.size() * 2,
@@ -170,8 +183,9 @@ int main() {
             auto ramSnapshot = core.snapshot.ram;
             for (int i = 0; i < 8; ++i)
                 core.tick();
-            check(fast.size() > 32 && fast[6] == '2' && core.restore(fast) &&
-                      core.native == nativeBefore && core.snapshot.ram == ramSnapshot,
+            check(fast.size() > 32 && fast[6] == '4' && core.restore(fast) &&
+                      core.native == nativeBefore && core.snapshot.ram == ramSnapshot &&
+                      core.snapshot.raster[194][0].x == 288 && core.frame == 30,
                   "Fast rewind restores the exact native image and all WRAM bytes");
             for (size_t offset : {size_t(28), size_t(32), fast.size() - 1}) {
                 auto corrupt = fast;

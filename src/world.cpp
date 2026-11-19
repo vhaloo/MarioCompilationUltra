@@ -31,7 +31,9 @@ Scene World::inspect(const Core &c, bool completeView) const {
     Scene s;
     auto &r = c.snapshot.ram;
     // Yoshi sets force-blank during its VBlank transfers while the emitted frame is valid.
-    if (!c.loaded || !c.cart.supported || (c.snapshot.blank && c.currentId != "yoshi"))
+    if (!c.loaded || !c.cart.supported || (c.snapshot.blank && c.currentId != "yoshi") ||
+        c.height > c.snapshot.raster.size() ||
+        (c.lastRestoreImage && c.imageVersion == c.lastRestoreImage && !c.snapshot.rasterValid))
         return s;
     s.id = c.currentId;
     s.kind = s.id == "world"        ? 4
@@ -372,8 +374,7 @@ void World::remember(const Core &c, const Scene &s) {
     maxY = std::max(maxY, s.cameraY + 224);
     if (s.fullMap)
         return;
-    // Serialized states retain their exact native image, but the core's per-row
-    // renderer scratch data is rebuilt on the next real frame. Do not cache it early.
+    // Older disk saves have no scanlines until the first newly emitted frame.
     if (!c.snapshot.rasterValid)
         return;
     // Sample the actual BG1 ring buffer only inside the authoritative camera.
@@ -392,10 +393,13 @@ void World::remember(const Core &c, const Scene &s) {
                     int dy = row + c.snapshot.raster[row][0].y;
                     t.pixels[y * 8 + x] = bgPixel(c.snapshot, 0, dx, dy, true);
                 }
-            auto &previous = cache[key(tx, ty)];
-            if (previous.pixels != t.pixels)
+            auto [it, added] = cache.try_emplace(key(tx, ty));
+            auto &previous = it->second;
+            if (added || previous.pixels != t.pixels) {
                 ++observedRevision;
-            previous = t;
+                previous.pixels = t.pixels;
+                previous.changedAt = c.frame;
+            }
         }
     if (cache.size() > 262144) {
         cache.clear();
@@ -538,6 +542,27 @@ void World::compose(const Core &c, Settings &s, int dw, int dh, float resolution
         graphicsVersion = ~uint64_t(0);
     wholeLevel = s.view == 4;
     scene = inspect(c, s.view == 4);
+    if (seenRestore != c.lastRestoreImage) {
+        seenRestore = c.lastRestoreImage;
+        cameraReady = false;
+        retainedValid = false;
+        minX = scene.cameraX;
+        maxX = minX + int(c.width);
+        minY = scene.cameraY;
+        maxY = minY + int(c.height);
+        for (auto it = cache.begin(); it != cache.end();) {
+            if (it->second.changedAt > c.frame)
+                it = cache.erase(it);
+            else {
+                int x = int32_t(it->first >> 32) * 8, y = int32_t(it->first) * 8;
+                minX = std::min(minX, x);
+                maxX = std::max(maxX, x + 8);
+                minY = std::min(minY, y);
+                maxY = std::max(maxY, y + 8);
+                ++it;
+            }
+        }
+    }
     if (!scene.valid && lastStage != -1)
         reset();
     bool completeReady = false;

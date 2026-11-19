@@ -11,13 +11,18 @@ namespace {
 struct ExamplePreset {
     const char *file;
     const char *label;
-    int view, volume;
+    int view, volume, angle = 18, tilt = -12;
 };
 constexpr ExamplePreset Examples[] = {
-    {"original", "Original framing", 0, 0}, {"panorama", "Panorama", 1, 0},
-    {"pixel", "Pixel world", 2, 0},         {"atlas", "Stage atlas", 3, 0},
-    {"full-map", "Full level map", 4, 0},   {"relief", "Pixel relief", 0, 1},
-    {"voxels", "Voxels", 0, 2},
+    {"original", "Original framing", 0, 0},
+    {"panorama", "Panorama", 1, 0},
+    {"pixel", "Pixel world", 2, 0},
+    {"atlas", "Stage atlas", 3, 0},
+    {"full-map", "Full level map", 4, 0},
+    {"relief", "Pixel relief", 0, 1},
+    {"voxels", "Voxels", 0, 2, 32, -14},
+    {"voxel-side", "Voxel side view", 0, 2, 74, -15},
+    {"voxel-rear", "Voxel rear view", 0, 2, 155, -18},
 };
 int gameIndex(const std::string &id) {
     for (int i = 0; i < int(games().size()); ++i)
@@ -107,6 +112,10 @@ bool App::exampleForSetting(const char *key, float width) {
         style = settings.view;
     else if (label == "Pixel volume")
         style = settings.volumeMode == 0 ? 0 : 4 + settings.volumeMode;
+    else if (label == "Volume angle" && settings.volumeMode == 2)
+        style = std::abs(settings.volumeAngle) >= 120  ? 8
+                : std::abs(settings.volumeAngle) >= 55 ? 7
+                                                       : 6;
     else if (label == "Voxel thickness" || label == "Layer spacing" ||
              label == "Rounded voxel shapes" || label == "Volume angle" || label == "Volume tilt")
         style = settings.volumeMode == 1 ? 5 : 6;
@@ -119,6 +128,7 @@ bool App::exampleForSetting(const char *key, float width) {
     return style >= 0 && exampleImage(game, style, width);
 }
 void App::exampleGallery() {
+    static_assert(std::size(Examples) == ExampleCount);
     if (!ImGui::CollapsingHeader(tr("Actual game captures")))
         return;
     int game = exampleGame < 0 ? std::max(0, gameIndex(core.currentId)) : exampleGame;
@@ -207,7 +217,10 @@ void App::renderNextExample() {
         settings.view = preset.view;
         settings.volumeMode = preset.volume;
         settings.adaptiveResolution = false;
-        settings.background = 3;
+        settings.volumeAngle = preset.angle;
+        settings.volumeTilt = preset.tilt;
+        if (preset.view <= 2 && !preset.volume)
+            settings.background = 0;
         settings.inset = false;
         world = preset.view == 1 || preset.view == 3 ? liveWorld : World{};
         volumeScene = VoxelScene{};
@@ -257,6 +270,7 @@ void App::renderNextExample() {
         nativeRect = liveNativeRect;
         insetRect = liveInsetRect;
         volumeDrawn = liveVolumeDrawn;
+        backdropVersion = ~uint64_t(0);
         voxelRasterVersion = volumeHudVersion = lastCompose = ~uint64_t(0);
         SDL_SetRenderTarget(renderer, previous);
         SDL_RenderSetScale(renderer, sx, sy);

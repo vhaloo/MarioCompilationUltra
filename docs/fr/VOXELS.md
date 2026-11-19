@@ -6,6 +6,8 @@
 
 Sur ordinateur ou appareil tactile, ouvre Écran → Volume des pixels. Essaie d’abord le Relief des pixels pour une profondeur discrète, puis les Voxels. L’épaisseur modifie le corps de chaque pixel ; l’écartement éloigne les couches sans changer leur ordre. Sur Quest, utilise la page Volume de la télécommande spatiale. Sur montre, la couronne zoome de la zone entière jusqu’à l’écran d’origine en fin de course.
 
+Fais un tour complet avec le stick droit, Alt + flèches ou un glissement sur le jeu. Sur écran tactile, commence hors des boutons. Maintiens le stick enfoncé pour déplacer la vue.
+
 3D procédurale facultative : les pixels deviennent des colonnes solides, avec terrain, décors et personnages sur des plans distincts. Le relief est léger ; les voxels sont plus épais. L’épaisseur règle la profondeur et l’angle règle la vue sur écran. La qualité automatique réduit le détail sous charge. HUD et gros plans gardent les pixels originaux. Les scènes spéciales reviennent à l’écran original. Il s’agit d’une interprétation, pas d’une reconstruction des faces cachées. Les performances physiques restent non testées. Les formes arrondies génèrent des corps en gradins à partir de la transparence des personnages ; désactivées, l’extrusion reste uniforme. L’inclinaison règle l’élévation de la vue sur écran. Les positions et la physique du jeu restent inchangées. L’écartement sépare les couches en profondeur sans changer leur ordre.
 
 | Volume des pixels | |
@@ -16,8 +18,8 @@ Sur ordinateur ou appareil tactile, ouvre Écran → Volume des pixels. Essaie d
 
 - **Épaisseur des voxels**: 1–16 px
 - **Écartement des couches**: 1–12 px
-- **Angle du volume**: −30° … +30°
-- **Inclinaison du volume**: −30° … +30°
+- **Angle du volume**: −180° … +180°
+- **Inclinaison du volume**: −80° … +80°
 - **Formes de voxels arrondies**
 
 ![Réglages illustrés](screenshots/volume-help.png)

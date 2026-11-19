@@ -121,7 +121,7 @@ int main() {
             auto pausedNative = a.core.native;
             a.showSection(1);
             a.scriptCommand("examples", "1");
-            for (int i = 0; i < 8; ++i)
+            for (int i = 0; i < 10; ++i)
                 step();
             auto examples = data / "examples" / "world";
             auto *localCapture = SDL_LoadBMP((examples / "original.bmp").u8string().c_str());

@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.10.1
+# Mario Compilation Ultra 0.11.0
 
 Colección local de SNES con una interfaz adaptable para PC y vistas ampliadas experimentales. Snes9x simula las cartuchos, incluido Super FX. El proyecto no afirma haber descompilado todos los juegos.
 
-[Descarga e inicio desde el escritorio](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.10.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Descarga e inicio desde el escritorio](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.11.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Descarga e inicio desde el escritorio
 
@@ -83,15 +83,15 @@ La versión 0.8 adapta resolución del entorno, cuadrícula de vóxeles, frecuen
 
 ## Teléfonos y tabletas Android
 
-[Teléfonos y tabletas Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.10.1/MarioCompilationUltra-0.10.1-Android-public.apk)
+[Teléfonos y tabletas Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Android-public.apk)
 
 ## Vista del reloj
 
-[Vista del reloj](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.10.1/MarioCompilationUltra-0.10.1-Wear-public.apk) · [Ajustes ilustrados](SETTINGS.md)
+[Vista del reloj](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Wear-public.apk) · [Ajustes ilustrados](SETTINGS.md)
 
 ## Quest VR / RA
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.10.1/MarioCompilationUltra-0.10.1-Quest-public.apk) · [Quest VR / RA](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Quest-public.apk) · [Quest VR / RA](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Controles
 
@@ -111,7 +111,7 @@ View/Back: opciones · LT: rebobinar · RT: Select<br>
 Clic stick izquierdo: atlas / mapa completo / panorama · LB/RB: secciones<br>
 Menús: cruceta + abajo confirmar + derecha volver
 
-Orienta la vista con la palanca derecha. Mantenla pulsada y muévela para desplazar la vista.
+Gira 360° con la palanca derecha, Alt + flechas o arrastrando sobre el juego. En pantallas táctiles, empieza fuera de los botones. Mantén pulsada la palanca para desplazar la vista.
 
 ## Guardado y sonido
 
@@ -163,7 +163,7 @@ Vuelve a elegir el cartucho si moviste el archivo o desconectaste la unidad. El 
 
 ![Quest VR / RA](screenshots/6.png)
 
-## Paquetes y validación · 0.10.1
+## Paquetes y validación · 0.11.0
 
 El mapa completo conserva el terreno bajo la cámara en movimiento. En pantallas táctiles, desliza el pulgar de Y hacia B para correr y saltar a la vez. Las versiones para Mac son experimentales. Queda por verificar el juego en un visor Quest y en un reloj físicos.
 

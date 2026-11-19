@@ -98,22 +98,26 @@ bool VoxelScene::update(const Core &c, const World &w, const Settings &s, int pr
                   hudPixels.begin() + size_t(statusStart) * c.width);
     // SMB2's hearts are OBJ. BG3 can contain scenery in the same rectangle;
     // treating it as HUD punches an L-shaped hole into the rendered sky.
-    if (sc.kind != 2 && sc.kind != 3 && (v.visibleLayers & 4))
-        for (auto r : hudAreas)
-            for (int ny = r.y; ny < r.y + r.h; ++ny)
-                for (int nx = r.x; nx < r.x + r.w; ++nx) {
-                    if (nx < 0 || ny < 0 || nx >= int(c.width) || ny >= int(c.height))
-                        continue;
-                    bool high = false;
-                    if (w.volumeLayer(c, 2, nx, ny, high))
-                        hudPixels[size_t(ny) * c.width + nx] = c.native[size_t(ny) * c.width + nx];
-                }
     auto matchesNative = [](uint32_t a, uint32_t b) {
         for (int shift : {0, 8, 16})
             if (std::abs(int((a >> shift) & 255) - int((b >> shift) & 255)) > 18)
                 return false;
         return true;
     };
+    // All-Stars can display the score via the SNES sub-screen. Use both
+    // layer masks, then verify the texel against the emitted picture.
+    if (sc.kind != 2 && sc.kind != 3 && (v.mainLayers & 4))
+        for (auto r : hudAreas)
+            for (int ny = r.y; ny < r.y + r.h; ++ny)
+                for (int nx = r.x; nx < r.x + r.w; ++nx) {
+                    if (nx < 0 || ny < 0 || nx >= int(c.width) || ny >= int(c.height))
+                        continue;
+                    bool high = false;
+                    size_t index = size_t(ny) * c.width + nx;
+                    auto color = w.volumeLayer(c, 2, nx, ny, high);
+                    if (color && matchesNative(color, c.native[index]))
+                        hudPixels[index] = c.native[index];
+                }
     // Read only sprite footprints. The original PPU color supplies HUD texels,
     // so window/color effects are not guessed from the flattened background.
     if (v.visibleLayers & 16)
@@ -182,10 +186,30 @@ bool VoxelScene::update(const Core &c, const World &w, const Settings &s, int pr
                 {px, py, pw, ph, ps, pz, thick, id, std::vector<uint32_t>(size_t(pw) * ph), {}});
             return index;
         };
+        auto shapeTerrain = [&](size_t low) {
+            if (s.volumeMode != 2)
+                return;
+            auto &a = planes[low], &b = planes[low + 1];
+            std::vector<uint32_t> silhouette(a.pixels.size());
+            bool occupied = false;
+            for (size_t i = 0; i < silhouette.size(); ++i) {
+                silhouette[i] = a.pixels[i] | b.pixels[i];
+                occupied |= (silhouette[i] >> 24) != 0;
+            }
+            if (!occupied)
+                return;
+            // Both PPU priorities describe the same physical terrain.
+            // Keep the center of each solid inside its own priority interval.
+            a.z -= depth * .5f;
+            b.z -= depth * .5f;
+            a.depths =
+                roundedVoxelDepths(silhouette, a.width, a.height, s.volumeDepth, a.step, true);
+            b.depths = a.depths;
+        };
         for (int layer = 1; layer >= 0; --layer) {
             // Native-only framing has no prepared offscreen Map16 cache. An
             // odd camera origin and a coarse LOD must not sample its padding.
-            if (!w.expanded)
+            if (!w.expanded || (layer && !w.complete.secondary))
                 continue;
             size_t low = plane(ox, oy, gw, gh, step, z(layer ? 4 : 5), depth, 10 + layer * 2);
             plane(ox, oy, gw, gh, step, z(layer ? 7 : 8), depth, 11 + layer * 2);
@@ -199,6 +223,7 @@ bool VoxelScene::update(const Core &c, const World &w, const Settings &s, int pr
                     auto color = w.volumeTerrain(c, layer, wx, wy, high);
                     planes[low + high].pixels[size_t(gy) * gw + gx] = color;
                 }
+            shapeTerrain(low);
         }
         int ns =
             std::max(step, voxelGridStep(c.width, c.height, std::max(size_t(4096), budget / 2)));
@@ -219,8 +244,12 @@ bool VoxelScene::update(const Core &c, const World &w, const Settings &s, int pr
                            : bg == 1       ? 7
                            : v.bg3Priority ? 11
                                            : 2;
-            size_t low = plane(nx0, ny0, nw, nh, ns, z(lowRank), bg == 0 ? depth : 1, 30 + bg * 2);
-            plane(nx0, ny0, nw, nh, ns, z(highRank), bg == 0 ? depth : 1, 31 + bg * 2);
+            bool solidTerrain = bg == 0 || (bg == 1 && sc.kind == 4 && worldHasSecondaryTerrain(c));
+            // Distant painted scenery is front-facing. Walking around the
+            // diorama reveals the backs of its actors and solid platforms.
+            float thickness = solidTerrain ? depth : (s.volumeMode == 2 ? 0.f : 1.f);
+            size_t low = plane(nx0, ny0, nw, nh, ns, z(lowRank), thickness, 30 + bg * 2);
+            plane(nx0, ny0, nw, nh, ns, z(highRank), thickness, 31 + bg * 2);
             for (int gy = 0; gy < nh; ++gy)
                 for (int gx = 0; gx < nw; ++gx) {
                     int ny = ny0 + gy * ns - sc.cameraY, nx = nx0 + gx * ns - sc.cameraX;
@@ -231,6 +260,8 @@ bool VoxelScene::update(const Core &c, const World &w, const Settings &s, int pr
                     auto color = w.volumeLayer(c, bg, nx, ny, high);
                     planes[low + high].pixels[size_t(gy) * nw + gx] = color;
                 }
+            if (solidTerrain)
+                shapeTerrain(low);
         }
         int actorStep = attempt < 3 ? 1 : 1 << (attempt - 2);
         for (int priority = 0; priority < 4; ++priority) {

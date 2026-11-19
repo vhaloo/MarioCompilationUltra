@@ -34,6 +34,7 @@ void App::mobileRefresh() {
             ImGui::GetStyle() = unscaledStyle;
             ImGui::GetStyle().ScaleAllSizes(density);
             touch.clear();
+            volumeFinger.reset();
             pendingTouchButtons = 0;
         }
         mobileDisplay = updated;
@@ -58,6 +59,7 @@ void App::mobileRefresh() {
     }
     if (changed) {
         touch.clear();
+        volumeFinger.reset();
         pendingTouchButtons = 0;
     }
     touchLayout = next;
@@ -83,6 +85,7 @@ bool App::mobileEvent(const SDL_Event &e) {
     if (e.type == SDL_APP_WILLENTERBACKGROUND || e.type == SDL_APP_DIDENTERBACKGROUND) {
         backgrounded = true;
         touch.clear();
+        volumeFinger.reset();
         pendingTouchButtons = 0;
         core.buttons[0] = core.buttons[1] = 0;
         core.clearAudio();
@@ -107,6 +110,7 @@ bool App::mobileEvent(const SDL_Event &e) {
     if (e.type == SDL_WINDOWEVENT && (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED ||
                                       e.window.event == SDL_WINDOWEVENT_FOCUS_LOST)) {
         touch.clear();
+        volumeFinger.reset();
         pendingTouchButtons = 0;
         mobileMetricsAt = 0;
     }
@@ -153,8 +157,10 @@ bool App::mobileEvent(const SDL_Event &e) {
         float x = e.tfinger.x * drawableWidth, y = e.tfinger.y * drawableHeight;
         if (e.type == SDL_FINGERDOWN) {
             mobileSuppressMouse = true;
-            if (touch.down(e.tfinger.fingerId, x, y, touchLayout) && settings.touchHaptics &&
-                !options.mobilePreview)
+            bool onControl = touch.down(e.tfinger.fingerId, x, y, touchLayout);
+            if (!onControl && !volumeFinger && settings.volumeMode && volumeScene.ready)
+                volumeFinger = e.tfinger.fingerId;
+            if (onControl && settings.touchHaptics && !options.mobilePreview)
                 androidVibrate();
             switch (touch.takeAction()) {
             case TouchMenu:
@@ -192,6 +198,11 @@ bool App::mobileEvent(const SDL_Event &e) {
                 dirty = true;
                 break;
             }
+        } else if (volumeFinger && *volumeFinger == e.tfinger.fingerId) {
+            if (e.type == SDL_FINGERMOTION)
+                dragVolume(e.tfinger.dx, e.tfinger.dy);
+            else
+                volumeFinger.reset();
         } else if (e.type == SDL_FINGERMOTION)
             touch.move(e.tfinger.fingerId, x, y);
         else {

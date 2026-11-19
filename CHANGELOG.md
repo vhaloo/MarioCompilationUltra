@@ -1,5 +1,11 @@
 # Releases
 
+## 0.11.0 — 2026-11-19
+
+- Rewind and new save slots retain the palettes, tiles, sprites and per-line scrolling that produced the original image. Older slots still load.
+- Rotate around voxel terrain and characters through 360° with the right stick, a mouse or touch drag, or Alt plus the arrow keys. Solid terrain has beveled edges. Painted scenery opens up from behind. The score stays readable while the camera turns.
+- The local gallery captures nine views of the same paused scene, including side and rear angles. Camera controls and examples are available in ten languages.
+
 ## 0.9.2 — 2026-11-08
 
 - Use the native defaults for fresh Android, Wear OS and Quest profiles. Start in simple settings and original framing.

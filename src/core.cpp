@@ -1,4 +1,6 @@
 #include "core.h"
+#include "frame_state.h"
+#include <memory>
 #include "performance.h"
 #include <algorithm>
 #include <cmath>
@@ -330,15 +332,17 @@ std::vector<uint8_t> Core::state(bool fastRewind) const {
         return {};
     size_t engineSize = retro_serialize_size();
     auto &raw = stateScratch;
-    raw.resize(engineSize + native.size() * sizeof(uint32_t));
+    size_t presentationOffset = engineSize + native.size() * sizeof(uint32_t);
+    raw.resize(presentationOffset + PresentationBytes);
     if (!retro_serialize(raw.data(), engineSize))
         return {};
     std::memcpy(raw.data() + engineSize, native.data(), native.size() * sizeof(uint32_t));
+    writePresentation(raw.data() + presentationOffset, snapshot, frame);
     uLongf packedSize =
         fastRewind ? LZ4_compressBound(int(raw.size())) : compressBound(uLong(raw.size()));
     auto &b = packedScratch;
     b.resize(32 + packedSize);
-    std::memcpy(b.data(), fastRewind ? "MCUFRM2" : "MCUFRM1", 8);
+    std::memcpy(b.data(), fastRewind ? "MCUFRM4" : "MCUFRM3", 8);
     auto put = [&](size_t p, uint32_t v) {
         for (int i = 0; i < 4; i++)
             b[p + i] = uint8_t(v >> (i * 8));
@@ -367,13 +371,15 @@ std::vector<uint8_t> Core::state(bool fastRewind) const {
 bool Core::restore(const std::vector<uint8_t> &b, bool flushAudio) {
     if (!loaded || b.size() < 32 || b.size() > 4 * 1024 * 1024)
         return false;
-    bool fastRewind = std::memcmp(b.data(), "MCUFRM2", 8) == 0;
-    if (!fastRewind && std::memcmp(b.data(), "MCUFRM1", 8))
+    bool current = !std::memcmp(b.data(), "MCUFRM3", 8) || !std::memcmp(b.data(), "MCUFRM4", 8);
+    bool fastRewind = !std::memcmp(b.data(), "MCUFRM2", 8) || !std::memcmp(b.data(), "MCUFRM4", 8);
+    if (!current && !fastRewind && std::memcmp(b.data(), "MCUFRM1", 8))
         return false;
     size_t engineSize = u32(b, 8), count = u32(b, 12), w = u32(b, 16), h = u32(b, 20),
            bytes = u32(b, 24);
-    if (engineSize != retro_serialize_size() || w > 1024 || h > 1024 || count != w * h ||
-        bytes != engineSize + count * 4 || bytes > 4 * 1024 * 1024)
+    if (engineSize != retro_serialize_size() || w > 1024 || h > 1024 || count != w * h || !w ||
+        !h || bytes != engineSize + count * 4 + (current ? PresentationBytes : 0) ||
+        bytes > 4 * 1024 * 1024)
         return false;
     std::vector<uint8_t> raw(bytes);
     uLongf size = uLongf(bytes);
@@ -386,7 +392,17 @@ bool Core::restore(const std::vector<uint8_t> &b, bool flushAudio) {
     } else if (uncompress(raw.data(), &size, b.data() + 32, uLong(b.size() - 32)) != Z_OK ||
                size != bytes)
         return false;
-    if (crc(raw) != u32(b, 28) || !retro_unserialize(raw.data(), engineSize))
+    if (crc(raw) != u32(b, 28))
+        return false;
+    std::unique_ptr<McuPresentation> display;
+    uint64_t restoredFrame = frame;
+    if (current) {
+        display = std::make_unique<McuPresentation>();
+        if (!readPresentation(raw.data() + engineSize + count * 4, PresentationBytes, *display,
+                              restoredFrame))
+            return false;
+    }
+    if (!retro_unserialize(raw.data(), engineSize))
         return false;
     width = unsigned(w);
     height = unsigned(h);
@@ -394,8 +410,13 @@ bool Core::restore(const std::vector<uint8_t> &b, bool flushAudio) {
     std::memcpy(native.data(), raw.data() + engineSize, count * 4);
     if (flushAudio)
         clearAudio();
-    mcuObserve(snapshot);
-    ++imageVersion;
+    if (display) {
+        static_cast<McuPresentation &>(snapshot) = *display;
+        mcuObserveMemory(snapshot);
+        frame = restoredFrame;
+    } else
+        mcuObserve(snapshot);
+    lastRestoreImage = ++imageVersion;
     return true;
 }
 fs::path Core::statePath(int n) const {

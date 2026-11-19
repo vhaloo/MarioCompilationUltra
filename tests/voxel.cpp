@@ -243,19 +243,49 @@ int main(int argc, char **argv) {
         object.flipY = true;
         require(voxelSpritePixel(*video, object, 0, 31) == 0xff000000u,
                 "Rectangular OBJ vertical flip matches original width-based line wiring");
-        for (int yaw : {-30, -18, 0, 18, 30})
-            for (int tilt : {-30, 0, 30}) {
+        for (int yaw : {-180, -135, -45, 0, 45, 135, 180, 360})
+            for (int tilt : {-76, -30, 0, 30, 76}) {
                 VoxelProjection projection({-40, -70, 512, 432, float(yaw), float(tilt), 64}, 1280,
                                            720);
                 for (auto p : {VoxelPoint{-32, -64, 8}, VoxelPoint{300, 250, -16}}) {
-                    auto screen = projection.project(p),
-                         back = projection.unproject(screen.x, screen.y, p.z);
-                    require(std::abs(back.x - p.x) < .001f && std::abs(back.y - p.y) < .001f,
+                    auto screen = projection.project(p);
+                    auto back = projection.unproject(screen.x, screen.y, p.z);
+                    require(back && std::abs(back->x - p.x) < .001f &&
+                                std::abs(back->y - p.y) < .001f,
                             "Screen overlays and camera input share the exact invertible world "
                             "projection");
                 }
             }
         VoxelView orbit;
+        VoxelCamera side{0, 0, 8, 8, 90, 0, 16};
+        require(!VoxelProjection(side, 128, 128).unproject(64, 64, 0),
+                "An edge-on Z plane has no unique pointer intersection");
+        auto ground =
+            roundedVoxelDepths({0xff003300, 0xff003300, 0xff003300, 0, 0}, 5, 1, 8, 1, true);
+        require(ground == std::vector<uint16_t>({8, 7, 5, 0, 0}),
+                "Solid ground keeps a thick core and bevels only at observed empty space");
+        auto scenic = far;
+        scenic.thickness = 0;
+        auto diorama = mesher.build({near, scenic});
+        for (int angle : {0, 90, 180, 270, 360}) {
+            side.yaw = float(angle);
+            require(raster.render(diorama, side, 128, 128) &&
+                        std::any_of(raster.pixels.begin(), raster.pixels.end(),
+                                    [](auto p) { return p >> 24; }),
+                    "A closed diorama has visible material at every cardinal angle");
+        }
+        auto fullTurn = raster.pixels;
+        side.yaw = 0;
+        require(raster.render(diorama, side, 128, 128) && raster.pixels == fullTurn,
+                "A complete orbit returns to the same pixels");
+        side.yaw = 180;
+        require(raster.render(mesher.build({near}), side, 128, 128), "Rear view renders");
+        auto rear = raster.pixels;
+        require(raster.render(diorama, side, 128, 128) && raster.pixels == rear,
+                "Distant scenery leaves the backs of solid objects visible");
+        require(orbit.rotate(200, 100) && orbit.yaw == -160 && orbit.pitch == 80 &&
+                    orbit.rotate(160, -80) && orbit.yaw == 0 && orbit.pitch == 0,
+                "Pointer and stick share a continuous orbit with bounded elevation");
         require(!orbit.move(.08f, -.08f, false, .05f, .22f), "Stick drift leaves the view stable");
         require(orbit.move(1, .5f, false, .02f, .22f) && orbit.yaw > 0 && orbit.pitch > 0 &&
                     orbit.panX == 0,
@@ -270,9 +300,9 @@ int main(int argc, char **argv) {
                 "Camera motion changes the rendered center in the requested directions");
         s.volumeMode = 9;
         s.volumeDepth = 99;
-        s.volumeAngle = -99;
+        s.volumeAngle = -299;
         s.clamp();
-        require(s.volumeMode == 2 && s.volumeDepth == 16 && s.volumeAngle == -30,
+        require(s.volumeMode == 2 && s.volumeDepth == 16 && s.volumeAngle == -180,
                 "Volume settings clamp");
         if (argc > 1) {
             VoxelPlane tile{0, 0, 64, 40, 1, 0, 8, 4, std::vector<uint32_t>(64 * 40)};
@@ -285,10 +315,32 @@ int main(int argc, char **argv) {
                     if (x >= 41 && x < 49 && y >= 12 && y < 30)
                         tile.pixels[y * 64 + x] = 0xff69a5c9u;
                 }
-            auto fixture = mesher.build({tile});
-            raster.render(fixture, {-4, -4, 72, 48, 22, -16, 20}, 960, 640);
+            tile.depths = roundedVoxelDepths(tile.pixels, 64, 40, 12, 1, true);
+            VoxelPlane orb{27, 9, 15, 15, 1, 9, 12, 8, std::vector<uint32_t>(225)};
+            for (int y = 0; y < 15; ++y)
+                for (int x = 0; x < 15; ++x)
+                    if ((x - 7) * (x - 7) + (y - 7) * (y - 7) <= 48)
+                        orb.pixels[y * 15 + x] = x + y < 10   ? 0xffffe5a6
+                                                 : x + y < 18 ? 0xffee967a
+                                                              : 0xffb76267;
+            orb.depths = roundedVoxelDepths(orb.pixels, 15, 15, 14);
+            auto fixture = mesher.build({tile, orb});
+            constexpr int panel = 384, height = 248, width = panel * 3;
+            std::vector<uint32_t> strip(width * height);
+            int column = 0;
+            for (int angle : {25, 72, 155}) {
+                require(
+                    raster.render(fixture, {-4, -4, 72, 48, float(angle), -16, 16}, panel, height),
+                    "Procedural orbit illustration renders");
+                for (int y = 0; y < height; ++y)
+                    for (int x = 0; x < panel; ++x) {
+                        auto p = raster.pixels[y * panel + x];
+                        strip[y * width + column * panel + x] = p ? p : 0xff142536;
+                    }
+                ++column;
+            }
             SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(
-                raster.pixels.data(), 960, 640, 32, 960 * 4, SDL_PIXELFORMAT_ARGB8888);
+                strip.data(), width, height, 32, width * 4, SDL_PIXELFORMAT_ARGB8888);
             require(surface && SDL_SaveBMP(surface, argv[1]) == 0,
                     "Original illustration exported");
             SDL_FreeSurface(surface);

@@ -22,6 +22,7 @@ struct Canvas {
 class World {
     struct CachedTile {
         std::array<uint32_t, 64> pixels{};
+        uint64_t changedAt = 0;
     };
     std::unordered_map<uint64_t, CachedTile> cache;
     std::vector<std::array<uint32_t, 256>> blockPixels;
@@ -50,6 +51,7 @@ class World {
     int lastStage = -1, lastKind = -1, minX = 0, maxX = 256, minY = 0, maxY = 224,
         previousCameraX = 0, previousCameraY = 0;
     uint64_t lastFrame = ~uint64_t(0);
+    uint64_t seenRestore = 0;
     bool wholeLevel = false, needScenery = false, cameraReady = false;
     uint32_t tilePixel(const McuVideo &, int bg, uint16_t attr, int x, int y) const;
     const std::array<uint32_t, 64> &preparedTile(const McuVideo &, int bg, uint16_t attr) const;

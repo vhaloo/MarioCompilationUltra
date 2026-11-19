@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MODES = ['Original 2D', 'Pixel relief', 'Voxels']
 CONTROLS = [('Voxel thickness', '1–16 px'), ('Layer spacing', '1–12 px'),
-            ('Volume angle', '−30° … +30°'), ('Volume tilt', '−30° … +30°'),
+            ('Volume angle', '−180° … +180°'), ('Volume tilt', '−80° … +80°'),
             ('Rounded voxel shapes', '')]
 CSS = '''@font-face{font-family:MCU;src:url(../../assets/Interface.otf)}*{box-sizing:border-box}
 html{color-scheme:dark}body{margin:0;background:#0c1520;color:#edf7f2;font:17px/1.7 MCU,system-ui,sans-serif}
@@ -35,7 +35,7 @@ def main():
         title = tr['Pixel volume']
         settings = tr['Settings illustrated']
         md_nav = ' · '.join(f'[{x["name"]}](../{x["code"]}/VOXELS.md)' for x in languages)
-        md = f'# {title}\n\n{md_nav}\n\n![{title}](../voxel-preview.png)\n\n{start[code]}\n\n{text[code]}\n\n'
+        md = f'# {title}\n\n{md_nav}\n\n![{title}](../voxel-preview.png)\n\n{start[code]}\n\n{tr["Orbit controls"]}\n\n{text[code]}\n\n'
         md += f'| {title} | |\n|---|---|\n' + ''.join(f'| {i} | {tr[k]} |\n' for i, k in enumerate(MODES))
         md += '\n' + ''.join(f'- **{tr[k]}**' + (f': {value}' if value else '') + '\n' for k, value in CONTROLS)
         md += f'\n![{settings}](screenshots/volume-help.png)\n\n[{tr["Collection"]}](README.md) · [{settings}](SETTINGS.md) · [HTML](voxels.html) · [Technical research](../VOXEL_RESEARCH.md)\n'
@@ -43,7 +43,7 @@ def main():
         nav = ''.join(f'<a href="../{x["code"]}/voxels.html" lang="{x["code"]}">{h(x["name"])}</a>' for x in languages)
         modes = ''.join(f'<li>{i} · {h(tr[k])}</li>' for i, k in enumerate(MODES))
         controls = ''.join(f'<dt>{h(tr[k])}</dt><dd>{h(value)}</dd>' for k, value in CONTROLS)
-        body = f'<main><h1>{h(title)}</h1><nav>{nav}</nav><section><img src="../voxel-preview.png" alt="{h(title)}"><p>{h(start[code])}</p><ol class="modes" start="0">{modes}</ol><p>{h(text[code])}</p></section>'
+        body = f'<main><h1>{h(title)}</h1><nav>{nav}</nav><section><img src="../voxel-preview.png" alt="{h(title)}"><p>{h(start[code])}</p><p>{h(tr["Orbit controls"])}</p><ol class="modes" start="0">{modes}</ol><p>{h(text[code])}</p></section>'
         body += f'<section><h2>{h(settings)}</h2><dl>{controls}</dl><img src="screenshots/volume-help.png" alt="{h(settings)}"></section><footer><a href="guide.html">{h(tr["Collection"])}</a><a href="settings.html">{h(settings)}</a><a href="xr.html">Meta Quest 3</a></footer></main>'
         outputs[folder / 'voxels.html'] = f'<!doctype html>\n<html lang="{code}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{h(title)}</title><style>{CSS}</style></head><body>{body}</body></html>\n'
     for path, content in outputs.items():

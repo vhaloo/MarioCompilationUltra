@@ -64,6 +64,7 @@ inline int CompleteMap::secondaryCell(int wx, int wy) const {
                                                                             : -1;
 }
 int worldMapCell(const Core &, int layer, int wx, int wy);
+bool worldHasSecondaryTerrain(const Core &);
 McuVideo::Scroll alignRasterCamera(const McuVideo &, int layer, McuVideo::Scroll);
 McuVideo::Scroll worldCamera(const Core &, int layer);
 } // namespace mcu

@@ -2,6 +2,7 @@
 #include <array>
 #include <cstdint>
 #include <cstddef>
+#include <optional>
 #include <vector>
 #include <unordered_map>
 
@@ -56,6 +57,7 @@ struct VoxelCamera {
 struct VoxelView {
     float yaw = 0, pitch = 0, panX = 0, panY = 0;
     bool move(float x, float y, bool pan, float seconds, float deadzone);
+    bool rotate(float horizontalDegrees, float verticalDegrees);
     VoxelCamera apply(VoxelCamera base) const;
     std::array<float, 4> key() const { return {yaw, pitch, panX, panY}; }
 };
@@ -66,7 +68,7 @@ class VoxelProjection {
   public:
     VoxelProjection(const VoxelCamera &, int width, int height);
     VoxelPoint project(VoxelPoint) const;
-    VoxelPoint unproject(float screenX, float screenY, float worldZ = 0) const;
+    std::optional<VoxelPoint> unproject(float screenX, float screenY, float worldZ = 0) const;
     float facing(VoxelPoint normal) const;
 };
 // Portable depth-buffer renderer. The same real XYZ faces can be submitted to
@@ -83,5 +85,5 @@ int voxelGridStep(double worldWidth, double worldHeight, size_t sampleBudget);
 int voxelGridOrigin(int coordinate, int step);
 VoxelPoint curveVoxelPoint(VoxelPoint, float angleRadians, float depthScale = 1);
 std::vector<uint16_t> roundedVoxelDepths(const std::vector<uint32_t> &, int width, int height,
-                                         int maximum, int step = 1);
+                                         int maximum, int step = 1, bool clippedTerrain = false);
 } // namespace mcu

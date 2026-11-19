@@ -81,6 +81,11 @@ void CompleteMap::reset() {
     x = y = width = height = 0;
     source.clear();
 }
+bool worldHasSecondaryTerrain(const Core &c) {
+    int mode = c.snapshot.ram[0x1925];
+    return (c.snapshot.mainLayers & 2) &&
+           (mode == 1 || mode == 2 || mode == 7 || mode == 8 || mode == 15 || mode == 31);
+}
 bool CompleteMap::prepare(const Core &c, int gameKind, int stage, bool upright, int worldWidth,
                           int worldHeight) {
     auto &r = c.snapshot.ram;
@@ -124,10 +129,7 @@ bool CompleteMap::prepare(const Core &c, int gameKind, int stage, bool upright, 
     } else if (kind == 4) {
         primaryWidth = width = worldWidth;
         primaryHeight = height = worldHeight;
-        int mode = r[0x1925];
-        secondary =
-            (mode == 1 || mode == 2 || mode == 7 || mode == 8 || mode == 15 || mode == 31) &&
-            (c.snapshot.mainLayers & 2);
+        secondary = worldHasSecondaryTerrain(c);
         auto first = worldCamera(c, 0), second = worldCamera(c, 1);
         secondaryX = secondary ? first.x - second.x : 0;
         secondaryY = secondary ? first.y - second.y : 0;
@@ -157,6 +159,8 @@ bool CompleteMap::prepare(const Core &c, int gameKind, int stage, bool upright, 
         return false;
     ready = width > 0 && height > 0 && width <= 16384 && height <= 8192;
     if (ready && image != c.imageVersion) {
+        if (kind <= 1 && image < c.lastRestoreImage)
+            classicLive = classic;
         image = c.imageVersion;
         if (kind <= 1) {
             static const int firstSolid[2][4] = {{0x14, 0x51, 0x8c, 0xe7},

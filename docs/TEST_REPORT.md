@@ -1,5 +1,11 @@
 # Validation report
 
+## 0.11.0
+
+The rewind regression records the displayed PPU state, runs the emulator forward, then restores the earlier frame. It checks independently modified scanlines, tiles, palette entries, sprites, native pixels, WRAM and the frame number. A generated map fixture compares five camera views, four backgrounds and three volume settings. The volume checks include front, edge-on and rear views.
+
+Private checks used six playable cartridge checkpoints. Each game went forward twelve frames, back twelve frames and forward again with the same inputs. The video callback data and native image matched at every step. The test compared 311 render fingerprints per game at the original checkpoint, after rewind and after disk-state restoration. This covers six gameplay scenes. Public fixtures contain original test art. The in-game gallery can capture nine views from the player's own cartridge.
+
 ## 0.10.1
 
 The full-map regression fixture moves the camera across two overlapping terrain

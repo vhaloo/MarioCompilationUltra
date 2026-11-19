@@ -6,6 +6,8 @@
 
 Am Computer oder Mobilgerät öffnest du Bildschirm → Pixelvolumen. Probiere zuerst Pixelrelief für dezente Tiefe und dann Voxel. Die Dicke ändert den Pixelkörper; der Abstand trennt Ebenen, ohne ihre Reihenfolge zu ändern. Auf Quest gibt es die Seite Volumen der Raumfernbedienung. Auf der Uhr zoomt die Krone vom ganzen Bereich bis zur Originalansicht.
 
+Drehe die Ansicht mit dem rechten Stick, Alt + Pfeiltasten oder durch Ziehen im Spiel um 360°. Beginne auf dem Touchscreen außerhalb der Tasten. Halte den Stick zum Verschieben gedrückt.
+
 Optionale prozedurale 3D-Darstellung: Pixel werden zu festen Säulen; Gelände, Hintergründe und Figuren liegen auf getrennten Tiefenebenen. Relief ist flach, Voxel sind dicker. Dicke ändert die Tiefe, Winkel die Bildschirmansicht. Automatische Qualität reduziert Details unter Last. HUD und native Nahansichten behalten Originalpixel. Spezialszenen verwenden den Originalbildschirm. Dies ist eine Interpretation, keine Rekonstruktion unsichtbarer Rückseiten. Leistung auf echten Geräten ist ungetestet. Abgerundete Formen erzeugen gestufte 3D-Körper aus der Transparenz der Figuren. Ohne diese Option bleibt die Extrusion gleichmäßig. Die Neigung ändert die Höhe der Bildschirmansicht. Ursprüngliche Positionen und Spielphysik bleiben erhalten. Der Ebenenabstand trennt Tiefenebenen, ohne ihre Reihenfolge zu ändern.
 
 | Pixelvolumen | |
@@ -16,8 +18,8 @@ Optionale prozedurale 3D-Darstellung: Pixel werden zu festen Säulen; Gelände, 
 
 - **Voxeldicke**: 1–16 px
 - **Ebenenabstand**: 1–12 px
-- **Volumenwinkel**: −30° … +30°
-- **Volumen-Neigung**: −30° … +30°
+- **Volumenwinkel**: −180° … +180°
+- **Volumen-Neigung**: −80° … +80°
 - **Abgerundete Voxelformen**
 
 ![Illustrierte Einstellungen](screenshots/volume-help.png)

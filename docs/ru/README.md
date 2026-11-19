@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.10.1
+# Mario Compilation Ultra 0.11.0
 
 Локальная коллекция SNES с адаптивным интерфейсом для ПК и экспериментальными расширенными видами. Snes9x эмулирует картриджи, включая Super FX. Проект не заявляет о декомпиляции всех игр.
 
-[Загрузка и запуск с рабочего стола](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.10.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Загрузка и запуск с рабочего стола](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.11.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Загрузка и запуск с рабочего стола
 
@@ -83,15 +83,15 @@ sh ./Install-Linux.sh
 
 ## Телефоны и планшеты Android
 
-[Телефоны и планшеты Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.10.1/MarioCompilationUltra-0.10.1-Android-public.apk)
+[Телефоны и планшеты Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Android-public.apk)
 
 ## Вид на часах
 
-[Вид на часах](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.10.1/MarioCompilationUltra-0.10.1-Wear-public.apk) · [Настройки с иллюстрациями](SETTINGS.md)
+[Вид на часах](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Wear-public.apk) · [Настройки с иллюстрациями](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.10.1/MarioCompilationUltra-0.10.1-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Управление
 
@@ -111,7 +111,7 @@ View/Back: настройки · LT: перемотка · RT: Select<br>
 Левый стик: атлас / вся карта / панорама · LB/RB: разделы меню<br>
 Меню: крестовина + низ подтвердить + право назад
 
-Поворачивайте вид правым стиком. Нажмите на него и отклоните, чтобы сместить вид.
+Поворачивайте сцену на 360° правым стиком, сочетанием Alt и стрелок или перетаскиванием. На сенсорном экране начните вне кнопок. Для сдвига вида удерживайте стик нажатым.
 
 ## Сохранения и звук
 
@@ -163,7 +163,7 @@ View/Back: настройки · LT: перемотка · RT: Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## Пакеты и проверка · 0.10.1
+## Пакеты и проверка · 0.11.0
 
 На полной карте местность остаётся видимой под движущейся камерой. На сенсорном экране проведите большим пальцем от Y к B, чтобы прыгнуть на бегу. Версии для Mac экспериментальные. Игра на реальных гарнитурах Quest и часах пока не проверена.
 

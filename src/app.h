@@ -93,7 +93,7 @@ class App {
     uint64_t nativeVersion = ~uint64_t(0), backdropVersion = ~uint64_t(0);
     std::array<double, 23> compositionKey{};
     bool volumeDrawn = false;
-    std::array<int, 3> backdropKey{};
+    std::array<int, 6> backdropKey{};
     void resetMetrics();
     void invalidateGraphics(bool deviceReset);
     const char *tr(const char *en, const char * = nullptr) const {
@@ -136,8 +136,9 @@ class App {
     void settingPicture(const char *key, float width, bool compact = false);
     int exampleGame = -1, exampleStyle = 0, exampleJob = -1, examplesWritten = 0;
     int optionProfile = 1;
-    std::array<std::array<SDL_Texture *, 7>, 6> exampleTextures{};
-    std::array<std::array<bool, 7>, 6> exampleChecked{};
+    static constexpr size_t ExampleCount = 9;
+    std::array<std::array<SDL_Texture *, ExampleCount>, 6> exampleTextures{};
+    std::array<std::array<bool, ExampleCount>, 6> exampleChecked{};
     void exampleGallery();
     void startExamples();
     void renderNextExample();
@@ -159,6 +160,8 @@ class App {
     int mobileLastOrientation = -1;
     bool mobileLastAwake = false, mobileScroll = false, mobileSuppressMouse = false;
     SDL_FingerID mobileScrollFinger = 0;
+    std::optional<SDL_FingerID> volumeFinger;
+    void dragVolume(float dx, float dy);
     float mobileScrollY = 0;
     SDL_Rect gameViewport{};
     void mobileRefresh();

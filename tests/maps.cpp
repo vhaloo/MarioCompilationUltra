@@ -1,4 +1,6 @@
 #include "world.h"
+#include "frame_state.h"
+#include "render_replay.h"
 #include <SDL.h>
 #include <algorithm>
 #include <cmath>
@@ -295,6 +297,24 @@ int main() {
             check(world.cleanOverview &&
                       covered.pixels[size_t(screenY) * covered.width + screenX] == 0xffff0000,
                   "Transparent live camera pixels keep the complete terrain underneath");
+            // The surrounding fixture intentionally streams transparent tile 1
+            // into the camera. Give that tile ink for the 3D orbit checks.
+            for (int row = 0; row < 8; ++row)
+                c.snapshot.vram[32 + 2 * row] = 0xf0;
+            auto originalViews = replay_test::renderModes(c);
+            std::vector<uint8_t> savedDisplay(PresentationBytes);
+            writePresentation(savedDisplay.data(), c.snapshot, c.frame);
+            c.snapshot.palette[1] = 0;
+            c.snapshot.raster[64][0].y += 16;
+            uint64_t frame;
+            check(readPresentation(savedDisplay.data(), savedDisplay.size(), c.snapshot, frame),
+                  "Historical display decodes before reconstructing every view");
+            c.lastRestoreImage = ++c.imageVersion;
+            check(replay_test::renderModes(c) == originalViews,
+                  "All five views, four backgrounds and three volume modes reproduce historical "
+                  "pixels");
+            for (int row = 0; row < 8; ++row)
+                c.snapshot.vram[32 + 2 * row] = 0;
             c.snapshot.palette[1] = 31 << 10;
             ++c.imageVersion;
             composeVerified(world, c, settings, 1280, 720);

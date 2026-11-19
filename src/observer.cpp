@@ -7,8 +7,9 @@
 extern SLineData LineData[240];
 void mcuObserve(McuVideo &s, bool rendered) {
     std::memcpy(s.vram.data(), Memory.VRAM, 65536);
-    std::memcpy(s.ram.data(), Memory.RAM, 131072);
-    std::memcpy(s.sram.data(), Memory.SRAM, 131072);
+    // Core::tick takes the authoritative RAM snapshot after retro_run.
+    if (!rendered)
+        mcuObserveMemory(s);
     std::memcpy(s.palette.data(), PPU.CGDATA, 512);
     s.objectBase = PPU.OBJNameBase;
     s.objectSelect = PPU.OBJNameSelect;

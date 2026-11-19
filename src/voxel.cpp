@@ -32,7 +32,7 @@ static void face(std::vector<VoxelFace> &out, uint32_t color, int axis, VoxelPoi
                  VoxelPoint c, VoxelPoint d) {
     // Constant face lighting preserves palette relationships and cannot turn
     // black pixels transparent. Front pixels keep the source color exactly.
-    static const int light[] = {100, 64, 74, 86, 112, 62};
+    static const int light[] = {100, 84, 78, 91, 112, 66};
     int amount = light[axis];
     auto lit = [&](uint32_t p) {
         uint32_t q = p & 0xff000000u;
@@ -43,11 +43,14 @@ static void face(std::vector<VoxelFace> &out, uint32_t color, int axis, VoxelPoi
     out.push_back({{a, b, c, d}, lit(color), uint8_t(axis)});
 }
 std::vector<uint16_t> roundedVoxelDepths(const std::vector<uint32_t> &pixels, int w, int h,
-                                         int maximum, int step) {
+                                         int maximum, int step, bool clippedTerrain) {
     if (w < 0 || h < 0 || w > 16384 || h > 16384 || size_t(w) * h != pixels.size() || maximum < 1 ||
         maximum > 4096 || step < 1 || step > 16384)
         return {};
     std::vector<uint16_t> distance(pixels.size());
+    // A terrain sampling window may cut through solid ground. Only observed
+    // transparent texels create a bevel. Actor windows contain a whole sprite.
+    int boundary = clippedTerrain ? maximum : 0;
     auto solid = [&](int x, int y) {
         return x >= 0 && y >= 0 && x < w && y < h && (pixels[size_t(y) * w + x] >> 24) != 0;
     };
@@ -56,7 +59,7 @@ std::vector<uint16_t> roundedVoxelDepths(const std::vector<uint32_t> &pixels, in
             size_t i = size_t(y) * w + x;
             if (!solid(x, y))
                 continue;
-            int left = x ? distance[i - 1] : 0, up = y ? distance[i - w] : 0;
+            int left = x ? distance[i - 1] : boundary, up = y ? distance[i - w] : boundary;
             distance[i] = uint16_t(std::min(32766, std::min(left, up) + 1));
         }
     for (int y = h - 1; y >= 0; --y)
@@ -64,12 +67,14 @@ std::vector<uint16_t> roundedVoxelDepths(const std::vector<uint32_t> &pixels, in
             size_t i = size_t(y) * w + x;
             if (!solid(x, y))
                 continue;
-            int right = x + 1 < w ? distance[i + 1] : 0, down = y + 1 < h ? distance[i + w] : 0;
+            int right = x + 1 < w ? distance[i + 1] : boundary,
+                down = y + 1 < h ? distance[i + w] : boundary;
             distance[i] = uint16_t(std::min(int(distance[i]), std::min(right, down) + 1));
         }
     for (auto &d : distance)
         if (d)
-            d = uint16_t(std::min(maximum, 2 * int(d) * step - 1));
+            d = uint16_t(
+                std::min(maximum, (clippedTerrain ? maximum / 2 : 0) + 2 * int(d) * step - 1));
     return distance;
 }
 VoxelMesh VoxelMesher::build(const std::vector<VoxelPlane> &planes, size_t limit) {
@@ -265,7 +270,7 @@ VoxelMesh VoxelMesher::build(const std::vector<VoxelPlane> &planes, size_t limit
 bool VoxelView::move(float x, float y, bool pan, float seconds, float deadzone) {
     float radius = std::hypot(x, y);
     deadzone = std::clamp(deadzone, .05f, .8f);
-    if (radius <= deadzone || seconds <= 0)
+    if (!std::isfinite(radius) || !std::isfinite(seconds) || radius <= deadzone || seconds <= 0)
         return false;
     auto before = key();
     float gain = (std::min(1.f, radius) - deadzone) / ((1 - deadzone) * radius);
@@ -274,24 +279,34 @@ bool VoxelView::move(float x, float y, bool pan, float seconds, float deadzone) 
     if (pan) {
         panX = std::clamp(panX + x * .55f, -.30f, .30f);
         panY = std::clamp(panY + y * .55f, -.30f, .30f);
-    } else {
-        yaw = std::clamp(yaw + x * 65.f, -30.f, 30.f);
-        pitch = std::clamp(pitch + y * 55.f, -25.f, 25.f);
-    }
+    } else
+        rotate(x * 90.f, y * 65.f);
+    return before != key();
+}
+bool VoxelView::rotate(float dx, float dy) {
+    if (!std::isfinite(dx) || !std::isfinite(dy))
+        return false;
+    auto before = key();
+    yaw = std::remainder(yaw + dx, 360.f);
+    pitch = std::clamp(pitch + dy, -80.f, 80.f);
     return before != key();
 }
 VoxelCamera VoxelView::apply(VoxelCamera base) const {
-    base.yaw += yaw;
-    base.pitch += pitch;
+    base.yaw = std::remainder(base.yaw + yaw, 360.f);
+    base.pitch = std::clamp(base.pitch + pitch, -80.f, 80.f);
     base.panX = panX;
     base.panY = panY;
     return base;
 }
 VoxelProjection::VoxelProjection(const VoxelCamera &c, int w, int h) {
-    float yaw = std::clamp(c.yaw, -60.f, 60.f) * .01745329252f,
-          pitch = std::clamp(c.pitch, -55.f, 55.f) * .01745329252f;
+    float yaw = std::remainder(c.yaw, 360.f) * .01745329252f,
+          pitch = std::clamp(c.pitch, -80.f, 80.f) * .01745329252f;
     sineYaw = std::sin(yaw);
     cosineYaw = std::cos(yaw);
+    if (std::abs(sineYaw) < 1e-6f)
+        sineYaw = 0;
+    if (std::abs(cosineYaw) < 1e-6f)
+        cosineYaw = 0;
     sinePitch = std::sin(pitch);
     cosinePitch = std::cos(pitch);
     centerX = c.x + c.width * .5f;
@@ -305,7 +320,8 @@ VoxelProjection::VoxelProjection(const VoxelCamera &c, int w, int h) {
         float bw = std::abs(cosineYaw) * c.width + 2 * std::abs(sineYaw) * margin;
         float bh = std::abs(cosinePitch) * c.height + std::abs(sinePitch * sineYaw) * c.width +
                    2 * std::abs(sinePitch * cosineYaw) * margin;
-        scaleX = scaleY = std::min(float(w) / std::max(1.f, bw), float(h) / std::max(1.f, bh));
+        scaleX = scaleY =
+            std::min(float(w) / std::max(c.width, bw), float(h) / std::max(c.height, bh));
     }
 }
 VoxelPoint VoxelProjection::project(VoxelPoint p) const {
@@ -314,10 +330,12 @@ VoxelPoint VoxelProjection::project(VoxelPoint p) const {
     return {xx * scaleX + offsetX, (cosinePitch * y - sinePitch * zz) * scaleY + offsetY,
             sinePitch * y + cosinePitch * zz};
 }
-VoxelPoint VoxelProjection::unproject(float x, float y, float z) const {
+std::optional<VoxelPoint> VoxelProjection::unproject(float x, float y, float z) const {
+    if (std::abs(cosineYaw) < 1e-6f)
+        return std::nullopt; // A ray parallel to the plane has no unique intersection.
     float dx = ((x - offsetX) / scaleX - sineYaw * z) / cosineYaw;
     float dy = ((y - offsetY) / scaleY + sinePitch * (-sineYaw * dx + cosineYaw * z)) / cosinePitch;
-    return {dx + centerX, dy + centerY, z};
+    return VoxelPoint{dx + centerX, dy + centerY, z};
 }
 float VoxelProjection::facing(VoxelPoint n) const {
     return sinePitch * n.y + cosinePitch * (-sineYaw * n.x + cosineYaw * n.z);

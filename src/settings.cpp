@@ -134,8 +134,8 @@ void Settings::clamp() {
     volumeMode = std::clamp(volumeMode, 0, 2);
     volumeDepth = std::clamp(volumeDepth, 1, 16);
     volumeSpacing = std::clamp(volumeSpacing, 1, 12);
-    volumeAngle = std::clamp(volumeAngle, -30, 30);
-    volumeTilt = std::clamp(volumeTilt, -30, 30);
+    volumeAngle = std::clamp(volumeAngle, -180, 180);
+    volumeTilt = std::clamp(volumeTilt, -80, 80);
     performanceReserve = std::clamp(performanceReserve, 15, 45);
     performanceMode = std::clamp(performanceMode, 0, 1);
     watchZoom = std::clamp(watchZoom, 0, 1000);

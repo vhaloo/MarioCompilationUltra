@@ -42,7 +42,7 @@ class Core {
     uint16_t buttons[2]{};
     bool loaded = false, headless = false, executionBlocked = false;
     std::string currentId, status;
-    uint64_t frame = 0, imageVersion = 0, audioFrames = 0;
+    uint64_t frame = 0, imageVersion = 0, lastRestoreImage = 0, audioFrames = 0;
     double fps = 60.0988138974405, sampleRate = 32040;
     SDL_AudioDeviceID device = 0;
     explicit Core(Settings &s) : settings(s) {}
