@@ -67,7 +67,9 @@ public abstract class UpdateActivity extends SDLActivity {
             File parent = apk.getParentFile();
             if (parent == null) return false;
             String version = parent.getName();
-            if (!apk.equals(UpdateFileProvider.archive(this,version)) || !samePublisher(apk)) return false;
+            // Android may expose the same app directory through /data/user/0 and /data/data.
+            File expected = UpdateFileProvider.archive(this,version).getCanonicalFile();
+            if (!apk.equals(expected) || !samePublisher(apk)) return false;
             runOnUiThread(() -> {
                 pendingVersion = version; updateLanguage = language;
                 try {

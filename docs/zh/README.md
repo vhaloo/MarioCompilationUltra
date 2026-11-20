@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.12.0
+# Mario Compilation Ultra 0.12.1
 
 本地SNES合集，提供可调整的电脑界面和实验性扩展视图。Snes9x负责模拟卡带，包括Super FX。本项目并未声称已反编译所有游戏。
 
-[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.12.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[下载与桌面启动](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.12.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 下载与桌面启动
 
@@ -87,15 +87,15 @@ sh ./Install-Linux.sh
 
 ## Android 手机和平板电脑
 
-[Android 手机和平板电脑](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.0/MarioCompilationUltra-0.12.0-Android-public.apk)
+[Android 手机和平板电脑](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Android-public.apk)
 
 ## 手表视图
 
-[手表视图](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.0/MarioCompilationUltra-0.12.0-Wear-public.apk) · [图解设置](SETTINGS.md)
+[手表视图](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Wear-public.apk) · [图解设置](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.0/MarioCompilationUltra-0.12.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 操作
 
@@ -167,7 +167,7 @@ View/Back：设置 · LT：倒带 · RT：Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 软件包与验证 · 0.12.0
+## 软件包与验证 · 0.12.1
 
 全图视图会在镜头移动时持续显示下方的地形。在触摸屏上，用拇指从 Y 滑向 B 即可边跑边跳。Mac 版为实验版本。Quest 头显和手表上的实际游戏体验仍待验证。
 

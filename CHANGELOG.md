@@ -1,5 +1,9 @@
 # Releases
 
+## 0.12.1
+
+Android, Wear OS and Meta Quest now recognize the verified download when Android gives its private data directory a second path. The matching signed APK opens in the system installer after the player chooses Update now.
+
 ## 0.12.0
 
 All seven editions check the project's published GitHub releases in the background at startup. Update now downloads the matching package and verifies its SHA-256. Update later defers until the next launch. The About screen also supports manual checks. Desktop activation preserves the original executable and the data directory. Android phones, tablets, Wear OS and Meta Quest use the system APK installer and check the installed publisher.
