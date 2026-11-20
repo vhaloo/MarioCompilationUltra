@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.11.0 · Quest VR / AR
+# Mario Compilation Ultra 0.12.0 · Quest VR / AR
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -16,7 +16,7 @@ Level, natives CRT, Fernbedienung oder Optionen als Ziel wählen. Ein Griff vers
 
 Stick mit Pinch ziehen, andere Hand für Tasten. Mittelfinger-Pinch greift Griffe. Trackingverlust löst Eingaben.
 
-Neue Installationen fordern 90 Hz und ein transparentes zwei Meter hohes AR-Wandbild an. Nicht unterstützte Raten fallen zurück; die Simulation behält ihr Originaltempo. Raumscan und Szene-/Ankerrechte sind für automatische Wände optional. Manuelle Platzierung und Bodenkalibrierung bleiben verfügbar. Passthrough liefert die Laufzeit; keine Internet-, Mikrofon- oder Kamerabildrechte.
+Neue Installationen fordern 90 Hz und ein transparentes zwei Meter hohes AR-Wandbild an. Nicht unterstützte Raten fallen zurück; die Simulation behält ihr Originaltempo. Raumscan und Szene-/Ankerrechte sind für automatische Wände optional. Manuelle Platzierung und Bodenkalibrierung bleiben verfügbar. Passthrough liefert die Laufzeit; keine Mikrofon- oder Kamerabildrechte.
 
 Geisterbilder sind Hinweise und simulieren keine entfernten Objekte. Geprüfte Positionen können sofort erscheinen; gelernte Bilder stammen nur aus dem lokalen Spiel.
 

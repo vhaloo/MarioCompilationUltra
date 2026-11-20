@@ -343,6 +343,12 @@ void App::hotplug() {
     }
 }
 void App::toggleMenu() {
+    if (softwarePrompt) {
+        if (softwareStatus.phase != UpdatePhase::Downloading &&
+            softwareStatus.phase != UpdatePhase::Ready)
+            dismissSoftware();
+        return;
+    }
     touch.clear();
     volumeFinger.reset();
     pendingTouchButtons = 0;
@@ -1575,6 +1581,7 @@ void App::optionsUi() {
                ": atlas · LB/RB : pages du menu\nMenus : croix + bas confirmer + droite retour"));
     }
     if (tab == 5) {
+        softwareOptions();
         ImGui::Text("Mario Compilation Ultra %s", MCU_VERSION);
         ImGui::TextWrapped(
             "%s",
@@ -2265,6 +2272,13 @@ void App::render() {
         browserUi();
     if (dialog)
         dialogs();
+    if (softwarePrompt)
+        softwareDialog();
+    else if (ImGui::IsPopupOpen("##software-update") &&
+             ImGui::BeginPopupModal("##software-update")) {
+        ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
     hintUi();
     if (mobileActive())
         mobileOverlay();

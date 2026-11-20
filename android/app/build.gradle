@@ -14,8 +14,8 @@ android {
         applicationId 'com.vhaloo.mariocompilationultra.quest'
         minSdk 29
         targetSdk 32
-        versionCode 1100
-        versionName '0.11.0-xr-preview'
+        versionCode 1200
+        versionName '0.12.0-xr-preview'
         ndk { abiFilters 'arm64-v8a' }
         externalNativeBuild {
             cmake {

@@ -44,3 +44,5 @@ decoders; Nintendo disassembly source and extracted assets are not bundled.
 
 Names of compatible games are Nintendo trademarks. No game asset licence is
 granted by this project, and no Nintendo game-data pack is distributed.
+
+The update reader uses [PicoJSON 1.3.0](https://github.com/kazuho/picojson) under the BSD two-clause licence and MiniZip from zlib 1.3.1 under the zlib licence. The licence texts are included in the licenses directory. macOS and Linux use the system libcurl TLS client.

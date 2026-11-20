@@ -274,5 +274,17 @@
     "Откройте «Снимки из игры» в разделе экрана, чтобы сравнить одну сцену в разных режимах. Во время игры откройте меню и выберите «Снять сцену», чтобы сохранить примеры на устройстве.",
     "在屏幕设置中打开实机画面，即可对比同一场景的不同视图。游戏中打开菜单并选择截取当前场景，即可将示例保存到设备。",
     "화면 설정의 실제 게임 화면에서 같은 장면을 여러 보기로 비교할 수 있습니다. 플레이 중 메뉴에서 현재 장면 캡처를 선택하면 기기에 예시가 저장됩니다."
+  ],
+  "updates": [
+    "At startup the game checks GitHub for your edition. Update now downloads and verifies the package. Update later continues playing and asks again on the next launch. You can also check in About. Android, Wear OS and Quest ask for system installation approval. Your cartridges, saves and settings stay in place.",
+    "Au lancement, le jeu consulte GitHub pour ton appareil. « Mettre à jour maintenant » télécharge et vérifie le paquet. « Mettre à jour plus tard » permet de jouer et reporte la proposition au prochain lancement. La recherche est aussi disponible dans À propos. Android, Wear OS et Quest demandent la confirmation du système. Les cartouches, sauvegardes et réglages sont conservés.",
+    "Al iniciar, el juego busca en GitHub la edición de tu dispositivo. Actualizar ahora descarga y verifica el paquete. Actualizar más tarde permite jugar y pospone el aviso hasta el próximo inicio. También puedes buscar en Acerca de. Android, Wear OS y Quest piden confirmación del sistema. Se conservan los cartuchos, las partidas y los ajustes.",
+    "起動時に端末に合う更新をGitHubで確認します。「今すぐ更新」でダウンロードして検証します。「後で更新」でゲームを続け、次の起動時に再度確認できます。「このアプリについて」からも確認できます。Android、Wear OS、Questではシステムの確認が必要です。カートリッジ、セーブ、設定は保持されます。",
+    "Beim Start sucht das Spiel auf GitHub nach der passenden Ausgabe. Jetzt aktualisieren lädt das Paket und prüft es. Später aktualisieren verschiebt die Frage bis zum nächsten Start. Die Suche ist auch im Infobereich verfügbar. Android, Wear OS und Quest bitten um eine Systembestätigung. Module, Spielstände und Einstellungen bleiben erhalten.",
+    "All’avvio il gioco cerca su GitHub la versione per il dispositivo. Aggiorna ora scarica e verifica il pacchetto. Aggiorna più tardi rimanda la proposta al prossimo avvio. Puoi cercare anche in Informazioni. Android, Wear OS e Quest richiedono la conferma del sistema. Cartucce, salvataggi e impostazioni vengono conservati.",
+    "Ao iniciar, o jogo procura no GitHub a edição para o dispositivo. Atualizar agora baixa e verifica o pacote. Atualizar mais tarde adia o aviso até a próxima abertura. A busca também está disponível em Sobre. Android, Wear OS e Quest pedem confirmação do sistema. Os cartuchos, jogos salvos e ajustes são preservados.",
+    "При запуске игра проверяет обновления для устройства на GitHub. «Обновить сейчас» скачивает и проверяет пакет. «Обновить позже» откладывает вопрос до следующего запуска. Проверку можно запустить в разделе «О программе». Android, Wear OS и Quest запрашивают подтверждение системы. Картриджи, сохранения и настройки сохраняются.",
+    "启动时，游戏会在 GitHub 检查适合设备的版本。选择“立即更新”即可下载并校验安装包。“稍后更新”会继续游戏，在下次启动时再提示。也可以在“关于”中检查更新。Android、Wear OS 和 Quest 会要求系统确认。卡带、存档和设置会保留。",
+    "시작할 때 GitHub에서 기기에 맞는 업데이트를 확인합니다. 지금 업데이트를 누르면 패키지를 다운로드하고 확인합니다. 나중에 업데이트를 누르면 다음 실행 때 다시 안내합니다. 정보 화면에서도 확인할 수 있습니다. Android, Wear OS, Quest는 시스템 설치 확인을 요청합니다. 카트리지, 저장 데이터, 설정은 유지됩니다."
   ]
 }

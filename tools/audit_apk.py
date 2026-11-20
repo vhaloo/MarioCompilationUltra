@@ -40,7 +40,9 @@ def main():
         assert set(libraries)=={f'lib/{abi}/{name}' for abi in abis for name in expected}
         # Android's binary XML string pool still stores these permission names literally.
         manifest = archive.read('AndroidManifest.xml')
-        for forbidden in ['android.permission.INTERNET','android.permission.CAMERA','android.permission.RECORD_AUDIO','android.permission.MANAGE_EXTERNAL_STORAGE']:
+        for required in ['android.permission.INTERNET','android.permission.REQUEST_INSTALL_PACKAGES']:
+            assert required.encode() in manifest or required.encode('utf-16le') in manifest
+        for forbidden in ['android.permission.CAMERA','android.permission.RECORD_AUDIO','android.permission.MANAGE_EXTERNAL_STORAGE']:
             assert forbidden.encode() not in manifest and forbidden.encode('utf-16le') not in manifest, forbidden
         assert 'assets/mcu/assets/Interface.otf' in names
         if args.edition in ('mobile','wear'):

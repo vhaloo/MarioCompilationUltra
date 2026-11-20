@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.11.0 · Quest VR / AR
+# Mario Compilation Ultra 0.12.0 · Quest VR / AR
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -16,7 +16,7 @@ Seleziona livello, CRT nativo, telecomando o opzioni. Una presa sposta e ruota; 
 
 Pizzica e trascina lo stick; usa l’altra mano per i pulsanti. Il pizzico col medio afferra le maniglie. La perdita del tracciamento rilascia i comandi.
 
-Una nuova installazione richiede 90 Hz e un murale AR trasparente alto due metri. Se necessario si usa una frequenza supportata; la simulazione resta originale. Scansione stanza e permessi scena/ancore sono facoltativi per le pareti automatiche. Restano posizione manuale e calibrazione del pavimento. Il runtime fornisce passthrough, senza permessi Internet, microfono o immagini della fotocamera.
+Una nuova installazione richiede 90 Hz e un murale AR trasparente alto due metri. Se necessario si usa una frequenza supportata; la simulazione resta originale. Scansione stanza e permessi scena/ancore sono facoltativi per le pareti automatiche. Restano posizione manuale e calibrazione del pavimento. Il runtime fornisce passthrough, senza permessi per microfono o immagini della fotocamera.
 
 Le immagini fantasma sono informative, senza simulare oggetti lontani. Le posizioni verificate appaiono subito; le immagini apprese provengono solo dal gioco locale.
 

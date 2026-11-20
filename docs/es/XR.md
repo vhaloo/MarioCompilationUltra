@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.11.0 · Quest VR / RA
+# Mario Compilation Ultra 0.12.0 · Quest VR / RA
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -16,7 +16,7 @@ Elige el nivel, CRT nativo, mando u opciones como objetivo. Una empuñadura muev
 
 Pellizca y arrastra la palanca; usa la otra mano para los botones. Pellizca con el dedo medio para agarrar. Si se pierde el seguimiento, se sueltan los controles.
 
-Una instalación nueva solicita 90 Hz y un mural AR transparente de dos metros. Si no está disponible se usa otra frecuencia; la simulación conserva su ritmo. Permisos de escena/anclas y escaneo son opcionales para paredes automáticas. Hay colocación manual y calibración del suelo. El runtime compone passthrough; la app no solicita Internet, micrófono ni imágenes de cámara.
+Una instalación nueva solicita 90 Hz y un mural AR transparente de dos metros. Si no está disponible se usa otra frecuencia; la simulación conserva su ritmo. Permisos de escena/anclas y escaneo son opcionales para paredes automáticas. Hay colocación manual y calibración del suelo. El runtime compone passthrough; la app no solicita micrófono ni imágenes de cámara.
 
 Las imágenes fantasma informan y no simulan objetos lejanos. Las posiciones verificadas pueden mostrarse al entrar; las imágenes aprendidas proceden de tu juego local.
 

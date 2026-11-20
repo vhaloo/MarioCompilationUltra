@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.11.0 · Quest RV / RA
+# Mario Compilation Ultra 0.12.0 · Quest RV / RA
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -16,7 +16,7 @@ Escolha nível, CRT nativo, controle ou opções como alvo. Uma empunhadura move
 
 Pince e arraste o analógico; use a outra mão nos botões. A pinça com o dedo médio segura alças. Perder o rastreamento solta os comandos.
 
-Uma nova instalação pede 90 Hz e um mural AR transparente de dois metros. Há frequência alternativa compatível; a simulação mantém o ritmo original. Varredura da sala e permissões de cena/âncoras são opcionais para paredes automáticas. Posicionamento manual e calibração do chão continuam disponíveis. O runtime fornece passthrough; sem permissões de Internet, microfone ou imagens da câmera.
+Uma nova instalação pede 90 Hz e um mural AR transparente de dois metros. Há frequência alternativa compatível; a simulação mantém o ritmo original. Varredura da sala e permissões de cena/âncoras são opcionais para paredes automáticas. Posicionamento manual e calibração do chão continuam disponíveis. O runtime fornece passthrough; sem permissões de microfone ou imagens da câmera.
 
 As imagens fantasma são informativas e não simulam objetos distantes. Posições verificadas aparecem no início; imagens aprendidas vêm apenas do jogo local.
 

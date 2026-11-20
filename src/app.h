@@ -16,6 +16,7 @@
 #include "performance.h"
 #include "gpu_timer.h"
 #include "voxel_scene.h"
+#include "update.h"
 namespace mcu {
 struct Options {
     bool headless = false, software = false, menu = false, realtime = true, noResume = false,
@@ -106,6 +107,15 @@ class App {
     void optionsUi();
     void browserUi();
     void dialogs();
+    SoftwareUpdates updates;
+    UpdateStatus softwareStatus;
+    uint64_t softwarePollAt = 0;
+    bool softwarePrompt = false, softwareDeferred = false, softwareResume = false,
+         softwareManual = false;
+    void checkSoftware(bool manual);
+    void dismissSoftware();
+    void softwareDialog();
+    void softwareOptions();
     void hotplug();
     void fullscreen();
     void bootstrapInput();
@@ -171,6 +181,9 @@ class App {
     float uiUnit() const { return mobileActive() ? density : 1.f; }
 
   public:
+    bool softwareEnabled = false;
+    fs::path restartProgram;
+    void pollSoftware();
     Options options;
     Settings settings;
     Library library;

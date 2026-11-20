@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-feature android:glEsVersion="0x00030000" android:required="true"/>
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <application android:label="Mario Compilation Ultra" android:icon="@drawable/mcu_icon" android:enableOnBackInvokedCallback="true"
         android:allowBackup="false" android:hasCode="true" android:extractNativeLibs="true"
@@ -16,5 +18,7 @@
             <layout android:minWidth="240dp" android:minHeight="200dp"/>
         </activity>
         <activity android:name=".GuideActivity" android:exported="false" android:resizeableActivity="true"/>
+        <provider android:name="com.vhaloo.mariocompilationultra.UpdateFileProvider"
+            android:authorities="${applicationId}.updates" android:exported="false" android:grantUriPermissions="true"/>
     </application>
 </manifest>

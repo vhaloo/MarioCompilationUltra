@@ -53,7 +53,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build libasound2-dev libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxfixes-dev libxkbcommon-dev libwayland-dev libegl1-mesa-dev libgl1-mesa-dev
+          sudo apt-get install -y ninja-build libcurl4-openssl-dev libasound2-dev libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxfixes-dev libxkbcommon-dev libwayland-dev libegl1-mesa-dev libgl1-mesa-dev
       - name: Configure Windows
         if: runner.os == 'Windows'
         run: cmake -S . -B build -A x64 -DBUILD_TESTING=ON -DCMAKE_DISABLE_FIND_PACKAGE_SDL2=ON

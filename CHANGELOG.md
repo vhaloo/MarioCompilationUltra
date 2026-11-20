@@ -1,5 +1,9 @@
 # Releases
 
+## 0.12.0
+
+All seven editions check the project's published GitHub releases in the background at startup. Update now downloads the matching package and verifies its SHA-256. Update later defers until the next launch. The About screen also supports manual checks. Desktop activation preserves the original executable and the data directory. Android phones, tablets, Wear OS and Meta Quest use the system APK installer and check the installed publisher.
+
 ## 0.11.0 — 2026-11-19
 
 - Rewind and new save slots retain the palettes, tiles, sprites and per-line scrolling that produced the original image. Older slots still load.

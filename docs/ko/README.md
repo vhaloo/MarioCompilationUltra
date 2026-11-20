@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.11.0
+# Mario Compilation Ultra 0.12.0
 
 PC에 맞게 조정할 수 있는 인터페이스와 실험적인 확장 화면을 제공하는 로컬 SNES 모음입니다. Super FX를 포함한 카트리지 동작은 Snes9x가 에뮬레이션합니다. 모든 게임을 역컴파일했다고 주장하지 않습니다.
 
-[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.11.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[다운로드와 바탕 화면에서 실행](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.12.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## 다운로드와 바탕 화면에서 실행
 
@@ -59,6 +59,10 @@ sh ./Install-Linux.sh
 
 **설정 프로필** · 모양을 적용하기 전에 사용자 설정을 여기에 저장하세요.
 
+## 소프트웨어 업데이트
+
+시작할 때 GitHub에서 기기에 맞는 업데이트를 확인합니다. 지금 업데이트를 누르면 패키지를 다운로드하고 확인합니다. 나중에 업데이트를 누르면 다음 실행 때 다시 안내합니다. 정보 화면에서도 확인할 수 있습니다. Android, Wear OS, Quest는 시스템 설치 확인을 요청합니다. 카트리지, 저장 데이터, 설정은 유지됩니다.
+
 ## 픽셀 입체화
 
 ![픽셀 입체화](../voxel-preview.png)
@@ -83,15 +87,15 @@ sh ./Install-Linux.sh
 
 ## Android 휴대전화와 태블릿
 
-[Android 휴대전화와 태블릿](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Android-public.apk)
+[Android 휴대전화와 태블릿](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.0/MarioCompilationUltra-0.12.0-Android-public.apk)
 
 ## 시계 보기
 
-[시계 보기](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Wear-public.apk) · [그림으로 보는 설정](SETTINGS.md)
+[시계 보기](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.0/MarioCompilationUltra-0.12.0-Wear-public.apk) · [그림으로 보는 설정](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.0/MarioCompilationUltra-0.12.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 조작
 
@@ -163,7 +167,7 @@ View/Back: 설정 · LT: 되감기 · RT: Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 패키지와 검증 · 0.11.0
+## 패키지와 검증 · 0.12.0
 
 전체 지도에서는 카메라가 움직여도 그 아래 지형이 계속 보입니다. 터치스크린에서 엄지를 Y에서 B 쪽으로 밀면 달리면서 점프할 수 있습니다. Mac 버전은 실험용입니다. 실제 Quest 헤드셋과 시계에서의 게임 플레이는 아직 검증되지 않았습니다.
 

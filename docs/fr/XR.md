@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.11.0 · Quest VR / AR
+# Mario Compilation Ultra 0.12.0 · Quest VR / AR
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -16,7 +16,7 @@ Choisis le niveau, le CRT natif, la télécommande ou les options comme cible. U
 
 Pince et déplace le stick ; l’autre main actionne les boutons. Pince avec le majeur pour saisir une poignée. Une perte de suivi relâche les commandes.
 
-Une nouvelle installation demande 90 Hz et une fresque AR transparente de deux mètres. La fréquence utilise un repli si nécessaire ; la simulation garde sa cadence native. Les permissions de scène/ancrage et le scan de pièce sont facultatifs pour les murs automatiques. Placement manuel et calibration du sol restent accessibles. Le runtime fournit le passthrough ; l’application ne demande ni Internet, ni micro, ni images caméra.
+Une nouvelle installation demande 90 Hz et une fresque AR transparente de deux mètres. La fréquence utilise un repli si nécessaire ; la simulation garde sa cadence native. Les permissions de scène/ancrage et le scan de pièce sont facultatifs pour les murs automatiques. Placement manuel et calibration du sol restent accessibles. Le runtime fournit le passthrough ; l’application ne demande ni micro, ni images caméra.
 
 Les images fantômes sont informatives et ne simulent pas les objets éloignés. Les placements vérifiés peuvent être montrés dès le début ; les images apprises viennent uniquement de ton jeu local.
 

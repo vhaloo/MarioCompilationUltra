@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.11.0
+# Mario Compilation Ultra 0.12.0
 
 PC向けの使いやすい画面と実験的な拡張表示を備えたローカルSNESコレクションです。Super FXを含むカートリッジの動作はSnes9xが再現します。全作品を逆コンパイルしたものではありません。
 
-[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.11.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[ダウンロードとデスクトップからの起動](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.12.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## ダウンロードとデスクトップからの起動
 
@@ -59,6 +59,10 @@ sh ./Install-Linux.sh
 
 **設定プロファイル** · 外観を適用する前に、現在の設定をここに保存できます。
 
+## ソフトウェアの更新
+
+起動時に端末に合う更新をGitHubで確認します。「今すぐ更新」でダウンロードして検証します。「後で更新」でゲームを続け、次の起動時に再度確認できます。「このアプリについて」からも確認できます。Android、Wear OS、Questではシステムの確認が必要です。カートリッジ、セーブ、設定は保持されます。
+
 ## ピクセルの立体化
 
 ![ピクセルの立体化](../voxel-preview.png)
@@ -83,15 +87,15 @@ sh ./Install-Linux.sh
 
 ## Androidスマートフォンとタブレット
 
-[Androidスマートフォンとタブレット](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Android-public.apk)
+[Androidスマートフォンとタブレット](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.0/MarioCompilationUltra-0.12.0-Android-public.apk)
 
 ## 時計の表示
 
-[時計の表示](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Wear-public.apk) · [図解設定ガイド](SETTINGS.md)
+[時計の表示](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.0/MarioCompilationUltra-0.12.0-Wear-public.apk) · [図解設定ガイド](SETTINGS.md)
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.0/MarioCompilationUltra-0.12.0-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## 操作
 
@@ -163,7 +167,7 @@ View/Back: 設定 · LT: 巻き戻し · RT: Select<br>
 
 ![Quest VR / AR](screenshots/6.png)
 
-## 配布パッケージと検証 · 0.11.0
+## 配布パッケージと検証 · 0.12.0
 
 全体マップではカメラが動いても地形が表示されます。タッチ操作では親指をYからBへ滑らせると、走りながらジャンプできます。Mac版は実験版です。Questと腕時計の実機でのプレイは未検証です。
 

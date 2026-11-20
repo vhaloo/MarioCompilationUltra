@@ -3,6 +3,7 @@
 #include <cstring>
 #include <imgui_internal.h>
 using namespace mcu;
+namespace mcu { void testSoftwarePrompt(const fs::path &); }
 static int checks = 0;
 static void check(bool b, const char *m) {
     ++checks;

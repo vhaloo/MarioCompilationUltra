@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.11.0
+# Mario Compilation Ultra 0.12.0
 
 Coleção SNES local com interface adaptável ao PC e visualizações ampliadas experimentais. O Snes9x emula os cartuchos, incluindo Super FX. O projeto não afirma ter descompilado todos os jogos.
 
-[Download e início pela área de trabalho](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.11.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download e início pela área de trabalho](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.12.0) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download e início pela área de trabalho
 
@@ -59,6 +59,10 @@ Escolhe um aspeto. Substitui as definições atuais de imagem e câmara.
 
 **Perfis de definições** · Guarda aqui a tua configuração personalizada antes de aplicar um aspeto.
 
+## Atualização do programa
+
+Ao iniciar, o jogo procura no GitHub a edição para o dispositivo. Atualizar agora baixa e verifica o pacote. Atualizar mais tarde adia o aviso até a próxima abertura. A busca também está disponível em Sobre. Android, Wear OS e Quest pedem confirmação do sistema. Os cartuchos, jogos salvos e ajustes são preservados.
+
 ## Volume dos pixels
 
 ![Volume dos pixels](../voxel-preview.png)
@@ -83,15 +87,15 @@ A versão 0.8 adapta resolução do cenário, grade de voxels, frequência decor
 
 ## Celulares e tablets Android
 
-[Celulares e tablets Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Android-public.apk)
+[Celulares e tablets Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.0/MarioCompilationUltra-0.12.0-Android-public.apk)
 
 ## Vista do relógio
 
-[Vista do relógio](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Wear-public.apk) · [Configurações ilustradas](SETTINGS.md)
+[Vista do relógio](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.0/MarioCompilationUltra-0.12.0-Wear-public.apk) · [Configurações ilustradas](SETTINGS.md)
 
 ## Quest RV / RA
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.11.0/MarioCompilationUltra-0.11.0-Quest-public.apk) · [Quest RV / RA](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.0/MarioCompilationUltra-0.12.0-Quest-public.apk) · [Quest RV / RA](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Controles
 
@@ -163,7 +167,7 @@ Escolha o cartucho novamente se o arquivo foi movido ou a unidade desconectada. 
 
 ![Quest RV / RA](screenshots/6.png)
 
-## Pacotes e validação · 0.11.0
+## Pacotes e validação · 0.12.0
 
 O mapa completo mantém o terreno visível sob a câmera em movimento. Na tela sensível ao toque, deslize o polegar de Y em direção a B para correr e pular ao mesmo tempo. As versões para Mac são experimentais. Ainda falta verificar o jogo em um headset Quest e em um relógio físicos.
 

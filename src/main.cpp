@@ -12,7 +12,8 @@
 #include <shellapi.h>
 #endif
 using namespace mcu;
-int run(const std::vector<std::string> &args) {
+int run(const std::vector<std::string> &args, fs::path &restart,
+        std::vector<std::string> &forward) {
     Options o;
     fs::path data;
     for (size_t i = 1; i < args.size(); i++) {
@@ -114,7 +115,18 @@ int run(const std::vector<std::string> &args) {
         data = fs::u8path(p);
         SDL_free(p);
     }
+    data = fs::absolute(data);
     fs::create_directories(data);
+    const bool interactive = !o.headless && o.frames < 0 && o.script.empty() && o.realtime;
+#ifndef __ANDROID__
+    forward.assign(args.begin() + 1, args.end());
+    forward.insert(forward.end(), {"--data-dir", data.u8string()});
+    if (interactive) {
+        auto active = newerDesktopProgram(updateRoot(data, updateEdition(false)), MCU_VERSION);
+        if (!active.empty() && launchUpdatedProgram(active, forward))
+            return 0;
+    }
+#endif
     std::multimap<int, std::pair<std::string, std::string>> timeline;
     if (!o.script.empty()) {
         std::ifstream f(fs::u8path(o.script));
@@ -149,6 +161,9 @@ int run(const std::vector<std::string> &args) {
     uint64_t liveReportAt = 0;
     for (int i = 0; !app.quit && (o.frames < 0 || i < o.frames); i++) {
         app.events();
+        if (i == 1)
+            app.softwareEnabled = interactive;
+        app.pollSoftware();
 #ifdef MCU_QUEST
         if (!xr.beginFrame()) {
             SDL_Delay(5);
@@ -222,6 +237,7 @@ int run(const std::vector<std::string> &args) {
     if (!o.report.empty())
         app.report(fs::u8path(o.report),
                    std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count());
+    restart = app.restartProgram;
     return 0;
 }
 #ifdef __ANDROID__
@@ -246,7 +262,12 @@ int main(int argc, char **argv) {
         for (int i = 0; i < argc; i++)
             args.emplace_back(argv[i]);
 #endif
-        return run(args);
+        fs::path restart;
+        std::vector<std::string> forward;
+        auto result = run(args, restart, forward);
+        if (!restart.empty() && !launchUpdatedProgram(restart, forward))
+            throw std::runtime_error("Could not restart the updated application");
+        return result;
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';
         if (std::find(args.begin(), args.end(), "--headless") == args.end())

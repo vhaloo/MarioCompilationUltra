@@ -112,6 +112,7 @@ void App::watchOptions() {
     if (!watchActive())
         return;
     if (tab == 5) {
+        softwareOptions();
         ImGui::TextWrapped("Mario Compilation Ultra");
         ImGui::TextUnformatted(MCU_VERSION);
         if (button("Open guide"))

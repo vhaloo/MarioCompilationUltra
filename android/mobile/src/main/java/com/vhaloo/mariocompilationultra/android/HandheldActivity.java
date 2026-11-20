@@ -26,8 +26,8 @@ import android.widget.Toast;
 import java.io.*;
 import java.util.ArrayList;
 
-/** Ordinary Android application: no headset, network or storage-wide permission. */
-public final class HandheldActivity extends SDLActivity {
+/** SDL entry point for Android phones, tablets and Wear OS. */
+public final class HandheldActivity extends com.vhaloo.mariocompilationultra.UpdateActivity {
     private File root;
     private volatile boolean rotarySeen;
     private static native void nativeRotary(float delta);

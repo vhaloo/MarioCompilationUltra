@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.11.0 · Quest VR / AR
+# Mario Compilation Ultra 0.12.0 · Quest VR / AR
 
 [English](../en/XR.md) · [Français](../fr/XR.md) · [Español](../es/XR.md) · [日本語](../ja/XR.md) · [Deutsch](../de/XR.md) · [Italiano](../it/XR.md) · [Português](../pt/XR.md) · [Русский](../ru/XR.md) · [简体中文](../zh/XR.md) · [한국어](../ko/XR.md)
 
@@ -16,7 +16,7 @@ Select the level, native CRT, remote or options as the placement target. One gri
 
 Pinch and drag the stick; use the other hand for buttons. Middle-finger pinch grabs handles. Tracking lost: controls release.
 
-New Quest data requests 90 Hz and a transparent two-metre AR mural. Supported refresh falls back when unavailable; native simulation speed is unchanged. Scene/anchor permissions and a room scan are optional for automatic walls. Manual placement and floor calibration remain available. Passthrough is supplied by the runtime; the app requests no Internet, microphone or camera-image permission.
+New Quest data requests 90 Hz and a transparent two-metre AR mural. Supported refresh falls back when unavailable; native simulation speed is unchanged. Scene/anchor permissions and a room scan are optional for automatic walls. Manual placement and floor calibration remain available. Passthrough is supplied by the runtime; the app requests no microphone or camera-image permission.
 
 Ghost images are informative and do not simulate distant objects. Verified placements can appear at entry; learned pictures come only from your local game.
 
