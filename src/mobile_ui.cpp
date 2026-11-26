@@ -95,11 +95,11 @@ bool App::mobileEvent(const SDL_Event &e) {
                 core.flushBattery();
                 if (settings.autoResume)
                     core.save(0);
-                settings.save(library);
             } catch (const std::exception &error) {
                 notify(error.what());
             }
         }
+        persistOptions(nullptr);
     }
     if (e.type == SDL_APP_DIDENTERFOREGROUND) {
         backgrounded = false;

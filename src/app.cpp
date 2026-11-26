@@ -1345,9 +1345,9 @@ void App::optionsUi() {
     const Defaults groups[] = {Defaults::All, Defaults::Screen, Defaults::Camera,
                                Defaults::AudioSaves, Defaults::Controls, Defaults::All,
                                Defaults::Spatial};
-    if (tab == 1 && watchActive() && watchRound())
-        choice("Screen curve", settings.watchCurve,
-               {"Flat", "Gentle curve", "Curved edges", "Fisheye"});
+    if (tab == 1 && watchActive() && watchRound() &&
+        choice("Screen curve", settings.watchCurve, {"Flat", "Gentle curve", "Curved edges", "Fisheye"}))
+        persistOptions(nullptr);
     if (tab != 5 && button(settings.advancedOptions ? "Use simple settings"
                                                     : "Open advanced settings",
                            nullptr, {-1, 38})) {

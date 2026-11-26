@@ -487,6 +487,12 @@ int main() {
                       roundtrip.touchPlacement == 2 && roundtrip.touchLeftHanded &&
                       roundtrip.mobileOrientation == 2 && !roundtrip.mobileKeepAwake,
                   "Mobile display and touch preferences survive a restart");
+            mobile.core.unload();
+            mobile.settings.watchCurve = 2;
+            SDL_PushEvent(&checkpoint);
+            step();
+            roundtrip.load(cartridges);
+            check(roundtrip.watchCurve == 2, "Leaving the library persists options before starting a game");
         }
         SDL_Quit();
         std::cout << checks << " controller/UI checks passed\n";
