@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.12.1 · 手表视图
+# Mario Compilation Ultra 0.12.2 · 手表视图
 
 [English](../en/WATCH.md) · [Français](../fr/WATCH.md) · [Español](../es/WATCH.md) · [日本語](../ja/WATCH.md) · [Deutsch](../de/WATCH.md) · [Italiano](../it/WATCH.md) · [Português](../pt/WATCH.md) · [Русский](../ru/WATCH.md) · [简体中文](../zh/WATCH.md) · [한국어](../ko/WATCH.md)
 
@@ -8,6 +8,8 @@
 
 0%：整个已加载区域。100%：原始镜头。门和管道可能加载其他区域。
 
+转动表冠可放大画面。缩放在 85% 到 100% 之间时，画面保持平直。缩小时可选择柔和弧度、中心较平的边缘弯曲或鱼眼效果。选择“平面”可在任意缩放比例下保持直线。
+
 大多数游戏中，B跳跃，Y奔跑或抓取。用不同手指同时按住方向和动作。
 
 点击暂停图标或Android返回键可暂停，继续会保留游戏。退出位于收藏列表底部。
@@ -16,17 +18,17 @@
 
 将卡带传输到CartridgeInbox，然后选择检查已传输卡带或重启应用。现有文件会保留。
 
-实体手表的操作与持续性能尚未验证，本版本为实验版。
-
-实体手表的操作与持续性能尚未验证，本版本为实验版。
-
 更新已签名APK会保留数据，卸载或清除应用数据会移除本地卡带和存档。
+
+已在 Galaxy Watch8 Classic 真机上通过触控和旋转输入事件进行测试。佩戴舒适度及长时间游戏的性能仍待评估。
+
+![合集 · Galaxy Watch8 Classic](../watch-library.png)
 
 ```text
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.12.1-Wear-public.apk
+adb install -r MarioCompilationUltra-0.12.2-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 ```
 
-[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Wear-public.apk) · [HTML](watch.html) · [图解设置](SETTINGS.md) · [Guide](README.md)
+[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.2/MarioCompilationUltra-0.12.2-Wear-public.apk) · [HTML](watch.html) · [图解设置](SETTINGS.md) · [Guide](README.md)

@@ -91,7 +91,7 @@ sh ./Install-Linux.sh
 
 ## Вид на часах
 
-[Вид на часах](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Wear-public.apk) · [Настройки с иллюстрациями](SETTINGS.md)
+[Вид на часах](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.2/MarioCompilationUltra-0.12.2-Wear-public.apk) · [Настройки с иллюстрациями](SETTINGS.md)
 
 ## Quest VR / AR
 

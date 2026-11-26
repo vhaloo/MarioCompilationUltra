@@ -51,7 +51,8 @@ struct Settings {
     bool adaptiveResolution = true, thermalAware = true;
     int performanceReserve = 25, performanceMode = 0;
     int watchZoom = 1000, watchCrownSensitivity = 100, watchTouchScale = 100;
-    bool watchLens = true, watchCrownReverse = false;
+    int watchCurve = 1;
+    bool watchCrownReverse = false;
     bool questFoveation = true;
     int volumeMode = 0, volumeDepth = 6, volumeSpacing = 2, volumeAngle = 18;
     int volumeTilt = -12;

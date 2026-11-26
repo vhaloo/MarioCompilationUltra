@@ -1,8 +1,10 @@
-Mario Compilation Ultra 0.12.1 · Vista del reloj
+Mario Compilation Ultra 0.12.2 · Vista del reloj
 
 Gira la corona o bisel para cambiar el zoom. En los menús desplaza el contenido; también funcionan + y - táctiles.
 
 0%: toda el área cargada. 100%: cámara original. Puertas y tuberías pueden cargar otra área.
+
+Gira la corona para acercar la imagen. Del 85 al 100 % se mantiene plana. Al alejarla, elige una curva suave, bordes curvos con el centro más plano u ojo de pez. El modo Plano conserva las líneas rectas con cualquier zoom.
 
 En la mayoría de los juegos, B salta e Y corre o agarra. Usa dedos distintos para mantener dirección y acción.
 
@@ -12,13 +14,11 @@ El paquete personal incluye tus cartuchos locales. Los paquetes públicos necesi
 
 Transfiere cartuchos a CartridgeInbox y elige Comprobar cartuchos transferidos o reinicia la app. Los archivos existentes se conservan.
 
-Los controles físicos y el rendimiento prolongado en reloj siguen sin probarse. Esta edición es experimental.
-
-Los controles físicos y el rendimiento prolongado en reloj siguen sin probarse. Esta edición es experimental.
-
 Actualizar un APK firmado conserva los datos. Desinstalar o borrar datos elimina cartuchos y partidas locales.
+
+Las pruebas usan eventos táctiles y de giro en un Galaxy Watch8 Classic. Aún falta evaluar la comodidad y el rendimiento en sesiones largas.
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.12.1-Wear-public.apk
+adb install -r MarioCompilationUltra-0.12.2-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

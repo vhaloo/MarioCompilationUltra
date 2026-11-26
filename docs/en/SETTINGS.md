@@ -18,9 +18,9 @@ Choose what the view follows: the original camera, the player or a fixed positio
 
 Zoom changes how much of the area fits on screen. On a watch, 0% shows the complete loaded map and 100% reaches the original camera. Game speed stays unchanged.
 
-## Round-screen fisheye
+## Screen curve
 
-On a round watch, the lens bends the whole game rectangle into a circle. Source edges remain visible. Controls and text stay flat; switch it off for an undistorted rectangle.
+Turn the crown to zoom in. From 85% to 100% the image stays flat. Zoom out for a gentle curve, curved edges with a flatter center, or a fisheye. Choose Flat for straight lines at every zoom.
 
 ## Crown sensitivity
 

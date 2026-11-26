@@ -921,6 +921,9 @@ void App::drawGame() {
                                : settings.quality == 1 ? 393216
                                                        : 196608);
         budget >>= std::min(3, settings.adaptiveResolution ? resolution.level() : 0);
+        if (settings.projectionWatch && settings.volumeMode == 2 && settings.adaptiveResolution &&
+            resolution.level() == 5)
+            budget /= 2;
         double scale =
             std::min(1., std::sqrt(double(budget) / (double(drawableWidth) * drawableHeight)));
         int vw = std::max(1, int(drawableWidth * scale)),
@@ -1342,6 +1345,9 @@ void App::optionsUi() {
     const Defaults groups[] = {Defaults::All, Defaults::Screen, Defaults::Camera,
                                Defaults::AudioSaves, Defaults::Controls, Defaults::All,
                                Defaults::Spatial};
+    if (tab == 1 && watchActive() && watchRound())
+        choice("Screen curve", settings.watchCurve,
+               {"Flat", "Gentle curve", "Curved edges", "Fisheye"});
     if (tab != 5 && button(settings.advancedOptions ? "Use simple settings"
                                                     : "Open advanced settings",
                            nullptr, {-1, 38})) {
@@ -2015,8 +2021,12 @@ void App::render() {
         settings.desktopPresentation = 0;
         settings.projectionWatch = true;
         settings.projectionWatchZoom = watchZoomCurrent;
-        if (watchZoomCurrent >= .9995f)
-            settings.volumeMode = 0; // The crown endpoint is always the original camera.
+        if (watchZoomCurrent >= .9995f) {
+            // At the crown endpoint only the original camera is visible. Use its
+            // normal render path, including the user's pixel filter and backdrop.
+            settings.view = 0;
+            settings.volumeMode = 0;
+        }
     }
     bool cleanProjection = settings.projectionCleanScene || watchFrame;
     SDL_SetRenderDrawColor(
@@ -2130,9 +2140,10 @@ void App::render() {
         SDL_SetRenderTarget(renderer, watchPreviousTarget);
         SDL_RenderSetViewport(renderer, nullptr);
         SDL_RenderSetScale(renderer, 1, 1);
-        float lens = watchRound() && settings.watchLens ? 1.f : 0.f;
+        auto curve = static_cast<WatchCurve>(settings.watchCurve);
+        float lens = watchRound() ? watchLensStrength(curve, watchZoomCurrent) : 0.f;
         if (!watchMesh.draw(renderer, watchTarget, fullWidth, fullHeight,
-                            float(watchWidth) / watchHeight, lens, watchRound()))
+                            float(watchWidth) / watchHeight, lens, watchRound(), curve))
             SDL_RenderCopy(renderer, watchTarget, nullptr, &watchOutput);
         gameViewport = watchOutput;
         settings = std::move(watchPersistent);
@@ -2396,6 +2407,8 @@ void App::capture(const fs::path &p) {
 void App::report(const fs::path &p, double elapsed) const {
     auto &s = world.scene;
     std::ostringstream o;
+    bool mapRequested = watchActive() && core.loaded && !menu ? watchZoomCurrent < .9995f
+                                                               : settings.view == 4;
     SDL_RendererInfo rendererInfo{};
     SDL_GetRendererInfo(renderer, &rendererInfo);
     double measured =
@@ -2454,7 +2467,9 @@ void App::report(const fs::path &p, double elapsed) const {
       << ",\n\"watch\":" << (watchActive() ? "true" : "false")
       << ",\n\"watch_round\":" << (watchRound() ? "true" : "false")
       << ",\n\"watch_crown\":" << (mobileDisplay.rotary ? "true" : "false")
-      << ",\n\"watch_zoom\":" << settings.watchZoom << ",\n\"thermal_status\":" << thermalStatus
+      << ",\n\"watch_zoom\":" << settings.watchZoom << ",\n\"watch_curve\":" << settings.watchCurve
+      << ",\n\"watch_lens_strength\":" << (watchRound() ? watchLensStrength(static_cast<WatchCurve>(settings.watchCurve), watchZoomCurrent) : 0)
+      << ",\n\"thermal_status\":" << thermalStatus
       << ",\n\"effect_cadence\":" << effectCadence()
       << ",\n\"texture_upload_bytes\":" << textureUploadBytes
       << ",\n\"terrain_builds\":" << world.terrainBuilds
@@ -2492,14 +2507,14 @@ void App::report(const fs::path &p, double elapsed) const {
       << world.canvas.worldHeight << ']' << ",\n\"ppu_blank\":" << core.snapshot.blank
       << ",\n\"ppu_layers\":" << core.snapshot.mainLayers
       << ",\n\"expanded\":" << (world.expanded ? "true" : "false")
-      << ",\n\"complete_map_requested\":" << (settings.view == 4 ? "true" : "false")
+      << ",\n\"complete_map_requested\":" << (mapRequested ? "true" : "false")
       << ",\n\"complete_map_foreground\":" << (world.cleanOverview ? "true" : "false")
       << ",\n\"complete_map_ready\":"
-      << (settings.view == 4 && world.expanded && world.complete.ready ? "true" : "false")
+      << (mapRequested && world.expanded && world.complete.ready ? "true" : "false")
       << ",\n\"complete_map_source\":"
-      << jsonString(settings.view == 4 && world.expanded ? world.complete.source : "")
+      << jsonString(mapRequested && world.expanded ? world.complete.source : "")
       << ",\n\"complete_map_layers\":"
-      << (settings.view == 4 && world.expanded ? (world.complete.secondary ? 2 : 1) : 0)
+      << (mapRequested && world.expanded ? (world.complete.secondary ? 2 : 1) : 0)
       << ",\n\"complete_map_bounds\":[" << world.complete.x << ',' << world.complete.y << ','
       << world.complete.width << ',' << world.complete.height << ']'
       << ",\n\"full_map\":" << (s.fullMap ? "true" : "false") << ",\n\"stage\":" << s.stage

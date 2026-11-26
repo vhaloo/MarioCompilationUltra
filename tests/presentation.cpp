@@ -68,11 +68,11 @@ int main() {
         imports.paths.emplace("world", settings.dataDir / "test cartridge.sfc");
         settings.volumeMode = 2;
         settings.view = 4;
-        settings.watchLens = false;
+        settings.watchCurve = 0;
         settings.questMode = 5;
         settings.restoreDefaults(Defaults::Screen);
         check(settings.view == defaults.view && settings.volumeMode == defaults.volumeMode &&
-                  settings.watchLens == defaults.watchLens && settings.volume == 31 &&
+                  settings.watchCurve == defaults.watchCurve && settings.volume == 31 &&
                   settings.language == 4 && settings.questMode == 5,
               "Screen reset changes only its own preferences");
         settings.cameraMode = 2;
@@ -97,7 +97,14 @@ int main() {
                   readFile(slot) == std::vector<uint8_t>({1, 2, 3}),
               "Global reset persists defaults, keeps imports and does not touch save slots");
         check(!reloaded.advancedOptions, "A fresh or reset profile opens simple settings");
+        for (int enabled : {0, 1}) {
+            atomicText(reloaded.profilePath(1), "qualityPolicy 1\nwatchLens " +
+                                                    std::to_string(enabled) + "\n");
+            check(reloaded.loadProfile(1) && reloaded.watchCurve == (enabled ? 3 : 0),
+                  "Earlier profiles retain the flat or fisheye choice");
+        }
         reloaded.advancedOptions = true;
+        reloaded.watchCurve = 2;
         reloaded.volumeMode = 2;
         reloaded.volumeDepth = 13;
         reloaded.filter = 2;
@@ -110,7 +117,7 @@ int main() {
                   reloaded.volumeDepth == defaults.volumeDepth && reloaded.volume == 38,
               "One-click map preset overrides the custom picture and camera");
         reloaded.advancedOptions = false;
-        check(reloaded.loadProfile(1) && reloaded.volumeMode == 2 && reloaded.volumeDepth == 13 &&
+        check(reloaded.loadProfile(1) && reloaded.watchCurve == 2 && reloaded.volumeMode == 2 && reloaded.volumeDepth == 13 &&
                   reloaded.filter == 2 && reloaded.cameraMode == 1 && !reloaded.advancedOptions &&
                   reloaded.lastGame == "world" && reloaded.dataDir == directory &&
                   !reloaded.loadProfile(Settings::ProfileCount),

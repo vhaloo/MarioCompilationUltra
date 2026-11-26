@@ -97,7 +97,7 @@ Version 0.8 adapts scenery resolution, voxel grid, decorative cadence and VR sha
 
 ## Watch view
 
-[Watch view](docs/en/WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Wear-public.apk) · [Illustrated settings](docs/en/SETTINGS.md)
+[Watch view](docs/en/WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.2/MarioCompilationUltra-0.12.2-Wear-public.apk) · [Illustrated settings](docs/en/SETTINGS.md)
 
 ## Quest VR / AR
 

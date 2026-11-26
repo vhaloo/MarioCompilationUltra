@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.12.1 · 時計の表示
+# Mario Compilation Ultra 0.12.2 · 時計の表示
 
 [English](../en/WATCH.md) · [Français](../fr/WATCH.md) · [Español](../es/WATCH.md) · [日本語](../ja/WATCH.md) · [Deutsch](../de/WATCH.md) · [Italiano](../it/WATCH.md) · [Português](../pt/WATCH.md) · [Русский](../ru/WATCH.md) · [简体中文](../zh/WATCH.md) · [한국어](../ko/WATCH.md)
 
@@ -8,6 +8,8 @@
 
 0%は読み込み済みエリア全体、100%は元のカメラです。扉や土管で別エリアを読み込む場合があります。
 
+リューズを回して拡大します。85～100%では平面表示になります。縮小時はゆるやかな湾曲、中心が平らな周辺湾曲、魚眼から選べます。「平面」ならどの倍率でも直線を保ちます。
+
 多くのゲームでBはジャンプ、Yは走る・つかむ操作です。方向とアクションを別の指で同時に押せます。
 
 一時停止アイコンかAndroidの戻るで停止します。再開で同じゲームを続けます。終了はコレクションの一番下です。
@@ -16,17 +18,17 @@
 
 CartridgeInboxに転送し、転送したカートリッジを確認するかアプリを再起動してください。既存ファイルは保護されます。
 
-実機時計の操作感と長時間性能は未検証です。このエディションは実験版です。
-
-実機時計の操作感と長時間性能は未検証です。このエディションは実験版です。
-
 署名済みAPKの更新はアプリデータを保ちます。アンインストールやデータ消去ではローカルのカートリッジとセーブが消えます。
+
+Galaxy Watch8 Classic の実機でタッチと回転の入力イベントを検証しました。装着時の操作感と長時間の性能は今後の検証項目です。
+
+![コレクション · Galaxy Watch8 Classic](../watch-library.png)
 
 ```text
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.12.1-Wear-public.apk
+adb install -r MarioCompilationUltra-0.12.2-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 ```
 
-[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Wear-public.apk) · [HTML](watch.html) · [図解設定ガイド](SETTINGS.md) · [Guide](README.md)
+[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.2/MarioCompilationUltra-0.12.2-Wear-public.apk) · [HTML](watch.html) · [図解設定ガイド](SETTINGS.md) · [Guide](README.md)

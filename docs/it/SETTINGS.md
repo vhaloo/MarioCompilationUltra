@@ -18,9 +18,9 @@ Scegli se seguire la telecamera originale, il personaggio o una posizione fissa.
 
 Lo zoom regola quanto terreno è visibile. Sull’orologio, 0% mostra tutta l’area caricata e 100% raggiunge la telecamera originale. La velocità del gioco resta invariata.
 
-## Fisheye per schermo rotondo
+## Curvatura dello schermo
 
-Su un orologio rotondo, la lente piega l’intero rettangolo del gioco in un cerchio, mantenendo i bordi. Comandi e testo restano piani. Disattivala per un rettangolo senza deformazioni.
+Ruota la corona per ingrandire. Tra l’85 e il 100% l’immagine resta piatta. Riducendo lo zoom puoi scegliere una curvatura lieve, bordi curvi con centro più piatto o un effetto occhio di pesce. Piatto mantiene le linee dritte a ogni ingrandimento.
 
 ## Sensibilità corona
 

@@ -18,9 +18,9 @@ Escolha se a vista segue a câmera original, o personagem ou uma posição fixa.
 
 O zoom muda quanto terreno cabe na tela. No relógio, 0% mostra toda a área carregada e 100% chega à câmera original. A velocidade do jogo não muda.
 
-## Fisheye para tela redonda
+## Curvatura da tela
 
-Em relógios redondos, a lente curva o retângulo inteiro do jogo para um círculo sem cortar suas bordas. Controles e textos ficam planos. Desative para um retângulo sem distorção.
+Gire a coroa para ampliar. De 85 a 100%, a imagem permanece plana. Ao afastar, escolha uma curvatura suave, bordas curvas com centro mais plano ou olho de peixe. Plano mantém as linhas retas em qualquer zoom.
 
 ## Sensibilidade da coroa
 

@@ -18,9 +18,9 @@ Elige si la vista sigue la cámara original, al personaje o una posición fija. 
 
 El zoom cambia cuánto terreno cabe en pantalla. En el reloj, 0% muestra toda el área cargada y 100% llega a la cámara original. No cambia la velocidad del juego.
 
-## Ojo de pez para pantalla redonda
+## Curvatura de la pantalla
 
-En un reloj redondo, la lente convierte todo el rectángulo del juego en un círculo sin perder sus bordes. Los controles y textos siguen planos. Desactívala para ver un rectángulo sin deformación.
+Gira la corona para acercar la imagen. Del 85 al 100 % se mantiene plana. Al alejarla, elige una curva suave, bordes curvos con el centro más plano u ojo de pez. El modo Plano conserva las líneas rectas con cualquier zoom.
 
 ## Sensibilidad de la corona
 

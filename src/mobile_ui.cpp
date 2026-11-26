@@ -274,6 +274,23 @@ void App::mobileOverlay() {
             }
             continue;
         }
+        if (watchActive() && (button.action == TouchZoomIn || button.action == TouchZoomOut)) {
+            float u = r.w * .19f, stroke = std::max(1.f, u * .28f);
+            draw->AddLine({centre.x - u, centre.y}, {centre.x + u, centre.y}, edge, stroke);
+            if (button.action == TouchZoomIn)
+                draw->AddLine({centre.x, centre.y - u}, {centre.x, centre.y + u}, edge, stroke);
+            continue;
+        }
+        if (watchActive() && button.action == TouchView) {
+            float u = r.w * .23f, stroke = std::max(1.f, u * .20f);
+            for (int x : {-1, 1})
+                for (int y : {-1, 1}) {
+                    ImVec2 corner = centre + ImVec2(x * u, y * u * .8f);
+                    draw->AddLine(corner, corner - ImVec2(x * u * .65f, 0), edge, stroke);
+                    draw->AddLine(corner, corner - ImVec2(0, y * u * .65f), edge, stroke);
+                }
+            continue;
+        }
         const char *text = tr(button.label);
         float px = button.action < 12 ? 19 * density : 12 * density;
         auto size = ImGui::GetFont()->CalcTextSizeA(px, FLT_MAX, 0, text);

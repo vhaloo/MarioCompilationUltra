@@ -1,8 +1,10 @@
-Mario Compilation Ultra 0.12.1 · Vue montre
+Mario Compilation Ultra 0.12.2 · Vue montre
 
 Tourne la couronne ou la lunette pour zoomer. Dans les menus, elle fait défiler ; les boutons tactiles + et - fonctionnent aussi.
 
 0 % : toute la zone chargée. 100 % : caméra originale. Les portes et tuyaux peuvent charger une autre zone.
+
+Tourne la couronne pour zoomer. De 85 à 100 %, l’image reste plate. En dézoomant, choisis une courbure douce, des bords incurvés avec un centre plus plat, ou un effet œil de poisson. Le mode Plat garde les lignes droites à tous les zooms.
 
 Dans la plupart des jeux, B fait sauter et Y fait courir ou saisir. Utilise plusieurs doigts pour maintenir direction et action.
 
@@ -12,13 +14,11 @@ Un paquet personnel inclut tes cartouches locales. Les paquets publics nécessit
 
 Transfère les cartouches dans CartridgeInbox, puis choisis Vérifier les cartouches transférées ou redémarre l’application. Les fichiers existants sont préservés.
 
-Les commandes physiques et les performances prolongées sur montre restent à tester. Cette édition est expérimentale.
-
-Les commandes physiques et les performances prolongées sur montre restent à tester. Cette édition est expérimentale.
-
 Mettre à jour un APK signé conserve les données. Désinstaller ou effacer les données retire les cartouches et sauvegardes locales.
+
+Les tests utilisent des événements tactiles et rotatifs sur une Galaxy Watch8 Classic. Le confort au poignet et les performances sur de longues parties restent à évaluer.
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.12.1-Wear-public.apk
+adb install -r MarioCompilationUltra-0.12.2-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

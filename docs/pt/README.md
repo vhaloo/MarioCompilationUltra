@@ -91,7 +91,7 @@ A versão 0.8 adapta resolução do cenário, grade de voxels, frequência decor
 
 ## Vista do relógio
 
-[Vista do relógio](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Wear-public.apk) · [Configurações ilustradas](SETTINGS.md)
+[Vista do relógio](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.2/MarioCompilationUltra-0.12.2-Wear-public.apk) · [Configurações ilustradas](SETTINGS.md)
 
 ## Quest RV / RA
 

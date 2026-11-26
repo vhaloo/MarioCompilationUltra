@@ -47,7 +47,7 @@ def main():
         md += f'## {tr("Automatic resolution")}\n\n{para("performance_note")}\n\n[Performance / GPU](../PERFORMANCE.md)\n\n'
         md += '| CRC32 | SNES |\n|---|---|\n' + ''.join(f'| `{crc}` | {name} |\n' for crc,name in EDITIONS) + '\n'
         md += f'## {tr("Android phones and tablets")}\n\n[{tr("Android phones and tablets")}](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Android-public.apk)\n\n'
-        md += f'## {tr("Watch view")}\n\n[{tr("Watch view")}](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Wear-public.apk) · [{tr("Settings illustrated")}](SETTINGS.md)\n\n'
+        md += f'## {tr("Watch view")}\n\n[{tr("Watch view")}](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.2/MarioCompilationUltra-0.12.2-Wear-public.apk) · [{tr("Settings illustrated")}](SETTINGS.md)\n\n'
         md += f'## {tr("questtab")}\n\n[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Quest-public.apk) · [{tr("questtab")}](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)\n\n'
         md += f'## {tr("Controls")}\n\n' + tr(CONTROLS).replace('\n', '<br>\n') + '\n\n'
         md += tr("Orbit controls") + '\n\n'

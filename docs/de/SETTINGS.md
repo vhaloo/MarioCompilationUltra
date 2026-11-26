@@ -18,9 +18,9 @@ Die Ansicht folgt der Originalkamera, der Spielfigur oder einer festen Position.
 
 Zoom bestimmt den sichtbaren Bereich. Auf der Uhr zeigt 0% die gesamte geladene Karte, 100% die Originalkamera. Die Spielgeschwindigkeit bleibt gleich.
 
-## Fisheye für runde Displays
+## Bildkrümmung
 
-Auf runden Uhren biegt die Linse das gesamte Spielrechteck zum Kreis, ohne Quellränder abzuschneiden. Bedienelemente und Text bleiben eben. Ausgeschaltet erscheint ein unverzerrtes Rechteck.
+Zum Vergrößern die Krone drehen. Von 85 bis 100 % bleibt das Bild flach. Beim Herauszoomen stehen eine sanfte Wölbung, gewölbte Ränder mit flacherer Mitte oder ein Fischauge zur Wahl. Flach erhält gerade Linien bei jeder Zoomstufe.
 
 ## Kronenempfindlichkeit
 

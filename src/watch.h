@@ -6,6 +6,8 @@ namespace mcu {
 constexpr int RotaryEvent = 0x4d43555a;
 float crownZoom(float current, float delta, int sensitivity, bool reversed);
 float smoothWatchZoom(float current, float target, double seconds);
+enum class WatchCurve { Flat, Gentle, Edge, Fisheye };
+float watchLensStrength(WatchCurve curve, float zoom);
 MobileLayout watchLayout(int width, int height, float density, bool leftHanded, bool controls,
                          int scale = 100);
 // Independent square-to-disc projection inspired by OrbitEmu's display behavior.
@@ -14,13 +16,15 @@ class WatchLens {
     int width = 0, height = 0;
     float amount = -1, aspect = 0;
     bool round = true;
+    WatchCurve curve = WatchCurve::Fisheye;
     std::vector<SDL_Vertex> vertices;
     std::vector<int> indices;
 
   public:
-    bool prepare(int w, int h, float imageAspect, float strength, bool isRound = true);
+    bool prepare(int w, int h, float imageAspect, float strength, bool isRound = true,
+                 WatchCurve shape = WatchCurve::Fisheye);
     bool draw(SDL_Renderer *, SDL_Texture *, int w, int h, float imageAspect, float strength,
-              bool isRound = true);
+              bool isRound = true, WatchCurve shape = WatchCurve::Fisheye);
     SDL_FPoint project(float u, float v) const;
     size_t vertexCount() const { return vertices.size(); }
 };

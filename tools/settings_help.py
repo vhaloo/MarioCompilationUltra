@@ -11,7 +11,7 @@ def topic(key):
         'Open advanced settings':'Interface','Use simple settings':'Interface',
         'Save current options':'Interface','Load option profile':'Interface','Screen':'View',
         'Automatic quality':'Quality','Performance reserve':'Headroom','Extra smooth':'Headroom',
-        'React to device heat':'Thermal','Round-screen fisheye':'Lens','Watch zoom':'Zoom',
+        'React to device heat':'Thermal','Screen curve':'Lens','Watch zoom':'Zoom',
         'questmode':'XRMode','questresolution':'XRDetail','questeyedetail':'XRDetail','questwalldetail':'XRDetail',
         'questadaptive':'Quality','questflip':'Screen','questrefresh':'Refresh','questar':'XREnvironment',
         'questtransparent':'XREnvironment','questfoveation':'Foveation','questanchor':'XRAnchor',

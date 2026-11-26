@@ -1,8 +1,10 @@
-Mario Compilation Ultra 0.12.1 · 시계 보기
+Mario Compilation Ultra 0.12.2 · 시계 보기
 
 크라운이나 베젤을 돌려 확대하세요. 메뉴에서는 스크롤하며 터치 +와 -도 사용할 수 있습니다.
 
 0%는 로드 영역 전체, 100%는 원래 카메라입니다. 문과 파이프는 다른 영역을 불러올 수 있습니다.
+
+크라운을 돌려 확대하세요. 85~100%에서는 평면으로 표시됩니다. 축소할 때는 부드러운 곡면, 중심이 더 평평한 가장자리 곡면, 어안 중에서 고를 수 있습니다. 평면을 선택하면 모든 배율에서 직선이 유지됩니다.
 
 대부분의 게임에서 B는 점프, Y는 달리기 또는 잡기입니다. 서로 다른 손가락으로 방향과 동작을 함께 누르세요.
 
@@ -12,13 +14,11 @@ Mario Compilation Ultra 0.12.1 · 시계 보기
 
 CartridgeInbox로 전송한 뒤 전송한 카트리지 확인을 누르거나 앱을 다시 시작하세요. 기존 파일은 보존됩니다.
 
-실제 시계 조작감과 장시간 성능은 아직 검증하지 않았습니다. 이 버전은 실험용입니다.
-
-실제 시계 조작감과 장시간 성능은 아직 검증하지 않았습니다. 이 버전은 실험용입니다.
-
 서명된 APK 업데이트는 데이터를 보존합니다. 앱 삭제나 데이터 지우기는 로컬 카트리지와 저장을 제거합니다.
+
+Galaxy Watch8 Classic 실기기에서 터치 및 회전 입력 이벤트를 시험했습니다. 착용 시 조작감과 장시간 플레이 성능은 추가 평가가 필요합니다.
 
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.12.1-Wear-public.apk
+adb install -r MarioCompilationUltra-0.12.2-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/

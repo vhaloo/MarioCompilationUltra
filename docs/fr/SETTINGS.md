@@ -18,9 +18,9 @@ Choisis ce que suit la vue : caméra originale, personnage ou position fixe. Le 
 
 Le zoom change la portion visible. Sur montre, 0 % montre toute la carte chargée et 100 % rejoint la caméra originale. La vitesse du jeu reste identique.
 
-## Fisheye pour écran rond
+## Courbure de l’écran
 
-Sur une montre ronde, la lentille déforme tout le rectangle du jeu en cercle. Les bords restent visibles. Commandes et textes restent plats ; désactive-la pour un rectangle sans déformation.
+Tourne la couronne pour zoomer. De 85 à 100 %, l’image reste plate. En dézoomant, choisis une courbure douce, des bords incurvés avec un centre plus plat, ou un effet œil de poisson. Le mode Plat garde les lignes droites à tous les zooms.
 
 ## Sensibilité de la couronne
 

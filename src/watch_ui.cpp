@@ -45,26 +45,28 @@ void App::watchMenu() {
     const char *sections[] = {"Collection",    "Screen",   "Camera & scenery",
                               "Saves & sound", "Controls", "About"};
     tab = std::clamp(tab, 0, 5);
-    if (ImGui::BeginTable("##watch-nav", 3, ImGuiTableFlags_SizingStretchProp)) {
-        ImGui::TableSetupColumn("previous", ImGuiTableColumnFlags_WidthFixed, 30 * uiUnit());
-        ImGui::TableSetupColumn("title", ImGuiTableColumnFlags_WidthStretch);
-        ImGui::TableSetupColumn("next", ImGuiTableColumnFlags_WidthFixed, 30 * uiUnit());
-        ImGui::TableNextColumn();
-        if (ImGui::SmallButton("<")) {
-            tab = (tab + 5) % 6;
-            focusPage = true;
+    const float unit = uiUnit();
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {10 * unit, 6 * unit});
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {6 * unit, 5 * unit});
+    ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 12 * unit);
+    ImGui::SetNextItemWidth(-1);
+    const auto nav = ImGui::GetCursorScreenPos();
+    ImGui::SetNextWindowPos({nav.x, nav.y + ImGui::GetFrameHeight()});
+    ImGui::SetNextWindowSize({ImGui::GetContentRegionAvail().x, side * .49f});
+    if (ImGui::BeginCombo("##watch-section", tr(sections[tab]))) {
+        for (int i = 0; i < IM_ARRAYSIZE(sections); ++i) {
+            if (ImGui::Selectable(tr(sections[i]), tab == i, 0, {0, 32 * unit})) {
+                tab = i;
+                focusPage = true;
+                watchScrollPending = 0;
+            }
+            if (tab == i)
+                ImGui::SetItemDefaultFocus();
         }
-        ImGui::TableNextColumn();
-        ImGui::TextWrapped("%s", tr(sections[tab]));
-        ImGui::TableNextColumn();
-        if (ImGui::SmallButton(">")) {
-            tab = (tab + 1) % 6;
-            focusPage = true;
-        }
-        ImGui::EndTable();
+        ImGui::EndCombo();
     }
     ImGui::Separator();
-    float footer = 44 * uiUnit();
+    float footer = core.loaded ? 42 * unit + ImGui::GetStyle().ItemSpacing.y * 2 : 0;
     ImGui::BeginChild("page", {0, -footer}, ImGuiChildFlags_None);
     if (focusPage) {
         ImGui::SetScrollY(0);
@@ -75,21 +77,31 @@ void App::watchMenu() {
         watchScrollPending = 0;
     }
     if (tab == 0) {
-        defaultsButton(Defaults::All);
         static const char *names[] = {"SMB 1", "Lost Levels",       "SMB 2",
                                       "SMB 3", "Super Mario World", "Yoshi's Island"};
+        static const ImVec4 accents[] = {{.96f, .48f, .42f, 1}, {.95f, .70f, .36f, 1},
+                                         {.50f, .79f, .97f, 1}, {.94f, .81f, .40f, 1},
+                                         {.42f, .84f, .65f, 1}, {.78f, .67f, .98f, 1}};
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 18 * unit);
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, unit);
         int index = 0;
         for (const auto &game : games()) {
             ImGui::PushID(game.id.c_str());
             bool available = gameAvailable(game.id);
             ImGui::BeginDisabled(!available);
-            if (ImGui::Button(tr(names[index++]), {-1, 42 * uiUnit()}))
+            const ImVec4 accent = settings.highContrast ? ImVec4(1, 1, 1, 1) : accents[index];
+            const ImVec4 base(.045f, .075f, .11f, 1);
+            ImGui::PushStyleColor(ImGuiCol_Border, ImLerp(base, accent, .8f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImLerp(base, accent, .15f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImLerp(base, accent, .29f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImLerp(base, accent, .38f));
+            if (ImGui::Button(tr(names[index++]), {-1, 40 * unit}))
                 request(3, 0, game.id);
+            ImGui::PopStyleColor(4);
             ImGui::EndDisabled();
             ImGui::PopID();
         }
-        if (core.loaded && button("Quit"))
-            request(4);
+        ImGui::PopStyleVar(2);
         if (availableGames() < 6) {
             ImGui::TextWrapped("%s", tr("Import required"));
             if (button("Choose cartridge..."))
@@ -97,15 +109,18 @@ void App::watchMenu() {
             if (button("Check transferred cartridges"))
                 androidCheckInbox(locale(settings.language).code);
         }
+        defaultsButton(Defaults::All);
+        if (button("Quit"))
+            request(4);
     } else
         optionsUi();
     ImGui::EndChild();
-    ImGui::Separator();
     if (core.loaded) {
-        if (ImGui::Button(tr("Resume"), {-1, 32 * uiUnit()}))
+        ImGui::Separator();
+        if (ImGui::Button(tr("Resume"), {-1, 40 * unit}))
             toggleMenu();
-    } else if (ImGui::Button(tr("Quit"), {-1, 32 * uiUnit()}))
-        request(4);
+    }
+    ImGui::PopStyleVar(3);
     ImGui::End();
 }
 void App::watchOptions() {
@@ -117,8 +132,9 @@ void App::watchOptions() {
         ImGui::TextUnformatted(MCU_VERSION);
         if (button("Open guide"))
             androidOpenGuide(locale(settings.language).code, true);
-        ImGui::TextWrapped("%s", tr("Physical watch controls and sustained hardware performance "
-                                    "remain untested. This edition is experimental."));
+        ImGui::TextWrapped(
+            "%s", tr("Watch tests use touch and rotary input events on a Galaxy Watch8 Classic. "
+                     "Comfort and long-session performance still need evaluation."));
         ImGui::TextWrapped("%s",
                            tr("Original code: MIT · Snes9x: noncommercial licence · SDL2/zlib: "
                               "zlib · Dear ImGui: MIT · font: SIL OFL. The bundled licences and "
@@ -170,7 +186,6 @@ void App::watchOptions() {
         settings.watchZoom = 0;
     if (button("Original framing"))
         settings.watchZoom = 1000;
-    tick("Round-screen fisheye", settings.watchLens);
     slider("Crown sensitivity", settings.watchCrownSensitivity, 25, 250, "%d%%");
     tick("Reverse crown", settings.watchCrownReverse);
     ImGui::TextWrapped("%s", tr(mobileDisplay.rotary

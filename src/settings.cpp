@@ -37,7 +37,7 @@ void Settings::applyAppearance(Appearance look) {
     volumeAngle = defaults.volumeAngle;
     volumeTilt = defaults.volumeTilt;
     volumeRound = defaults.volumeRound;
-    watchLens = defaults.watchLens;
+    watchCurve = defaults.watchCurve;
     watchZoom = look == Appearance::Original ? 1000
                 : look == Appearance::FullMap ? 0
                 : look == Appearance::Panorama ? 780
@@ -61,7 +61,7 @@ void Settings::restoreDefaults(Defaults group) {
                 &Settings::mobileOrientation, &Settings::mobileKeepAwake,
                 &Settings::adaptiveResolution, &Settings::thermalAware,
                 &Settings::performanceMode, &Settings::performanceReserve, &Settings::watchZoom,
-                &Settings::watchLens, &Settings::watchCrownSensitivity, &Settings::watchCrownReverse,
+                &Settings::watchCurve, &Settings::watchCrownSensitivity, &Settings::watchCrownReverse,
                 &Settings::volumeMode, &Settings::volumeDepth, &Settings::volumeSpacing,
                 &Settings::volumeAngle, &Settings::volumeTilt, &Settings::volumeRound);
         break;
@@ -139,6 +139,7 @@ void Settings::clamp() {
     performanceReserve = std::clamp(performanceReserve, 15, 45);
     performanceMode = std::clamp(performanceMode, 0, 1);
     watchZoom = std::clamp(watchZoom, 0, 1000);
+    watchCurve = std::clamp(watchCurve, 0, 3);
     watchTouchScale = std::clamp(watchTouchScale, 70, 110);
     watchCrownSensitivity = std::clamp(watchCrownSensitivity, 25, 250);
     touchMode = std::clamp(touchMode, 0, 2);
@@ -290,7 +291,9 @@ bool Settings::readSettings(const fs::path &path, Library &l, bool profile) {
         I(watchZoom);
         I(watchTouchScale);
         I(watchCrownSensitivity);
-        B(watchLens);
+        if (key == "watchLens")
+            watchCurve = n ? 3 : 0; // Profiles from 0.12.1 and earlier.
+        I(watchCurve);
         B(watchCrownReverse);
         I(panoramaHeight);
         I(rewindMemory);
@@ -466,7 +469,7 @@ void Settings::writeSettings(const fs::path &path, const Library *library) const
     S(watchZoom);
     S(watchTouchScale);
     S(watchCrownSensitivity);
-    S(watchLens);
+    S(watchCurve);
     S(watchCrownReverse);
     S(panoramaHeight);
     S(rewindMemory);

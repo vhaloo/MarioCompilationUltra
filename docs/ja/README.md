@@ -91,7 +91,7 @@ sh ./Install-Linux.sh
 
 ## 時計の表示
 
-[時計の表示](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Wear-public.apk) · [図解設定ガイド](SETTINGS.md)
+[時計の表示](WATCH.md) · [Wear OS APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.2/MarioCompilationUltra-0.12.2-Wear-public.apk) · [図解設定ガイド](SETTINGS.md)
 
 ## Quest VR / AR
 

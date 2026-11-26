@@ -54,6 +54,14 @@ MobileLayout watchLayout(int width, int height, float density, bool leftHanded, 
     add(TouchView, "View modes", .37f, .20f, .04f);
     return out;
 }
+float watchLensStrength(WatchCurve shape, float zoom) {
+    if (shape == WatchCurve::Flat || !std::isfinite(zoom))
+        return 0;
+    // Smooth shoulders keep the straight inner range easy to find with either
+    // a discrete bezel or a continuous crown.
+    float t = std::clamp((.85f - zoom) / .65f, 0.f, 1.f);
+    return t * t * (3 - 2 * t) * (shape == WatchCurve::Gentle ? .62f : 1.f);
+}
 SDL_FPoint WatchLens::project(float u, float v) const {
     float rw = float(width), rh = width / std::max(.01f, aspect);
     if (rh > height) {
@@ -69,24 +77,30 @@ SDL_FPoint WatchLens::project(float u, float v) const {
     double x = 2 * u - 1, y = 2 * v - 1;
     double dx = x * std::sqrt(std::max(0., 1 - y * y * .5)),
            dy = y * std::sqrt(std::max(0., 1 - x * x * .5));
-    double r = std::sqrt(dx * dx + dy * dy), k = 1.25 * amount, gain = (1 + k) / (1 + k * r);
+    double r = std::hypot(dx, dy);
+    double k = curve == WatchCurve::Fisheye ? 1.25 * amount : 0.;
+    double gain = (1 + k) / (1 + k * r);
+    double edge = std::max(std::abs(x), std::abs(y));
+    float blend = curve == WatchCurve::Edge ? float(edge * edge) * amount : amount;
     float radius = std::min(width, height) * .485f;
-    return {bx + (width * .5f + float(dx * gain) * radius - bx) * amount,
-            by + (height * .5f + float(dy * gain) * radius - by) * amount};
+    return {bx + (width * .5f + float(dx * gain) * radius - bx) * blend,
+            by + (height * .5f + float(dy * gain) * radius - by) * blend};
 }
-bool WatchLens::prepare(int w, int h, float imageAspect, float strength, bool isRound) {
+bool WatchLens::prepare(int w, int h, float imageAspect, float strength, bool isRound,
+                        WatchCurve shape) {
     if (w <= 0 || h <= 0)
         return false;
     imageAspect = std::isfinite(imageAspect) && imageAspect > 0 ? imageAspect : 256.f / 224;
     strength = std::isfinite(strength) ? std::clamp(strength, 0.f, 1.f) : 0;
     if (width == w && height == h && aspect == imageAspect && amount == strength &&
-        round == isRound && !vertices.empty())
+        round == isRound && curve == shape && !vertices.empty())
         return false;
     width = w;
     height = h;
     aspect = imageAspect;
     amount = strength;
     round = isRound;
+    curve = shape;
     constexpr int n = 24, side = n + 1;
     vertices.resize(side * side);
     for (int y = 0; y <= n; ++y)
@@ -104,11 +118,16 @@ bool WatchLens::prepare(int w, int h, float imageAspect, float strength, bool is
     return true;
 }
 bool WatchLens::draw(SDL_Renderer *r, SDL_Texture *texture, int w, int h, float imageAspect,
-                     float strength, bool isRound) {
-    prepare(w, h, imageAspect, strength, isRound);
+                     float strength, bool isRound, WatchCurve shape) {
+    prepare(w, h, imageAspect, strength, isRound, shape);
     if (vertices.empty() || !texture)
         return false;
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+    if (amount == 0) {
+        auto a = vertices.front().position, b = vertices.back().position;
+        SDL_FRect rect{a.x, a.y, b.x - a.x, b.y - a.y};
+        return SDL_RenderCopyF(r, texture, nullptr, &rect) == 0;
+    }
     return SDL_RenderGeometry(r, texture, vertices.data(), int(vertices.size()), indices.data(),
                               int(indices.size())) == 0;
 }

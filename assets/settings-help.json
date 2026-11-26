@@ -68,16 +68,16 @@
       "id": "Lens",
       "picture": "Lens",
       "text": {
-        "en": "On a round watch, the lens bends the whole game rectangle into a circle. Source edges remain visible. Controls and text stay flat; switch it off for an undistorted rectangle.",
-        "fr": "Sur une montre ronde, la lentille déforme tout le rectangle du jeu en cercle. Les bords restent visibles. Commandes et textes restent plats ; désactive-la pour un rectangle sans déformation.",
-        "es": "En un reloj redondo, la lente convierte todo el rectángulo del juego en un círculo sin perder sus bordes. Los controles y textos siguen planos. Desactívala para ver un rectángulo sin deformación.",
-        "ja": "丸い時計ではゲーム画面全体を円形に曲げ、元画像の端も残します。操作ボタンと文字は変形しません。無効にすると歪みのない長方形で表示します。",
-        "de": "Auf runden Uhren biegt die Linse das gesamte Spielrechteck zum Kreis, ohne Quellränder abzuschneiden. Bedienelemente und Text bleiben eben. Ausgeschaltet erscheint ein unverzerrtes Rechteck.",
-        "it": "Su un orologio rotondo, la lente piega l’intero rettangolo del gioco in un cerchio, mantenendo i bordi. Comandi e testo restano piani. Disattivala per un rettangolo senza deformazioni.",
-        "pt": "Em relógios redondos, a lente curva o retângulo inteiro do jogo para um círculo sem cortar suas bordas. Controles e textos ficam planos. Desative para um retângulo sem distorção.",
-        "ru": "На круглых часах линза преобразует весь прямоугольник игры в круг, сохраняя края изображения. Кнопки и текст не искажаются. Отключите её для обычного прямоугольника.",
-        "zh": "在圆形手表上，镜头将整个游戏矩形弯曲成圆形，同时保留图像边缘。按钮和文字保持平直。关闭后显示无变形矩形。",
-        "ko": "원형 시계에서는 렌즈가 게임 화면 전체를 원으로 휘게 하면서 이미지 가장자리를 보존합니다. 버튼과 글자는 변형하지 않습니다. 끄면 왜곡 없는 직사각형으로 표시합니다."
+        "en": "Turn the crown to zoom in. From 85% to 100% the image stays flat. Zoom out for a gentle curve, curved edges with a flatter center, or a fisheye. Choose Flat for straight lines at every zoom.",
+        "fr": "Tourne la couronne pour zoomer. De 85 à 100 %, l’image reste plate. En dézoomant, choisis une courbure douce, des bords incurvés avec un centre plus plat, ou un effet œil de poisson. Le mode Plat garde les lignes droites à tous les zooms.",
+        "es": "Gira la corona para acercar la imagen. Del 85 al 100 % se mantiene plana. Al alejarla, elige una curva suave, bordes curvos con el centro más plano u ojo de pez. El modo Plano conserva las líneas rectas con cualquier zoom.",
+        "ja": "リューズを回して拡大します。85～100%では平面表示になります。縮小時はゆるやかな湾曲、中心が平らな周辺湾曲、魚眼から選べます。「平面」ならどの倍率でも直線を保ちます。",
+        "de": "Zum Vergrößern die Krone drehen. Von 85 bis 100 % bleibt das Bild flach. Beim Herauszoomen stehen eine sanfte Wölbung, gewölbte Ränder mit flacherer Mitte oder ein Fischauge zur Wahl. Flach erhält gerade Linien bei jeder Zoomstufe.",
+        "it": "Ruota la corona per ingrandire. Tra l’85 e il 100% l’immagine resta piatta. Riducendo lo zoom puoi scegliere una curvatura lieve, bordi curvi con centro più piatto o un effetto occhio di pesce. Piatto mantiene le linee dritte a ogni ingrandimento.",
+        "pt": "Gire a coroa para ampliar. De 85 a 100%, a imagem permanece plana. Ao afastar, escolha uma curvatura suave, bordas curvas com centro mais plano ou olho de peixe. Plano mantém as linhas retas em qualquer zoom.",
+        "ru": "Поверните заводную головку, чтобы приблизить изображение. От 85 до 100 % оно остаётся плоским. При отдалении можно выбрать мягкий изгиб, изгиб по краям с более плоским центром или рыбий глаз. Режим «Без изгиба» сохраняет прямые линии при любом масштабе.",
+        "zh": "转动表冠可放大画面。缩放在 85% 到 100% 之间时，画面保持平直。缩小时可选择柔和弧度、中心较平的边缘弯曲或鱼眼效果。选择“平面”可在任意缩放比例下保持直线。",
+        "ko": "크라운을 돌려 확대하세요. 85~100%에서는 평면으로 표시됩니다. 축소할 때는 부드러운 곡면, 중심이 더 평평한 가장자리 곡면, 어안 중에서 고를 수 있습니다. 평면을 선택하면 모든 배율에서 직선이 유지됩니다."
       }
     },
     {

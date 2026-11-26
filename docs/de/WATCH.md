@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.12.1 · Uhransicht
+# Mario Compilation Ultra 0.12.2 · Uhransicht
 
 [English](../en/WATCH.md) · [Français](../fr/WATCH.md) · [Español](../es/WATCH.md) · [日本語](../ja/WATCH.md) · [Deutsch](../de/WATCH.md) · [Italiano](../it/WATCH.md) · [Português](../pt/WATCH.md) · [Русский](../ru/WATCH.md) · [简体中文](../zh/WATCH.md) · [한국어](../ko/WATCH.md)
 
@@ -8,6 +8,8 @@ Drehe Krone oder Lünette zum Zoomen. Im Menü scrollen sie; Touch-Tasten + und 
 
 0%: gesamtes geladenes Gebiet. 100%: Originalkamera. Türen und Röhren können ein anderes Gebiet laden.
 
+Zum Vergrößern die Krone drehen. Von 85 bis 100 % bleibt das Bild flach. Beim Herauszoomen stehen eine sanfte Wölbung, gewölbte Ränder mit flacherer Mitte oder ein Fischauge zur Wahl. Flach erhält gerade Linien bei jeder Zoomstufe.
+
 In den meisten Spielen springt B, Y rennt oder greift. Halte Richtung und Aktion mit verschiedenen Fingern.
 
 Pause über das Pausensymbol oder Android-Zurück. Fortsetzen behält dein Spiel. Beenden steht unten in Sammlung.
@@ -16,17 +18,17 @@ Ein persönliches Paket enthält deine lokalen Module. Öffentliche Pakete benö
 
 Übertrage Module nach CartridgeInbox und prüfe übertragene Module oder starte die App neu. Vorhandene Dateien bleiben erhalten.
 
-Physische Uhrenbedienung und Dauerleistung bleiben ungetestet. Diese Ausgabe ist experimentell.
-
-Physische Uhrenbedienung und Dauerleistung bleiben ungetestet. Diese Ausgabe ist experimentell.
-
 Ein signiertes APK-Update erhält App-Daten. Deinstallation oder Datenlöschung entfernt lokale Module und Spielstände.
+
+Die Tests verwenden Touch- und Drehereignisse auf einer Galaxy Watch8 Classic. Tragekomfort und Leistung bei langen Spielsitzungen sind noch zu prüfen.
+
+![Sammlung · Galaxy Watch8 Classic](../watch-library.png)
 
 ```text
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.12.1-Wear-public.apk
+adb install -r MarioCompilationUltra-0.12.2-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 ```
 
-[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Wear-public.apk) · [HTML](watch.html) · [Illustrierte Einstellungen](SETTINGS.md) · [Guide](README.md)
+[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.2/MarioCompilationUltra-0.12.2-Wear-public.apk) · [HTML](watch.html) · [Illustrierte Einstellungen](SETTINGS.md) · [Guide](README.md)

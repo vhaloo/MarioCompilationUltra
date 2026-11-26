@@ -42,22 +42,50 @@ void App::nextButton(const char *) {
     if (ImGui::GetContentRegionAvail().x > 320 * uiUnit())
         ImGui::SameLine();
 }
+bool App::beginOptionList(const char *id, const char *preview, int items) {
+    if (!watchActive()) {
+        ImGui::SetNextItemWidth(-1);
+        return ImGui::BeginCombo(id, preview);
+    }
+    const auto size = ImGui::GetIO().DisplaySize;
+    const auto &style = ImGui::GetStyle();
+    const float side = std::min(size.x, size.y), font = ImGui::GetFontSize();
+    if (ImGui::Button(id, {-1, ImGui::GetFrameHeight()}))
+        ImGui::OpenPopup(id);
+    auto a = ImGui::GetItemRectMin() + style.FramePadding, b = ImGui::GetItemRectMax();
+    float arrowX = b.x - style.FramePadding.x - font;
+    ImGui::RenderTextEllipsis(ImGui::GetWindowDrawList(), a, {arrowX, b.y}, arrowX, arrowX,
+                              preview, nullptr, nullptr);
+    ImGui::RenderArrow(ImGui::GetWindowDrawList(), {arrowX, a.y}, ImGui::GetColorU32(ImGuiCol_Text),
+                       ImGuiDir_Down);
+    float rows = items * (32 * uiUnit() + style.ItemSpacing.y);
+    float height = std::min(side * .56f, rows + 2 * style.WindowPadding.y);
+    // A conventional dropdown near the bottom of a round display clips its last rows.
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, {.5f, .5f});
+    ImGui::SetNextWindowSize({side * (watchRound() ? .68f : .86f), height});
+    return ImGui::BeginPopup(id);
+}
+void App::endOptionList() {
+    if (watchActive())
+        ImGui::EndPopup();
+    else
+        ImGui::EndCombo();
+}
 bool App::choice(const char *key, int &value, std::initializer_list<const char *> labels) {
     value = std::clamp(value, 0, int(labels.size()) - 1);
     ImGui::PushID(key);
     settingTitle(key);
-    ImGui::SetNextItemWidth(-1);
+    float rowHeight = watchActive() ? 32 * uiUnit() : mobileActive() ? 48 * uiUnit() : 0;
     bool changed = false;
-    if (ImGui::BeginCombo("##value", tr(*(labels.begin() + value)))) {
+    if (beginOptionList("##value", tr(*(labels.begin() + value)), int(labels.size()))) {
         int index = 0;
         for (auto label : labels) {
-            if (ImGui::Selectable(tr(label), index == value, 0,
-                                  {0, mobileActive() ? 48 * uiUnit() : 0}))
+            if (ImGui::Selectable(tr(label), index == value, 0, {0, rowHeight}))
                 value = index, changed = true;
             if (index++ == value)
                 ImGui::SetItemDefaultFocus();
         }
-        ImGui::EndCombo();
+        endOptionList();
     }
     control(key);
     ImGui::PopID();
@@ -87,16 +115,15 @@ bool App::slider(const char *key, int &value, int low, int high, const char *for
 void App::languageControl() {
     ImGui::PushID("##language-control");
     settingTitle("Interface language");
-    ImGui::SetNextItemWidth(-1);
-    if (ImGui::BeginCombo("##language", locale(settings.language).name)) {
+    if (beginOptionList("##language", locale(settings.language).name, LocaleCount)) {
         for (int i = 0; i < LocaleCount; ++i) {
             if (ImGui::Selectable(locale(i).name, i == settings.language, 0,
-                                  {0, mobileActive() ? 48 * uiUnit() : 0}))
+                                  {0, watchActive() ? 32 * uiUnit() : mobileActive() ? 48 * uiUnit() : 0}))
                 settings.language = i;
             if (i == settings.language)
                 ImGui::SetItemDefaultFocus();
         }
-        ImGui::EndCombo();
+        endOptionList();
     }
     control("Interface language");
     ImGui::PopID();

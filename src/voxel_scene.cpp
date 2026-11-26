@@ -124,20 +124,29 @@ bool VoxelScene::update(const Core &c, const World &w, const Settings &s, int pr
         for (const auto &o : v.objects) {
             auto size = voxelSpriteSize(v.objectSize, o.large);
             int sx = o.x >= 256 ? o.x - 512 : o.x, sy = o.y > 239 ? o.y - 256 : o.y;
-            for (int ny = std::max(0, sy); ny < std::min(int(c.height), sy + size.height); ++ny)
-                for (int nx = std::max(0, sx); nx < std::min(int(c.width), sx + size.width); ++nx) {
-                    if (!inHud(nx, ny))
-                        continue;
-                    auto color = voxelSpritePixel(v, o, nx - sx, ny - sy);
-                    size_t i = size_t(ny) * c.width + nx;
-                    if (color && matchesNative(color, c.native[i]))
-                        hudPixels[i] = c.native[i];
-                }
+            for (auto hud : hudAreas) {
+                int left = std::max({0, sx, hud.x}), top = std::max({0, sy, hud.y});
+                int right = std::min({sx + size.width, hud.x + hud.w, int(c.width)});
+                int bottom = std::min({sy + size.height, hud.y + hud.h, int(c.height)});
+                if (left >= right)
+                    continue;
+                for (int ny = top; ny < bottom; ++ny)
+                    for (int nx = left; nx < right; ++nx) {
+                        auto color = voxelSpritePixel(v, o, nx - sx, ny - sy);
+                        size_t i = size_t(ny) * c.width + nx;
+                        if (color && matchesNative(color, c.native[i]))
+                            hudPixels[i] = c.native[i];
+                    }
+            }
         }
     size_t budget = size_t(s.quality == 2   ? 180000
                            : s.quality == 1 ? 110000
                                             : 48000) >>
                     std::min(pressure, 3);
+    // At maximum pressure on a watch, spend less on distant terrain. The
+    // separately sampled player and foreground sprites retain their detail.
+    if (s.projectionWatch && s.volumeMode == 2 && pressure == 5)
+        budget /= 2;
     int initial = voxelGridStep(width, height, budget);
     if (!initial)
         return false;

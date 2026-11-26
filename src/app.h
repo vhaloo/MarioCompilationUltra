@@ -240,6 +240,8 @@ class App {
     std::string guideTopic() const { return guideKey; }
     void nextButton(const char *);
     bool choice(const char *, int &, std::initializer_list<const char *>);
+    bool beginOptionList(const char *id, const char *preview, int items);
+    void endOptionList();
     bool tick(const char *, bool &);
     bool slider(const char *, int &, int, int, const char *format = "%d");
     int activeTab() const { return tab; }

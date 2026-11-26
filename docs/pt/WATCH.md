@@ -1,4 +1,4 @@
-# Mario Compilation Ultra 0.12.1 · Vista do relógio
+# Mario Compilation Ultra 0.12.2 · Vista do relógio
 
 [English](../en/WATCH.md) · [Français](../fr/WATCH.md) · [Español](../es/WATCH.md) · [日本語](../ja/WATCH.md) · [Deutsch](../de/WATCH.md) · [Italiano](../it/WATCH.md) · [Português](../pt/WATCH.md) · [Русский](../ru/WATCH.md) · [简体中文](../zh/WATCH.md) · [한국어](../ko/WATCH.md)
 
@@ -8,6 +8,8 @@ Gire a coroa ou aro para o zoom. Nos menus, ele rola o conteúdo; os botões + e
 
 0%: toda a área carregada. 100%: câmera original. Portas e canos podem carregar outra área.
 
+Gire a coroa para ampliar. De 85 a 100%, a imagem permanece plana. Ao afastar, escolha uma curvatura suave, bordas curvas com centro mais plano ou olho de peixe. Plano mantém as linhas retas em qualquer zoom.
+
 Na maioria dos jogos, B pula e Y corre ou segura. Mantenha direção e ação com dedos diferentes.
 
 Pause pelo ícone ou Voltar do Android. Retomar mantém o jogo. Sair fica no fim de Coleção.
@@ -16,17 +18,17 @@ O pacote pessoal inclui seus cartuchos locais. Pacotes públicos precisam dos se
 
 Transfira os cartuchos para CartridgeInbox e escolha Verificar cartuchos transferidos ou reinicie o app. Arquivos existentes são preservados.
 
-Controles físicos e desempenho prolongado no relógio ainda não foram testados. Esta edição é experimental.
-
-Controles físicos e desempenho prolongado no relógio ainda não foram testados. Esta edição é experimental.
-
 Atualizar um APK assinado preserva os dados. Desinstalar ou limpar dados remove cartuchos e salvamentos locais.
+
+Os testes usam eventos de toque e rotação em um Galaxy Watch8 Classic. O conforto e o desempenho em sessões longas ainda precisam ser avaliados.
+
+![Coleção · Galaxy Watch8 Classic](../watch-library.png)
 
 ```text
 /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 
-adb install -r MarioCompilationUltra-0.12.1-Wear-public.apk
+adb install -r MarioCompilationUltra-0.12.2-Wear-public.apk
 adb push cartridge.sfc /sdcard/Android/data/com.vhaloo.mariocompilationultra.wear/files/CartridgeInbox/
 ```
 
-[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Wear-public.apk) · [HTML](watch.html) · [Configurações ilustradas](SETTINGS.md) · [Guide](README.md)
+[Wear APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.2/MarioCompilationUltra-0.12.2-Wear-public.apk) · [HTML](watch.html) · [Configurações ilustradas](SETTINGS.md) · [Guide](README.md)

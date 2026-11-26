@@ -72,6 +72,43 @@ int main() {
         }
         check(smooth == 1, "Zoom easing reaches its endpoint without drift");
         WatchLens lens;
+        for (auto curve :
+             {WatchCurve::Flat, WatchCurve::Gentle, WatchCurve::Edge, WatchCurve::Fisheye}) {
+            float previous = 1;
+            for (int i = 0; i <= 100; ++i) {
+                float strength = watchLensStrength(curve, i / 100.f);
+                check(strength <= previous && strength >= 0, "Zoom flattens the lens continuously");
+                if (i >= 85 || curve == WatchCurve::Flat)
+                    check(strength == 0, "The straight zoom range has no distortion");
+                previous = strength;
+            }
+            for (float zoom : {0.f, .45f, .75f, .85f, 1.f}) {
+                float strength = watchLensStrength(curve, zoom);
+                lens.prepare(438, 438, 1.f, strength, true, curve);
+                for (int y = 0; y < 24; ++y)
+                    for (int x = 0; x < 24; ++x) {
+                        auto a = lens.project(x / 24.f, y / 24.f);
+                        auto b = lens.project((x + 1) / 24.f, y / 24.f);
+                        auto c = lens.project(x / 24.f, (y + 1) / 24.f);
+                        auto d = lens.project((x + 1) / 24.f, (y + 1) / 24.f);
+                        auto area = [](auto a, auto b, auto c) {
+                            return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+                        };
+                        check(area(a, b, c) > 0 && area(d, c, b) > 0,
+                              "Neither triangle folds over");
+                        check(std::hypot(d.x - 219, d.y - 219) < 438 * .486,
+                              "All curves preserve the source corners");
+                        if (strength == 0)
+                            check(std::abs(a.y - b.y) < .001 && std::abs(a.x - c.x) < .001,
+                                  "Flat source rows and columns stay straight");
+                    }
+            }
+        }
+        lens.prepare(438, 438, 1, 1, true, WatchCurve::Edge);
+        auto nearCenter = lens.project(.55f, .5f);
+        lens.prepare(438, 438, 1, 0, true, WatchCurve::Flat);
+        check(std::abs(nearCenter.x - lens.project(.55f, .5f).x) < .15f,
+              "Curved edges keep small details near the center at flat scale");
         for (float amount : {0.f, .25f, .5f, .75f, 1.f}) {
             check(lens.prepare(438, 438, 256.f / 224, amount),
                   "A changed lens configuration rebuilds its mesh");
