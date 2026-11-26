@@ -3,11 +3,11 @@
 
 [English](../en/README.md) · [Français](../fr/README.md) · [Español](../es/README.md) · [日本語](../ja/README.md) · [Deutsch](../de/README.md) · [Italiano](../it/README.md) · [Português](../pt/README.md) · [Русский](../ru/README.md) · [简体中文](../zh/README.md) · [한국어](../ko/README.md)
 
-# Mario Compilation Ultra 0.12.1
+# Mario Compilation Ultra 0.12.2
 
 Raccolta SNES locale con interfaccia adattabile al PC e viste estese sperimentali. Snes9x emula le cartucce, incluso Super FX. Il progetto non dichiara di aver decompilato tutti i giochi.
 
-[Download e avvio dal desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.12.1) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
+[Download e avvio dal desktop](https://github.com/vhaloo/MarioCompilationUltra/releases/tag/v0.12.2) · [HTML](guide.html) · [GitHub](https://github.com/vhaloo/MarioCompilationUltra)
 
 ## Download e avvio dal desktop
 
@@ -87,7 +87,7 @@ La versione 0.8 adatta risoluzione dello scenario, griglia voxel, frequenza deco
 
 ## Telefoni e tablet Android
 
-[Telefoni e tablet Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Android-public.apk)
+[Telefoni e tablet Android](MOBILE.md) · [HTML](mobile.html) · [Android APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.2/MarioCompilationUltra-0.12.2-Android-public.apk)
 
 ## Vista orologio
 
@@ -95,7 +95,7 @@ La versione 0.8 adatta risoluzione dello scenario, griglia voxel, frequenza deco
 
 ## Quest VR / AR
 
-[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.1/MarioCompilationUltra-0.12.1-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
+[Quest ARM64 APK](https://github.com/vhaloo/MarioCompilationUltra/releases/download/v0.12.2/MarioCompilationUltra-0.12.2-Quest-public.apk) · [Quest VR / AR](XR.md) · [HTML](xr.html) · [Parity](../PARITY.md)
 
 ## Comandi
 
@@ -167,7 +167,7 @@ Scegli di nuovo la cartuccia se il file è stato spostato o l’unità scollegat
 
 ![Quest VR / AR](screenshots/6.png)
 
-## Pacchetti e verifica · 0.12.1
+## Pacchetti e verifica · 0.12.2
 
 La mappa completa mantiene visibile il terreno sotto la telecamera in movimento. Sul touchscreen fai scorrere il pollice da Y verso B per correre e saltare insieme. Le versioni Mac sono sperimentali. Il gioco su visore Quest e orologio fisico deve ancora essere verificato.
 

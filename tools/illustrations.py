@@ -2,7 +2,7 @@
 from pathlib import Path
 import json
 from html import escape
-from PIL import Image, ImageDraw
+from launcher_icon import write_icons
 
 ROOT = Path(__file__).resolve().parents[1]
 def main():
@@ -40,17 +40,7 @@ def main():
             svg += f'<text x="24" y="294" fill="#a8c5c9" font-size="18">Ctrl+{index+1} · {tr("Native camera")}</text></g>'
         svg += f'<text x="30" y="1091" fill="#b6cbd2" font-size="18">{tr("Known terrain")} / {tr("Unknown area")} · {tr("Player")} · {tr("Illustrative geometry; no Nintendo artwork")}</text></g></svg>'
         (output / 'views.svg').write_text(svg, encoding='utf8')
-    # The icon uses the same original shapes as the vector identity.
-    icon = Image.new('RGBA', (1024, 1024), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(icon)
-    draw.rounded_rectangle((30, 30, 994, 994), radius=190, fill='#142332')
-    draw.rounded_rectangle((157, 257, 867, 825), radius=42, outline='#5f8b93', width=14)
-    for box in [(235, 665, 365, 775), (415, 485, 545, 775), (595, 305, 725, 775)]:
-        draw.rounded_rectangle(box, radius=18, fill='#a0d1b6')
-    draw.ellipse((229, 339, 371, 481), fill='#ecd477')
-    icon.save(ROOT / 'assets/icon.png')
-    icon.save(ROOT / 'assets/icon.ico', sizes=[(16,16),(24,24),(32,32),(48,48),(64,64),(128,128),(256,256)])
-    icon.save(ROOT / 'assets/icon.icns')
+    write_icons()
     print('Ten original SVG identities, ten view diagrams and platform icons generated')
 if __name__ == '__main__':
     main()
